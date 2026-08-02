@@ -107,12 +107,18 @@
     return stateCache[code];
   }
 
-  /* Load a state plus its neighbours so border searches aren't cut in half. */
-  function loadRegion(code) {
+  /* Neighbouring states, so a search near a border isn't cut in half.
+   *
+   * Deliberately separate from loadState: Missouri touches eight states, and
+   * waiting on all nine files before showing anything would put megabytes
+   * between the visitor and their first result. Callers render the home state
+   * first and fold these in when they land. A neighbour that fails to load is
+   * dropped rather than failing the search. */
+  function loadNeighbors(code) {
     code = String(code).toUpperCase();
-    var codes = [code].concat(ADJACENT[code] || []);
+    var codes = ADJACENT[code] || [];
     return Promise.all(codes.map(function (c) {
-      return loadState(c).catch(function () { return []; });   // a missing neighbour shouldn't fail the search
+      return loadState(c).catch(function () { return []; });
     })).then(function (lists) {
       return Array.prototype.concat.apply([], lists);
     });
@@ -151,8 +157,16 @@
     return null;
   }
 
-  /* Fall back to the nearest state centroid when the geocoder gives us no state.
-   * Crude, but it only fires for results that landed outside a named state. */
+  /* Fall back to the nearest state centroid when the geocoder names no state.
+   *
+   * Returns null past MAX_FALLBACK_MILES. Centroids are crude -- El Paso is
+   * some 500 miles from the middle of Texas -- but Puerto Rico is 1,600 miles
+   * from the nearest one and Guam far beyond that, so the cutoff cleanly
+   * separates "geocoder was vague about a real state" from "this territory
+   * isn't in the dataset". Without it a search in San Juan would quietly return
+   * churches in Florida. */
+  var MAX_FALLBACK_MILES = 600;
+
   function nearestStateCode(lat, lon, index) {
     var best = null;
     var bestDistance = Infinity;
@@ -163,7 +177,7 @@
         best = state.code;
       }
     });
-    return best;
+    return bestDistance <= MAX_FALLBACK_MILES ? best : null;
   }
 
   function nominatim(path, params) {
@@ -223,7 +237,7 @@
   global.ChurchData = {
     loadIndex: loadIndex,
     loadState: loadState,
-    loadRegion: loadRegion,
+    loadNeighbors: loadNeighbors,
     haversine: haversine,
     geocode: geocode,
     reverseGeocode: reverseGeocode,

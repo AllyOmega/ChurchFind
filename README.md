@@ -37,10 +37,13 @@ too much to hand a visitor who wants to know what is down the road. So it is spl
 - `data/states/XX.json` is fetched only when a search actually lands in that state, then
   cached in memory for the session.
 
-Searching near a border pulls in the neighbouring states too, via an adjacency table in
-`assets/js/data.js`. Without it, someone searching from Kansas City would see half a
-city — the Missouri half, or the Kansas half, depending on which side of the line the
-geocoder put them.
+Searching near a border needs the neighbouring states too — without them, someone
+searching from Kansas City sees half a city, the Missouri half or the Kansas half
+depending on which side of the line the geocoder put them. But Missouri touches eight
+states, and blocking the first result on nine files is worse than the problem it solves.
+So the home state renders immediately and the neighbours, listed in an adjacency table in
+`assets/js/data.js`, fold in when they arrive. Each search carries a token so a slow load
+from an abandoned search cannot leak into the current one.
 
 Each state file stores churches as positional arrays rather than objects, with the column
 names given once in a `fields` key. Repeating sixteen key names across a hundred thousand

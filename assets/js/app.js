@@ -30,6 +30,10 @@
     sort: 'distance'
   };
 
+  // Bumped on every search so a slow neighbour load from an abandoned search
+  // cannot fold its results into the current one.
+  var searchToken = 0;
+
   var map = null;
   var mapUnavailable = false;
   var markerLayer = null;
@@ -283,13 +287,18 @@
 
   function loadAndShow(place, code, query) {
     if (!code) {
-      setStatus('That location does not look like it is inside a US state.', 'error');
+      setStatus('That location is outside the 50 states and DC, which is all this ' +
+                'dataset covers. US territories are not included.', 'error');
       return;
     }
     var stateName = stateNameFor(code);
-    setStatus('Loading churches in ' + stateName + ' and nearby states…');
+    setStatus('Loading churches in ' + stateName + '…');
 
-    ChurchData.loadRegion(code).then(function (churches) {
+    var token = ++searchToken;
+
+    ChurchData.loadState(code).then(function (churches) {
+      if (token !== searchToken) return;   // a newer search overtook this one
+
       state.mode = 'near';
       state.origin = { lat: place.lat, lon: place.lon, label: place.label || query, code: code };
       state.stateCode = code;
@@ -304,14 +313,26 @@
       updateUrl({ q: query || (place.lat.toFixed(4) + ',' + place.lon.toFixed(4)) });
       reveal();
       refresh(true);
+
+      // Then quietly widen the net. Somebody in Kansas City needs both sides of
+      // the state line, but they should not wait on eight files to see the
+      // first result.
+      ChurchData.loadNeighbors(code).then(function (extra) {
+        if (token !== searchToken || !extra.length) return;
+        state.pool = state.pool.concat(extra);
+        refresh();
+      });
     }).catch(function (error) {
-      setStatus(error.message, 'error');
+      if (token === searchToken) setStatus(error.message, 'error');
     });
   }
 
   function browseState(entry) {
     setStatus('Loading every church in ' + entry.name + '…');
+    var token = ++searchToken;
+
     ChurchData.loadState(entry.code).then(function (churches) {
+      if (token !== searchToken) return;
       state.mode = 'state';
       state.origin = { lat: entry.lat, lon: entry.lon, label: entry.name, code: entry.code };
       state.stateCode = entry.code;
@@ -326,7 +347,7 @@
       reveal();
       refresh(true);
     }).catch(function (error) {
-      setStatus(error.message, 'error');
+      if (token === searchToken) setStatus(error.message, 'error');
     });
   }
 

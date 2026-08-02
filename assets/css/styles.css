@@ -360,6 +360,9 @@ input[type="range"] { width: 100%; accent-color: var(--indigo); }
 .toast {
   position: fixed; left: 50%; bottom: 1.25rem; transform: translateX(-50%);
   z-index: 1000; max-width: min(90vw, 460px);
+  /* It floats over the bottom of the results column, where "Show more" lives --
+     it must never swallow a click meant for the button underneath. */
+  pointer-events: none;
   padding: .7rem 1rem;
   background: var(--ink); color: var(--paper);
   border-radius: var(--radius); box-shadow: var(--shadow);
