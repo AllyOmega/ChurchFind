@@ -127,6 +127,7 @@
       stateGrid: $('state-grid'),
       aboutStats: $('about-stats'),
       heroCount: $('hero-count'),
+      heroStates: $('hero-states'),
       colophon: $('colophon-meta'),
       toast: $('toast')
     };
@@ -188,6 +189,15 @@
   function renderIndexBits(index) {
     var total = index.totals.churches;
     dom.heroCount.textContent = formatNumber(total);
+
+    // Say what was actually scraped rather than a hardcoded "all 50 states" --
+    // a partial run should not be advertised as complete coverage.
+    var stateCount = index.states.length;
+    var hasDC = index.states.some(function (s) { return s.code === 'DC'; });
+    dom.heroStates.textContent = (stateCount === 51 && hasDC)
+      ? 'all 50 states and DC'
+      : formatNumber(hasDC ? stateCount - 1 : stateCount) +
+        (hasDC ? ' states and DC' : (stateCount === 1 ? ' state' : ' states'));
 
     dom.chips.textContent = '';
     Object.keys(index.families).forEach(function (family) {
