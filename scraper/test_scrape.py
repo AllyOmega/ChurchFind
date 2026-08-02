@@ -122,3 +122,58 @@ def test_states_are_listed_alphabetically_by_name(data_dir):
 
     names = [s["name"] for s in index["states"]]
     assert names == sorted(names)
+
+
+# ------------------------------------------------------------------- resilience
+
+def test_fetch_retries_any_transport_failure(monkeypatch):
+    """The scrape died two states into a 51-state run because
+    http.client.RemoteDisconnected is not a urllib.error.URLError and walked
+    past a hand-picked tuple of exception types. Anything the far end can throw
+    has to be retryable."""
+    import http.client
+
+    failures = [
+        http.client.RemoteDisconnected("closed without response"),
+        ConnectionResetError("reset by peer"),
+        http.client.IncompleteRead(b"half"),
+    ]
+    calls = {"n": 0}
+
+    def flaky(request, timeout=None):
+        calls["n"] += 1
+        if failures:
+            raise failures.pop(0)
+        raise AssertionError("should have stopped raising")
+
+    monkeypatch.setattr(scrape_churches.urllib.request, "urlopen", flaky)
+    monkeypatch.setattr(scrape_churches.time, "sleep", lambda _: None)
+
+    with pytest.raises(RuntimeError) as caught:
+        scrape_churches.fetch("CO")
+
+    # Every attempt was spent retrying rather than crashing out on the first one.
+    assert calls["n"] == scrape_churches.MAX_ATTEMPTS
+    assert "attempts failed for CO" in str(caught.value)
+
+
+def test_one_unfetchable_state_does_not_abandon_the_others(monkeypatch, data_dir, capsys):
+    """A state that cannot be fetched is a missing file, not a reason to stop."""
+    root, states = data_dir
+    write_fake_state(states, "CO", 2)
+
+    def explode(state_code):
+        raise OSError("the far end hung up")
+
+    monkeypatch.setattr(scrape_churches, "scrape_state", explode)
+    monkeypatch.setattr(scrape_churches.time, "sleep", lambda _: None)
+    monkeypatch.setattr(sys, "argv", ["scrape_churches.py", "--force", "--states", "UT", "WY"])
+
+    exit_code = scrape_churches.main()
+
+    assert exit_code == 1                       # non-zero: something was lost
+    output = capsys.readouterr().out
+    assert "UT" in output and "WY" in output    # both were attempted
+    # The state already on disk survived and the index still describes it.
+    index = json.loads((root / "index.json").read_text())
+    assert [s["code"] for s in index["states"]] == ["CO"]

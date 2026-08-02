@@ -85,7 +85,13 @@ def fetch(state_code):
         try:
             with urllib.request.urlopen(request, timeout=QUERY_TIMEOUT + 30) as response:
                 return json.loads(response.read().decode("utf-8", "replace"))
-        except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError, json.JSONDecodeError) as exc:
+        # Deliberately broad. This ran for two states out of 51 before a public
+        # server closed a connection mid-response and killed the whole job:
+        # http.client.RemoteDisconnected is not a URLError, so it walked straight
+        # past a hand-picked tuple of exception types. There is no failure a
+        # remote server can hand us that is worth abandoning 49 states over, and
+        # enumerating the ways a network can break is a game you lose slowly.
+        except Exception as exc:                            # noqa: BLE001
             last_error = exc
             if attempt == MAX_ATTEMPTS:
                 break
@@ -211,7 +217,9 @@ def main():
         started = time.time()
         try:
             churches, raw_count, osm_timestamp = scrape_state(state_code)
-        except RuntimeError as exc:
+        # A state that cannot be fetched is a missing file, not a reason to stop.
+        # The states already on disk stay valid and the run reports what it lost.
+        except Exception as exc:                            # noqa: BLE001
             print(f"    FAILED: {exc}", flush=True)
             failures.append(state_code)
             continue
