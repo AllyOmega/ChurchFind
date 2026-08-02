@@ -1,0 +1,802 @@
+{
+ "scores": {
+  "n356588897": {
+   "ceremonial": 0.592,
+   "confidence": 0.208,
+   "matched": [
+    "broad church",
+    "cassock",
+    "vestment"
+   ],
+   "source": "wikipedia",
+   "theology": 0.341
+  },
+  "n356878903": {
+   "ceremonial": 0.765,
+   "confidence": 0.321,
+   "matched": [
+    "benediction",
+    "blessed sacrament",
+    "choral evensong"
+   ],
+   "source": "wikipedia",
+   "theology": 0.732
+  },
+  "n357375193": {
+   "ceremonial": 0.5,
+   "confidence": 0.101,
+   "matched": [
+    "book of common prayer",
+    "processional"
+   ],
+   "source": "wikipedia",
+   "theology": 0.056
+  },
+  "n359282949": {
+   "ceremonial": -0.8,
+   "confidence": 0.068,
+   "matched": [
+    "informal"
+   ],
+   "source": "wikipedia",
+   "theology": -0.2
+  },
+  "n359286847": {
+   "ceremonial": 0.662,
+   "confidence": 0.45,
+   "matched": [
+    "anglican missal",
+    "anglo-catholic",
+    "low mass",
+    "traditional language"
+   ],
+   "source": "wikipedia",
+   "theology": 0.787
+  },
+  "n7199395668": {
+   "ceremonial": -0.9,
+   "confidence": 0.141,
+   "matched": [
+    "low church"
+   ],
+   "source": "wikipedia",
+   "theology": -0.7
+  },
+  "r18539487": {
+   "ceremonial": 0.5,
+   "confidence": 0.056,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "wikipedia",
+   "theology": 0.1
+  },
+  "r21046165": {
+   "ceremonial": 0.9,
+   "confidence": 0.084,
+   "matched": [
+    "cope"
+   ],
+   "source": "wikipedia",
+   "theology": 0.6
+  },
+  "r2682714": {
+   "ceremonial": 0.285,
+   "confidence": 0.377,
+   "matched": [
+    "book of common prayer",
+    "contemporary worship",
+    "cope",
+    "evensong",
+    "requiem"
+   ],
+   "source": "wikipedia",
+   "theology": 0.167
+  },
+  "r3573490": {
+   "ceremonial": 0.7,
+   "confidence": 0.169,
+   "matched": [
+    "anglo-catholic"
+   ],
+   "source": "wikipedia",
+   "theology": 1.0
+  },
+  "r383495": {
+   "ceremonial": -0.133,
+   "confidence": 0.152,
+   "matched": [
+    "confession",
+    "informal"
+   ],
+   "source": "wikipedia",
+   "theology": 0.3
+  },
+  "r6112760": {
+   "ceremonial": 0.62,
+   "confidence": 0.113,
+   "matched": [
+    "procession",
+    "vestment"
+   ],
+   "source": "wikipedia",
+   "theology": 0.18
+  },
+  "r64066": {
+   "ceremonial": 0.3,
+   "confidence": 0.293,
+   "matched": [
+    "book of common prayer",
+    "broad church",
+    "charismatic",
+    "compline",
+    "evensong"
+   ],
+   "source": "wikipedia",
+   "theology": 0.062
+  },
+  "w105530705": {
+   "ceremonial": 0.5,
+   "confidence": 0.056,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "wikipedia",
+   "theology": 0.1
+  },
+  "w108707359": {
+   "ceremonial": 0.4,
+   "confidence": 0.113,
+   "matched": [
+    "our lady of"
+   ],
+   "source": "wikipedia",
+   "theology": 0.9
+  },
+  "w1134442749": {
+   "ceremonial": 0.9,
+   "confidence": 0.141,
+   "matched": [
+    "high church"
+   ],
+   "source": "wikipedia",
+   "theology": 0.6
+  },
+  "w114919326": {
+   "ceremonial": 0.609,
+   "confidence": 0.309,
+   "matched": [
+    "anglo-catholic",
+    "catholic tradition"
+   ],
+   "source": "wikipedia",
+   "theology": 0.955
+  },
+  "w118861660": {
+   "ceremonial": 0.5,
+   "confidence": 0.045,
+   "matched": [
+    "processional"
+   ],
+   "source": "wikipedia",
+   "theology": 0.0
+  },
+  "w1222263061": {
+   "ceremonial": -0.2,
+   "confidence": 0.225,
+   "matched": [
+    "reformed episcopal"
+   ],
+   "source": "wikipedia",
+   "theology": -0.85
+  },
+  "w141129259": {
+   "ceremonial": 0.717,
+   "confidence": 0.45,
+   "matched": [
+    "anglo-catholic",
+    "catholic tradition",
+    "compline",
+    "high mass"
+   ],
+   "source": "wikipedia",
+   "theology": 0.867
+  },
+  "w145219392": {
+   "ceremonial": 0.747,
+   "confidence": 0.45,
+   "matched": [
+    "anglo-catholic",
+    "book of common prayer",
+    "evensong",
+    "high church",
+    "high mass",
+    "rosary"
+   ],
+   "source": "wikipedia",
+   "theology": 0.719
+  },
+  "w160947235": {
+   "ceremonial": 0.5,
+   "confidence": 0.056,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "wikipedia",
+   "theology": 0.1
+  },
+  "w164655923": {
+   "ceremonial": 0.7,
+   "confidence": 0.169,
+   "matched": [
+    "anglo-catholic"
+   ],
+   "source": "wikipedia",
+   "theology": 1.0
+  },
+  "w170954640": {
+   "ceremonial": 0.418,
+   "confidence": 0.45,
+   "matched": [
+    "acolyte",
+    "adoration",
+    "anglo-catholic",
+    "high church",
+    "low church",
+    "vestment"
+   ],
+   "source": "wikipedia",
+   "theology": 0.425
+  },
+  "w177187138": {
+   "ceremonial": 0.7,
+   "confidence": 0.45,
+   "matched": [
+    "anglo-catholic",
+    "catholic tradition",
+    "high church"
+   ],
+   "source": "wikipedia",
+   "theology": 0.844
+  },
+  "w179008394": {
+   "ceremonial": 0.65,
+   "confidence": 0.225,
+   "matched": [
+    "anglo-catholic",
+    "book of common prayer"
+   ],
+   "source": "wikipedia",
+   "theology": 0.775
+  },
+  "w187564921": {
+   "ceremonial": 0.5,
+   "confidence": 0.056,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "wikipedia",
+   "theology": 0.1
+  },
+  "w205489653": {
+   "ceremonial": 0.6,
+   "confidence": 0.056,
+   "matched": [
+    "compline"
+   ],
+   "source": "wikipedia",
+   "theology": 0.3
+  },
+  "w209926099": {
+   "ceremonial": -0.643,
+   "confidence": 0.197,
+   "matched": [
+    "broad church",
+    "low church"
+   ],
+   "source": "wikipedia",
+   "theology": -0.5
+  },
+  "w231789318": {
+   "ceremonial": 0.9,
+   "confidence": 0.141,
+   "matched": [
+    "high church"
+   ],
+   "source": "wikipedia",
+   "theology": 0.6
+  },
+  "w236141921": {
+   "ceremonial": -0.2,
+   "confidence": 0.225,
+   "matched": [
+    "reformed episcopal"
+   ],
+   "source": "wikipedia",
+   "theology": -0.85
+  },
+  "w241832522": {
+   "ceremonial": 0.609,
+   "confidence": 0.309,
+   "matched": [
+    "anglo-catholic",
+    "catholic tradition"
+   ],
+   "source": "wikipedia",
+   "theology": 0.955
+  },
+  "w241834025": {
+   "ceremonial": 0.7,
+   "confidence": 0.169,
+   "matched": [
+    "anglo-catholic"
+   ],
+   "source": "wikipedia",
+   "theology": 1.0
+  },
+  "w249666372": {
+   "ceremonial": 0.8,
+   "confidence": 0.068,
+   "matched": [
+    "choral evensong"
+   ],
+   "source": "wikipedia",
+   "theology": 0.1
+  },
+  "w264752147": {
+   "ceremonial": -0.5,
+   "confidence": 0.141,
+   "matched": [
+    "evangelical"
+   ],
+   "source": "wikipedia",
+   "theology": -0.9
+  },
+  "w266170537": {
+   "ceremonial": 0.806,
+   "confidence": 0.45,
+   "matched": [
+    "anglo-catholic",
+    "benediction",
+    "catholic tradition",
+    "evensong",
+    "high church",
+    "high mass",
+    "incense"
+   ],
+   "source": "wikipedia",
+   "theology": 0.764
+  },
+  "w266894275": {
+   "ceremonial": 0.5,
+   "confidence": 0.056,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "wikipedia",
+   "theology": 0.1
+  },
+  "w266894428": {
+   "ceremonial": 0.666,
+   "confidence": 0.45,
+   "matched": [
+    "anglo-catholic",
+    "catholic tradition",
+    "english missal",
+    "solemn mass",
+    "sung mass",
+    "the mass",
+    "traditional language"
+   ],
+   "source": "wikipedia",
+   "theology": 0.817
+  },
+  "w269318057": {
+   "ceremonial": -0.5,
+   "confidence": 0.124,
+   "matched": [
+    "renewal",
+    "small group"
+   ],
+   "source": "wikipedia",
+   "theology": -0.309
+  },
+  "w270948862": {
+   "ceremonial": 0.696,
+   "confidence": 0.45,
+   "matched": [
+    "angelus",
+    "anglican missal",
+    "anglo-catholic",
+    "book of common prayer",
+    "confession",
+    "gregorian chant",
+    "stations of the cross"
+   ],
+   "source": "wikipedia",
+   "theology": 0.754
+  },
+  "w278039453": {
+   "ceremonial": 0.638,
+   "confidence": 0.366,
+   "matched": [
+    "book of common prayer",
+    "compline",
+    "high church",
+    "our lady of"
+   ],
+   "source": "wikipedia",
+   "theology": 0.569
+  },
+  "w278346592": {
+   "ceremonial": 0.682,
+   "confidence": 0.45,
+   "matched": [
+    "acolyte",
+    "angelus",
+    "anglo-catholic",
+    "bcp",
+    "confession",
+    "evensong",
+    "high mass",
+    "incense",
+    "low mass",
+    "matins",
+    "our lady of",
+    "procession"
+   ],
+   "source": "wikipedia",
+   "theology": 0.627
+  },
+  "w296277803": {
+   "ceremonial": 0.8,
+   "confidence": 0.068,
+   "matched": [
+    "choral evensong"
+   ],
+   "source": "wikipedia",
+   "theology": 0.1
+  },
+  "w308123671": {
+   "ceremonial": 0.0,
+   "confidence": 0.113,
+   "matched": [
+    "book of common prayer",
+    "renewal"
+   ],
+   "source": "wikipedia",
+   "theology": -0.05
+  },
+  "w327006059": {
+   "ceremonial": 0.5,
+   "confidence": 0.056,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "wikipedia",
+   "theology": 0.1
+  },
+  "w32946942": {
+   "ceremonial": 0.55,
+   "confidence": 0.225,
+   "matched": [
+    "adoration",
+    "our lady of"
+   ],
+   "source": "wikipedia",
+   "theology": 0.9
+  },
+  "w332757057": {
+   "ceremonial": 0.5,
+   "confidence": 0.056,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "wikipedia",
+   "theology": 0.1
+  },
+  "w332974947": {
+   "ceremonial": 0.521,
+   "confidence": 0.45,
+   "matched": [
+    "anglo-catholic",
+    "blessed sacrament",
+    "book of common prayer",
+    "confession",
+    "english missal",
+    "genuflect",
+    "high church",
+    "high mass",
+    "low church",
+    "low mass",
+    "our lady of",
+    "the mass"
+   ],
+   "source": "wikipedia",
+   "theology": 0.612
+  },
+  "w334179780": {
+   "ceremonial": 0.262,
+   "confidence": 0.45,
+   "matched": [
+    "anglo-catholic",
+    "high church",
+    "low church"
+   ],
+   "source": "wikipedia",
+   "theology": 0.344
+  },
+  "w337523884": {
+   "ceremonial": 0.387,
+   "confidence": 0.45,
+   "matched": [
+    "anglo-catholic",
+    "evangelical",
+    "high church"
+   ],
+   "source": "wikipedia",
+   "theology": 0.281
+  },
+  "w342277775": {
+   "ceremonial": 0.502,
+   "confidence": 0.45,
+   "matched": [
+    "anglo-catholic",
+    "benediction",
+    "book of common prayer",
+    "catholic tradition",
+    "informal",
+    "procession",
+    "vestment"
+   ],
+   "source": "wikipedia",
+   "theology": 0.633
+  },
+  "w370278549": {
+   "ceremonial": 0.7,
+   "confidence": 0.135,
+   "matched": [
+    "acolyte",
+    "vestment"
+   ],
+   "source": "wikipedia",
+   "theology": 0.3
+  },
+  "w396127724": {
+   "ceremonial": 0.7,
+   "confidence": 0.169,
+   "matched": [
+    "anglo-catholic"
+   ],
+   "source": "wikipedia",
+   "theology": 1.0
+  },
+  "w404144744": {
+   "ceremonial": 0.776,
+   "confidence": 0.45,
+   "matched": [
+    "anglo-catholic",
+    "cope",
+    "high church",
+    "stations of the cross"
+   ],
+   "source": "wikipedia",
+   "theology": 0.759
+  },
+  "w413726299": {
+   "ceremonial": 0.5,
+   "confidence": 0.056,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "wikipedia",
+   "theology": 0.1
+  },
+  "w439092463": {
+   "ceremonial": -0.8,
+   "confidence": 0.068,
+   "matched": [
+    "casual"
+   ],
+   "source": "wikipedia",
+   "theology": -0.2
+  },
+  "w444202400": {
+   "ceremonial": -0.1,
+   "confidence": 0.084,
+   "matched": [
+    "39 articles"
+   ],
+   "source": "wikipedia",
+   "theology": -0.7
+  },
+  "w446621113": {
+   "ceremonial": -0.2,
+   "confidence": 0.225,
+   "matched": [
+    "reformed episcopal"
+   ],
+   "source": "wikipedia",
+   "theology": -0.85
+  },
+  "w528006851": {
+   "ceremonial": 0.5,
+   "confidence": 0.056,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "wikipedia",
+   "theology": 0.1
+  },
+  "w544480953": {
+   "ceremonial": 0.611,
+   "confidence": 0.253,
+   "matched": [
+    "book of common prayer",
+    "broad church",
+    "high church"
+   ],
+   "source": "wikipedia",
+   "theology": 0.356
+  },
+  "w54677516": {
+   "ceremonial": -0.214,
+   "confidence": 0.197,
+   "matched": [
+    "book of common prayer",
+    "evangelical"
+   ],
+   "source": "wikipedia",
+   "theology": -0.614
+  },
+  "w55332523": {
+   "ceremonial": 0.5,
+   "confidence": 0.056,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "wikipedia",
+   "theology": 0.1
+  },
+  "w560132872": {
+   "ceremonial": -0.5,
+   "confidence": 0.068,
+   "matched": [
+    "small group"
+   ],
+   "source": "wikipedia",
+   "theology": -0.4
+  },
+  "w589705045": {
+   "ceremonial": 0.528,
+   "confidence": 0.45,
+   "matched": [
+    "book of common prayer",
+    "casual",
+    "chrism",
+    "daily mass",
+    "evensong",
+    "incense",
+    "plainsong",
+    "sung mass",
+    "traditional language"
+   ],
+   "source": "wikipedia",
+   "theology": 0.41
+  },
+  "w66811710": {
+   "ceremonial": 0.6,
+   "confidence": 0.056,
+   "matched": [
+    "compline"
+   ],
+   "source": "wikipedia",
+   "theology": 0.3
+  },
+  "w684874918": {
+   "ceremonial": 0.7,
+   "confidence": 0.068,
+   "matched": [
+    "acolyte"
+   ],
+   "source": "wikipedia",
+   "theology": 0.3
+  },
+  "w69118027": {
+   "ceremonial": 0.7,
+   "confidence": 0.169,
+   "matched": [
+    "anglican missal",
+    "book of common prayer"
+   ],
+   "source": "wikipedia",
+   "theology": 0.567
+  },
+  "w696673999": {
+   "ceremonial": 0.7,
+   "confidence": 0.169,
+   "matched": [
+    "anglo-catholic"
+   ],
+   "source": "wikipedia",
+   "theology": 1.0
+  },
+  "w702960935": {
+   "ceremonial": 0.9,
+   "confidence": 0.084,
+   "matched": [
+    "plainsong"
+   ],
+   "source": "wikipedia",
+   "theology": 0.5
+  },
+  "w708127935": {
+   "ceremonial": 0.7,
+   "confidence": 0.113,
+   "matched": [
+    "blessed sacrament"
+   ],
+   "source": "wikipedia",
+   "theology": 0.9
+  },
+  "w733127321": {
+   "ceremonial": 0.15,
+   "confidence": 0.135,
+   "matched": [
+    "evensong",
+    "small group"
+   ],
+   "source": "wikipedia",
+   "theology": -0.15
+  },
+  "w765465371": {
+   "ceremonial": 0.791,
+   "confidence": 0.309,
+   "matched": [
+    "anglo-catholic",
+    "high church"
+   ],
+   "source": "wikipedia",
+   "theology": 0.818
+  },
+  "w769394823": {
+   "ceremonial": 0.5,
+   "confidence": 0.056,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "wikipedia",
+   "theology": 0.1
+  },
+  "w80670446": {
+   "ceremonial": 0.9,
+   "confidence": 0.141,
+   "matched": [
+    "high church"
+   ],
+   "source": "wikipedia",
+   "theology": 0.6
+  },
+  "w84515804": {
+   "ceremonial": 0.5,
+   "confidence": 0.056,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "wikipedia",
+   "theology": 0.1
+  },
+  "w93407561": {
+   "ceremonial": 0.565,
+   "confidence": 0.433,
+   "matched": [
+    "anglo-catholic",
+    "compline",
+    "high church",
+    "small group"
+   ],
+   "source": "wikipedia",
+   "theology": 0.561
+  }
+ }
+}

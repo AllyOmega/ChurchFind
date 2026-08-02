@@ -178,11 +178,23 @@ def cache_path(church_id):
 
 
 def gather(church_id, url, refresh=False):
-    """Fetch and score one parish. Returns a record, using the cache if allowed."""
+    """Fetch and score one parish. Returns a record, using the cache if allowed.
+
+    A cached entry that kept the page text is rescored rather than reused.
+    Fetching is the expensive, externally visible part; scoring is free and the
+    lexicon changes, so a lexicon fix should never mean re-crawling other
+    people's servers. Entries written before the text was cached still carry
+    their old score and are left alone until a --refresh.
+    """
     path = cache_path(church_id)
     if path.exists() and not refresh:
         try:
-            return json.loads(path.read_text())
+            record = json.loads(path.read_text())
+            if record.get("text"):
+                result = churchmanship.score(record["text"], source="website")
+                record["score"] = result
+                record["status"] = "scored" if result else "no-signal"
+            return record
         except json.JSONDecodeError:
             pass
 
@@ -203,9 +215,11 @@ def gather(church_id, url, refresh=False):
                     time.sleep(extra_delay)
                     if more:
                         text = text + " " + more
-            result = churchmanship.score(text)
+            result = churchmanship.score(text, source="website")
             record = {"id": church_id, "url": url,
                       "status": "scored" if result else "no-signal",
+                      # Kept so a lexicon change is a rescore, not a re-crawl.
+                      "text": text[:200_000],
                       "score": result}
 
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
