@@ -39,6 +39,11 @@
 
 * { box-sizing: border-box; }
 
+/* The UA rule for [hidden] is display:none, but any author `display` beats it --
+   .layout{display:grid} and .load-more{display:block} both did, so both showed
+   through their hidden attribute. This has to win over every layout rule below. */
+[hidden] { display: none !important; }
+
 body {
   margin: 0;
   background: var(--paper);
