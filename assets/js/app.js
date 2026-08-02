@@ -475,7 +475,10 @@
     });
   }
 
+  /* Returns '' when nothing but the state is known -- a card reading just "KS"
+     is worse than one that admits the address is missing. */
   function addressLine(church) {
+    if (!church.address && !church.city) return '';
     var parts = [church.address, church.city, church.state].filter(Boolean);
     if (church.postcode) parts.push(church.postcode);
     return parts.join(', ');

@@ -8,7 +8,48 @@ list with addresses, phone numbers, websites, service times and a map. No build 
 server, no API keys — the whole thing is HTML, CSS, one script, and a folder of JSON.
 
 <!-- STATS:BEGIN -->
-Run `python scraper/update_readme.py` to generate this section.
+
+**235,784 churches** across **50 states and DC**, from an OpenStreetMap snapshot taken **2026-08-02**.
+
+| | Count | Share |
+|---|---:|---:|
+| Has a street address | 70,740 | 30% |
+| Has a website | 26,452 | 11% |
+| Has a phone number | 22,180 | 9% |
+
+Denominational families, largest first:
+
+| Family | Churches | Share |
+|---|---:|---:|
+| Unspecified | 127,658 | 54.1% |
+| Baptist | 38,480 | 16.3% |
+| Methodist & Wesleyan | 15,591 | 6.6% |
+| Catholic | 13,945 | 5.9% |
+| Lutheran | 9,037 | 3.8% |
+| Restorationist | 8,693 | 3.7% |
+| Presbyterian & Reformed | 7,335 | 3.1% |
+| Pentecostal & Charismatic | 4,798 | 2.0% |
+| Other | 2,823 | 1.2% |
+| Anglican & Episcopal | 2,815 | 1.2% |
+| Non-denominational | 2,105 | 0.9% |
+| Orthodox | 1,711 | 0.7% |
+| Anabaptist & Peace Churches | 793 | 0.3% |
+
+Ten largest state files:
+
+| State | Churches |
+|---|---:|
+| Texas | 16,251 |
+| Georgia | 12,320 |
+| Alabama | 11,787 |
+| North Carolina | 11,675 |
+| California | 11,661 |
+| Tennessee | 10,340 |
+| Ohio | 9,809 |
+| Pennsylvania | 9,370 |
+| Virginia | 9,124 |
+| Illinois | 9,111 |
+
 <!-- STATS:END -->
 
 ## Running it

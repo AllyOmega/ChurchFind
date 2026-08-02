@@ -20,10 +20,17 @@ END = "<!-- STATS:END -->"
 def build_block(index):
     totals = index["totals"]
     total = totals["churches"]
+
+    # DC is an entry in `states` but is not a state, so it gets counted separately.
+    codes = {entry["code"] for entry in index["states"]}
+    has_dc = "DC" in codes
+    state_count = len(codes) - (1 if has_dc else 0)
+    coverage = f"{state_count} states" + (" and DC" if has_dc else "")
+
     lines = [
         BEGIN,
         "",
-        f"**{total:,} churches** across **{len(index['states'])} states and DC**, "
+        f"**{total:,} churches** across **{coverage}**, "
         f"from an OpenStreetMap snapshot taken **{(index.get('osm_snapshot') or '')[:10] or 'unknown'}**.",
         "",
         "| | Count | Share |",
@@ -42,7 +49,11 @@ def build_block(index):
     lines += ["", "Denominational families, largest first:", "",
               "| Family | Churches | Share |", "|---|---:|---:|"]
 
-    for info in index["families"].values():
+    # index.json orders these for the filter chips, which deliberately pushes
+    # the huge "Unspecified" bucket to the end. A reference table wants plain
+    # descending order instead.
+    families = sorted(index["families"].values(), key=lambda info: -info["count"])
+    for info in families:
         share = (info["count"] / total * 100) if total else 0
         lines.append(f"| {info['label']} | {info['count']:,} | {share:.1f}% |")
 
