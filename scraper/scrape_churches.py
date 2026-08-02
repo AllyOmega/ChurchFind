@@ -196,40 +196,63 @@ def main():
             parser.error(f"unknown state code(s): {', '.join(unknown)}")
         wanted = requested
 
-    summaries = []
-    totals = {"churches": 0, "with_website": 0, "with_phone": 0, "with_address": 0}
-    families = {}
-    denominations = {}
     failures = []
-    osm_timestamps = []
 
     for position, state_code in enumerate(wanted, start=1):
         prefix = f"[{position}/{len(wanted)}] {state_code} {STATE_NAMES[state_code]}"
 
-        cached = None if args.force else load_existing_summary(state_code)
-        if cached:
-            payload, churches = cached
+        if not args.force and load_existing_summary(state_code):
+            payload = json.loads((STATE_DIR / f"{state_code}.json").read_text())
             print(f"{prefix}: {payload['count']:,} churches (cached)", flush=True)
-            osm_timestamp = payload.get("osm_timestamp", "")
-        else:
-            print(f"{prefix}: fetching...", flush=True)
-            started = time.time()
-            try:
-                churches, raw_count, osm_timestamp = scrape_state(state_code)
-            except RuntimeError as exc:
-                print(f"    FAILED: {exc}", flush=True)
-                failures.append(state_code)
-                continue
-            write_state(state_code, churches, osm_timestamp)
-            elapsed = time.time() - started
-            dropped = raw_count - len(churches)
-            print(
-                f"    {len(churches):,} churches kept, {dropped:,} unnamed/duplicate "
-                f"dropped, {elapsed:.1f}s",
-                flush=True,
-            )
-            time.sleep(PAUSE_BETWEEN_STATES)
+            continue
 
+        print(f"{prefix}: fetching...", flush=True)
+        started = time.time()
+        try:
+            churches, raw_count, osm_timestamp = scrape_state(state_code)
+        except RuntimeError as exc:
+            print(f"    FAILED: {exc}", flush=True)
+            failures.append(state_code)
+            continue
+        write_state(state_code, churches, osm_timestamp)
+        elapsed = time.time() - started
+        dropped = raw_count - len(churches)
+        print(
+            f"    {len(churches):,} churches kept, {dropped:,} unnamed/duplicate "
+            f"dropped, {elapsed:.1f}s",
+            flush=True,
+        )
+        time.sleep(PAUSE_BETWEEN_STATES)
+
+    if failures:
+        print(f"\nStates that could not be fetched: {', '.join(failures)}", flush=True)
+
+    write_index()
+    return 1 if failures else 0
+
+
+def write_index():
+    """Rebuild data/index.json from every state file on disk.
+
+    Deliberately not limited to the states this run fetched. The index carries
+    national totals, the denomination lists behind both filter levels, and the
+    browse-by-state menu -- so building it from one run's states would leave a
+    `--states CO UT` invocation claiming the country holds two states' worth of
+    churches, and the site would silently lose the rest.
+    """
+    summaries = []
+    totals = {"churches": 0, "with_website": 0, "with_phone": 0, "with_address": 0}
+    families = {}
+    denominations = {}
+    osm_timestamps = []
+
+    for state_code, _ in STATES:
+        existing = load_existing_summary(state_code)
+        if not existing:
+            continue
+        payload, churches = existing
+
+        osm_timestamp = payload.get("osm_timestamp", "")
         if osm_timestamp:
             osm_timestamps.append(osm_timestamp)
 
@@ -258,9 +281,6 @@ def main():
             "lat": center[0],
             "lon": center[1],
         })
-
-    if failures:
-        print(f"\nStates that could not be fetched: {', '.join(failures)}", flush=True)
 
     summaries.sort(key=lambda s: s["name"])
     index = {
@@ -296,7 +316,6 @@ def main():
     print(f"  with website:        {totals['with_website']:,}")
     print(f"  with phone:          {totals['with_phone']:,}")
     print(f"Wrote {DATA_DIR / 'index.json'}")
-    return 1 if failures else 0
 
 
 if __name__ == "__main__":

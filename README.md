@@ -15,46 +15,46 @@ list of churches you care about. The page detects which it has and says so.
 
 <!-- STATS:BEGIN -->
 
-**235,784 churches** across **50 states and DC**, from an OpenStreetMap snapshot taken **2026-08-02**.
+**235,761 churches** across **50 states and DC**, from an OpenStreetMap snapshot taken **2026-08-02**.
 
 | | Count | Share |
 |---|---:|---:|
-| Has a street address | 70,740 | 30% |
-| Has a website | 26,452 | 11% |
-| Has a phone number | 22,180 | 9% |
+| Has a street address | 70,727 | 30% |
+| Has a website | 26,453 | 11% |
+| Has a phone number | 22,228 | 9% |
 
 Denominational families, largest first:
 
 | Family | Churches | Share |
 |---|---:|---:|
-| Unspecified | 127,658 | 54.1% |
-| Baptist | 38,480 | 16.3% |
-| Methodist & Wesleyan | 15,591 | 6.6% |
-| Catholic | 13,945 | 5.9% |
-| Lutheran | 9,037 | 3.8% |
-| Restorationist | 8,693 | 3.7% |
-| Presbyterian & Reformed | 7,335 | 3.1% |
-| Pentecostal & Charismatic | 4,798 | 2.0% |
-| Other | 2,823 | 1.2% |
-| Anglican & Episcopal | 2,815 | 1.2% |
-| Non-denominational | 2,105 | 0.9% |
-| Orthodox | 1,711 | 0.7% |
-| Anabaptist & Peace Churches | 793 | 0.3% |
+| Unspecified | 127,632 | 54.1% |
+| Baptist | 38,487 | 16.3% |
+| Methodist & Wesleyan | 15,587 | 6.6% |
+| Catholic | 13,954 | 5.9% |
+| Lutheran | 9,035 | 3.8% |
+| Restorationist | 8,688 | 3.7% |
+| Presbyterian & Reformed | 7,327 | 3.1% |
+| Pentecostal & Charismatic | 4,796 | 2.0% |
+| Other | 2,839 | 1.2% |
+| Anglican & Episcopal | 2,816 | 1.2% |
+| Non-denominational | 2,107 | 0.9% |
+| Orthodox | 1,705 | 0.7% |
+| Anabaptist & Peace Churches | 788 | 0.3% |
 
 Ten largest state files:
 
 | State | Churches |
 |---|---:|
 | Texas | 16,251 |
-| Georgia | 12,320 |
+| Georgia | 12,304 |
 | Alabama | 11,787 |
-| North Carolina | 11,675 |
-| California | 11,661 |
+| North Carolina | 11,689 |
+| California | 11,662 |
 | Tennessee | 10,340 |
-| Ohio | 9,809 |
-| Pennsylvania | 9,370 |
-| Virginia | 9,124 |
-| Illinois | 9,111 |
+| Ohio | 9,794 |
+| Pennsylvania | 9,321 |
+| Illinois | 9,131 |
+| Virginia | 9,129 |
 
 <!-- STATS:END -->
 
@@ -80,7 +80,7 @@ Pages copies the tree verbatim instead of running it through Jekyll. Any other s
 host works the same; there is nothing to build.
 
 What you get is the static half: search, both denomination filters, service times,
-radius, the map, and browse-by-state, over all 235,784 churches. What you do not get is
+radius, the map, and browse-by-state, over all 235,761 churches. What you do not get is
 anything that needs the API — accounts, saved churches, correction reports, reviews and
 churchmanship voting all require the server. The page detects this at boot and says so
 in a banner rather than leaving you to wonder where the sign-in button went.
@@ -129,7 +129,7 @@ So the home state renders immediately and the neighbours, listed in an adjacency
 from an abandoned search cannot leak into the current one.
 
 Each state file stores churches as positional arrays rather than objects, with the column
-names given once in a `fields` key. Repeating sixteen key names across a hundred thousand
+names given once in a `fields` key. Repeating nineteen key names across a hundred thousand
 records costs several megabytes for nothing; the site expands rows back into objects on
 load.
 
@@ -139,11 +139,11 @@ load.
   "count": 1990,
   "fields": ["id", "name", "denomination", "family", "address", "city", "state",
              "postcode", "lat", "lon", "website", "phone", "email", "services",
-             "hours", "wheelchair"],
+             "hours", "wheelchair", "hearing_loop", "toilets_wheelchair", "updated"],
   "churches": [
     ["n358950246", "Antioch Baptist Church", "Baptist", "baptist",
      "2500 Lafayette Street", "Denver", "CO", "80205", 39.753465, -104.970488,
-     "", "", "", "", "", ""]
+     "", "", "", "", "", "", "", "", "2026-05-14"]
   ]
 }
 ```
@@ -261,7 +261,7 @@ anyone's login or saved list.
 
 Two things make the query side worth having. `churches_geo` is an R\*Tree over the
 coordinates, so a radius search narrows to a bounding box before a single haversine runs;
-`churches_fts` is an FTS5 index over name, city and denomination. Across 235,783 rows on
+`churches_fts` is an FTS5 index over name, city and denomination. Across 235,761 rows on
 a laptop:
 
 | Query | Results | Time |
@@ -318,7 +318,7 @@ These are the parts worth arguing with, so here is the reasoning rather than a c
 - **A tight CSP**, with no `unsafe-inline` — every script and style is a file. The only
   cross-origin destinations allowed are OSM tiles and the geocoder.
 
-`server/test_api.py` covers this: 68 tests, including that the stored hash is not the
+`server/test_api.py` covers this: 77 tests, including that the stored hash is not the
 cookie, that a session cookie without the CSRF header is refused, that two users cannot
 see each other's saved churches, that `'; DROP TABLE churches; --` and five other hostile
 strings leave the table standing, and that an expired cookie cannot be replayed.
@@ -607,6 +607,7 @@ scraper/service_times.py       OSM opening_hours -> searchable (day, time) pairs
 scraper/churchmanship.py       the two-axis Anglican scorer and the vote blend
 scraper/fetch_sites.py         robots-respecting fetch of Anglican parish websites
 scraper/validate.py            consistency checks over data/
+scraper/test_scrape.py         5 tests over index bookkeeping
 scraper/update_readme.py       regenerates the stats block in this file
 server/schema.sql              the database, churches and accounts
 server/db.py                   connections, pragmas, haversine as a SQL function
