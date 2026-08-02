@@ -45,8 +45,6 @@
   var mapUnavailable = false;
   var markerLayer = null;
   var markersById = {};
-  var tileFailures = 0;
-  var tilesLoaded = 0;
 
   var dom = {};
 
@@ -128,7 +126,8 @@
       stateGrid: $('state-grid'), aboutStats: $('about-stats'),
       heroCount: $('hero-count'), heroStates: $('hero-states'),
       colophon: $('colophon-meta'), toast: $('toast'),
-      account: $('account-area'), savedLink: $('saved-link'), modeNote: $('mode-note')
+      account: $('account-area'), savedLink: $('saved-link'),
+      queueLink: $('queue-link'), modeNote: $('mode-note')
     };
 
     bindEvents();
@@ -197,6 +196,10 @@
     dom.savedLink.addEventListener('click', function (event) {
       event.preventDefault();
       showSaved();
+    });
+    dom.queueLink.addEventListener('click', function (event) {
+      event.preventDefault();
+      ChurchReviews.openQueue();
     });
   }
 
@@ -341,10 +344,12 @@
       dom.account.appendChild(signIn);
       dom.account.appendChild(signUp);
       dom.savedLink.hidden = true;
+      dom.queueLink.hidden = true;
       return;
     }
 
     dom.savedLink.hidden = false;
+    dom.queueLink.hidden = !user.isModerator;
     var who = el('span', { class: 'account-who', text: user.displayName || user.email });
     var out = el('button', { type: 'button', class: 'link-btn', text: 'Sign out' });
     out.addEventListener('click', function () {
@@ -741,6 +746,15 @@
     var save = saveButton(church);
     if (save) actions.push(save);
 
+    if (ChurchAccount.available()) {
+      var reviews = el('button', {
+        type: 'button', class: 'action',
+        'aria-label': 'Reviews of ' + church.name, text: 'Reviews'
+      });
+      reviews.addEventListener('click', function () { ChurchReviews.open(church); });
+      actions.push(reviews);
+    }
+
     var meta = [];
     if (church.service_text || church.services) {
       meta.push(el('p', { class: 'services',
@@ -816,21 +830,32 @@
 
       // Without this the basemap just stays grey and nobody can tell whether the
       // tile host is blocked, the URL is wrong, or there is simply no data there.
-      layer.on('tileerror', function () {
-        tileFailures++;
-        if (!tilesLoaded && tileFailures >= 3) showTileWarning();
-      });
-      layer.on('tileload', function () {
-        tilesLoaded++;
-        hideTileWarning();
-      });
-
+      // Counting tileerror events alone proved unreliable -- a single spurious
+      // tileload suppressed the warning permanently -- so the authority is
+      // whether any tile has actually painted, checked once the network has had
+      // time to answer.
+      layer.on('tileload', hideTileWarning);
       layer.addTo(map);
+      setTimeout(checkTilesPainted, 6000);
       markerLayer = L.layerGroup().addTo(map);
       map.setView([39.5, -98.35], 4);
     } catch (error) {
       disableMap();
     }
+  }
+
+  /* Authoritative test: has any tile image actually decoded? A request that
+     404s, is blocked by an extension, or is refused by the tile host all end up
+     the same way here -- an <img> with no pixels. */
+  function checkTilesPainted() {
+    if (!map) return;
+    var tiles = document.querySelectorAll('#map img.leaflet-tile');
+    if (!tiles.length) return;
+    var painted = Array.prototype.some.call(tiles, function (img) {
+      return img.complete && img.naturalWidth > 0;
+    });
+    if (painted) hideTileWarning();
+    else showTileWarning();
   }
 
   /* The markers are still positioned correctly relative to each other, so the

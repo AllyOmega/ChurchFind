@@ -495,3 +495,44 @@ input[type="range"] { width: 100%; accent-color: var(--indigo); }
 .stale {
   margin: .3rem 0 0; font-size: .8rem; color: var(--ink-faint); font-style: italic;
 }
+
+/* ---------------------------------------------------------------- reviews */
+
+.review-dialog {
+  width: min(94vw, 560px); max-height: 85vh; overflow-y: auto;
+  padding: 1.5rem; color: var(--ink); background: var(--card);
+  border: 1px solid var(--rule); border-radius: var(--radius);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .28);
+}
+.review-dialog::backdrop { background: rgba(20, 22, 28, .55); }
+.review-title { font-size: 1.2rem; margin-bottom: .3rem; }
+.review-summary { margin: 0 0 1rem; font-size: .9rem; color: var(--ink-soft); }
+
+.review {
+  padding: .8rem 0; border-top: 1px solid var(--rule);
+}
+.review.is-mine { border-left: 3px solid var(--gold); padding-left: .8rem; }
+.review-head { display: flex; align-items: baseline; gap: .6rem; margin-bottom: .3rem; }
+.review-stars { color: var(--gold); letter-spacing: .05em; }
+.review-author { font-size: .84rem; color: var(--ink-soft); }
+.review-body { margin: 0; font-size: .92rem; white-space: pre-wrap; }
+.review-status { margin: .35rem 0 0; font-size: .8rem; color: var(--ink-faint); font-style: italic; }
+.review-verdict {
+  margin: .4rem 0 .5rem; padding: .4rem .6rem;
+  font-size: .8rem; color: var(--ink-soft);
+  background: color-mix(in srgb, var(--indigo) 7%, transparent);
+  border-radius: 6px;
+}
+.review-decide { margin-right: .4rem; }
+
+.review-compose { margin-top: 1.2rem; padding-top: 1rem; border-top: 1px solid var(--rule); }
+.review-form { display: flex; flex-direction: column; gap: .35rem; }
+.review-form label { font-size: .85rem; font-weight: 600; color: var(--ink-soft); margin-top: .5rem; }
+.review-form select, .review-form textarea {
+  font: inherit; font-size: .92rem; padding: .5rem .6rem;
+  color: var(--ink); background: var(--paper);
+  border: 1px solid var(--rule); border-radius: 8px; resize: vertical;
+}
+.review-form select:focus-visible, .review-form textarea:focus-visible {
+  outline: 2px solid var(--indigo); outline-offset: 1px;
+}

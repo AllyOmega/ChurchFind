@@ -134,6 +134,8 @@
         denominations: body.denominations,
         states: body.states,
         tiles: body.tiles,
+        servicePeriods: body.servicePeriods,
+        withServiceTimes: body.withServiceTimes,
         dataset: body.dataset || {}
       };
     });

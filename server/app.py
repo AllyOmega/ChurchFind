@@ -139,8 +139,8 @@ def current_user(session=Depends(current_session)):
     if session is None:
         return None
     row = db().execute(
-        "SELECT id, email, display_name, created_at, home_lat, home_lon, home_label, is_active "
-        "FROM users WHERE id = ?", (session["user_id"],)
+        "SELECT id, email, display_name, created_at, home_lat, home_lon, home_label, "
+        "is_active, is_moderator FROM users WHERE id = ?", (session["user_id"],)
     ).fetchone()
     if row is None or not row["is_active"]:
         return None
@@ -174,6 +174,7 @@ def public_user(user):
         "email": user["email"],
         "displayName": user["display_name"],
         "createdAt": user["created_at"],
+        "isModerator": bool(user.get("is_moderator")),
         "home": (
             {"lat": user["home_lat"], "lon": user["home_lon"], "label": user["home_label"]}
             if user["home_lat"] is not None else None
@@ -359,8 +360,8 @@ def register(payload: Credentials, request: Request, response: Response):
 
     set_session_cookies(response, raw_token, raw_csrf)
     user = connection.execute(
-        "SELECT id, email, display_name, created_at, home_lat, home_lon, home_label, is_active "
-        "FROM users WHERE id = ?", (user_id,)
+        "SELECT id, email, display_name, created_at, home_lat, home_lon, home_label, "
+        "is_active, is_moderator FROM users WHERE id = ?", (user_id,)
     ).fetchone()
     return {"user": public_user(dict(user))}
 
@@ -417,8 +418,8 @@ def login(payload: Credentials, request: Request, response: Response):
 
     set_session_cookies(response, raw_token, raw_csrf)
     user = connection.execute(
-        "SELECT id, email, display_name, created_at, home_lat, home_lon, home_label, is_active "
-        "FROM users WHERE id = ?", (row["id"],)
+        "SELECT id, email, display_name, created_at, home_lat, home_lon, home_label, "
+        "is_active, is_moderator FROM users WHERE id = ?", (row["id"],)
     ).fetchone()
     return {"user": public_user(dict(user))}
 
