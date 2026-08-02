@@ -46,7 +46,7 @@ STATE_DIR = DATA_DIR / "states"
 FIELDS = [
     "id", "name", "denomination", "family", "address", "city", "state",
     "postcode", "lat", "lon", "website", "phone", "email", "services",
-    "hours", "wheelchair",
+    "hours", "wheelchair", "hearing_loop", "toilets_wheelchair", "updated",
 ]
 
 
@@ -55,7 +55,8 @@ def build_query(state_code):
 
     `nwr` covers nodes, ways and relations -- a church may be mapped as a point,
     a building outline, or a multipolygon. `out center` collapses the latter two
-    to a single coordinate.
+    to a single coordinate, and `meta` adds the last-edit timestamp, which is how
+    the site tells a record refreshed last month from one untouched since 2013.
     """
     return f"""
 [out:json][timeout:{QUERY_TIMEOUT}];
@@ -63,7 +64,7 @@ area["ISO3166-2"="US-{state_code}"][admin_level=4]->.state;
 (
   nwr["amenity"="place_of_worship"]["religion"="christian"](area.state);
 );
-out center tags;
+out center meta;
 """.strip()
 
 

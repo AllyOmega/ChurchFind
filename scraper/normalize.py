@@ -248,5 +248,12 @@ def normalize(element, state_code):
         "services": tags.get("service_times", "").strip(),
         "hours": tags.get("opening_hours", "").strip(),
         "wheelchair": tags.get("wheelchair", "").strip(),
+        # Accessibility beyond the wheelchair flag. These are real OSM tags that
+        # earlier versions of this scraper threw away.
+        "hearing_loop": tags.get("hearing_loop", "").strip(),
+        "toilets_wheelchair": tags.get("toilets:wheelchair", "").strip(),
+        # Last edit in OSM, so the site can mark records nobody has touched in
+        # years rather than presenting every row with equal confidence.
+        "updated": (element.get("timestamp") or "")[:10],
         "denomination_raw": tags.get("denomination", "").strip(),
     }

@@ -51,7 +51,7 @@ def client():
             "id", "name", "denomination", "family", "address", "city", "state",
             "postcode", "lat", "lon", "website", "phone", "email", "services",
             "hours", "wheelchair",
-        ])
+        ])   # later columns (accessibility, service times) default to empty
         connection.executemany(
             f"INSERT OR REPLACE INTO churches ({columns}) VALUES ({','.join('?' * 16)})",
             CHURCHES,
@@ -71,7 +71,8 @@ def client():
 def clean_accounts(client):
     """Every test starts with no users, sessions or throttle history."""
     connection = app_module._connection
-    for table in ("saved_churches", "correction_reports", "sessions", "auth_attempts", "users"):
+    for table in ("reviews", "saved_churches", "correction_reports", "sessions",
+                  "auth_attempts", "users"):
         connection.execute(f"DELETE FROM {table}")
     connection.commit()
     client.cookies.clear()
@@ -417,3 +418,230 @@ def test_security_headers_present(client):
     assert "default-src 'self'" in headers["content-security-policy"]
     assert headers["x-content-type-options"] == "nosniff"
     assert headers["x-frame-options"] == "DENY"
+
+
+# ------------------------------------------------------------------ schema drift
+
+def test_base_schema_and_migration_list_agree():
+    """A column added to the migration list but not to CREATE TABLE gives
+    upgraded databases a column that fresh installs lack -- which is exactly the
+    bug this test was written after hitting."""
+    import db as db_module
+
+    connection = app_module._connection
+    present = {row["name"] for row in connection.execute("PRAGMA table_info(churches)")}
+    for column, _ in db_module._ADDED_CHURCH_COLUMNS:
+        assert column in present, f"{column} is in the migration list but not in schema.sql"
+
+    user_columns = {row["name"] for row in connection.execute("PRAGMA table_info(users)")}
+    for column, _ in db_module._ADDED_USER_COLUMNS:
+        assert column in user_columns, f"{column} is in the migration list but not in schema.sql"
+
+
+def test_query_columns_all_exist():
+    """queries.CHURCH_COLUMNS is interpolated into SQL; every name must be real."""
+    import queries as queries_module
+
+    present = {row["name"] for row in
+               app_module._connection.execute("PRAGMA table_info(churches)")}
+    assert set(queries_module.CHURCH_COLUMNS) <= present
+
+
+# ---------------------------------------------------------------------- reviews
+
+@pytest.fixture
+def stub_moderation(monkeypatch):
+    """Replace the Claude call with a canned verdict. test_moderation.py covers
+    the classifier itself; these tests cover what the API does with its answer."""
+    import moderation as moderation_module
+
+    calls = []
+
+    def make(status):
+        def fake(body, church_name, rating, client=None):
+            calls.append({"body": body, "church": church_name, "rating": rating})
+            return {"status": status, "verdict": status, "categories": [],
+                    "reason": "stubbed", "confidence": "high",
+                    "model": "stub", "usage": None}
+        monkeypatch.setattr(moderation_module, "moderate", fake)
+        return calls
+    return make
+
+
+def post_review(client, status="approved", church="n1", body="A thoughtful review.", rating=4):
+    return client.post("/api/reviews", json={"church_id": church, "rating": rating, "body": body},
+                       headers={"X-CSRF-Token": csrf(client)})
+
+
+def test_approved_review_is_published(client, stub_moderation):
+    stub_moderation("approved")
+    register(client)
+    assert post_review(client).json()["status"] == "approved"
+
+    body = client.get("/api/churches/n1/reviews").json()
+    assert body["total"] == 1 and body["average"] == 4.0
+    assert body["results"][0]["body"] == "A thoughtful review."
+
+
+@pytest.mark.parametrize("status", ["pending", "escalated", "rejected"])
+def test_unapproved_reviews_are_invisible_to_everyone_else(client, stub_moderation, status):
+    stub_moderation(status)
+    register(client, email="author@example.org")
+    post_review(client, status)
+
+    # The author still sees their own, with its status -- "held for review" beats
+    # a review that silently vanishes.
+    own = client.get("/api/churches/n1/reviews").json()
+    assert own["total"] == 0                    # not counted as published
+    assert len(own["results"]) == 1 and own["results"][0]["mine"] is True
+
+    client.cookies.clear()
+    assert client.get("/api/churches/n1/reviews").json()["results"] == []
+
+    register(client, email="other@example.org")
+    assert client.get("/api/churches/n1/reviews").json()["results"] == []
+
+
+def test_moderation_failure_does_not_publish(client, monkeypatch):
+    """With no API key the real moderate() holds the review; it must not appear."""
+    import moderation as moderation_module
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    monkeypatch.delenv("ANTHROPIC_AUTH_TOKEN", raising=False)
+    assert moderation_module.available() is False
+
+    register(client)
+    assert post_review(client).json()["status"] == "pending"
+    client.cookies.clear()
+    assert client.get("/api/churches/n1/reviews").json()["total"] == 0
+
+
+def test_review_requires_sign_in_and_csrf(client, stub_moderation):
+    stub_moderation("approved")
+    assert client.post("/api/reviews", json={"church_id": "n1", "rating": 4, "body": "x"}).status_code == 401
+    register(client)
+    assert client.post("/api/reviews",
+                       json={"church_id": "n1", "rating": 4, "body": "x"}).status_code == 403
+
+
+@pytest.mark.parametrize("payload", [
+    {"church_id": "n1", "rating": 0, "body": "x"},
+    {"church_id": "n1", "rating": 6, "body": "x"},
+    {"church_id": "n1", "rating": 3, "body": ""},
+    {"church_id": "n1", "rating": 3, "body": "x" * 99999},
+])
+def test_invalid_reviews_rejected(client, stub_moderation, payload):
+    stub_moderation("approved")
+    register(client)
+    assert client.post("/api/reviews", json=payload,
+                       headers={"X-CSRF-Token": csrf(client)}).status_code == 422
+
+
+def test_review_of_unknown_church_404s(client, stub_moderation):
+    stub_moderation("approved")
+    register(client)
+    assert post_review(client, church="nope").status_code == 404
+
+
+def test_second_review_replaces_the_first_and_is_re_moderated(client, stub_moderation):
+    calls = stub_moderation("approved")
+    register(client)
+    post_review(client, body="First take.")
+    post_review(client, body="Changed my mind.")
+
+    body = client.get("/api/churches/n1/reviews").json()
+    assert body["total"] == 1                      # one per user per church
+    assert body["results"][0]["body"] == "Changed my mind."
+    assert len(calls) == 2                          # the edit went through moderation too
+
+
+def test_author_can_delete_their_own_review_but_not_anothers(client, stub_moderation):
+    stub_moderation("approved")
+    register(client, email="first@example.org")
+    post_review(client)
+    review_id = client.get("/api/churches/n1/reviews").json()["results"][0]["id"]
+
+    client.cookies.clear()
+    register(client, email="second@example.org")
+    assert client.delete(f"/api/reviews/{review_id}",
+                         headers={"X-CSRF-Token": csrf(client)}).status_code == 404
+
+    client.cookies.clear()
+    client.post("/api/auth/login", json={"email": "first@example.org", "password": GOOD_PASSWORD})
+    assert client.delete(f"/api/reviews/{review_id}",
+                         headers={"X-CSRF-Token": csrf(client)}).status_code == 200
+    assert client.get("/api/churches/n1/reviews").json()["total"] == 0
+
+
+def test_average_ignores_unapproved(client, stub_moderation):
+    stub_moderation("approved")
+    register(client, email="a@example.org")
+    post_review(client, rating=5)
+    client.cookies.clear()
+
+    stub_moderation("escalated")
+    register(client, email="b@example.org")
+    post_review(client, rating=1)
+    client.cookies.clear()
+
+    assert client.get("/api/churches/n1/reviews").json()["average"] == 5.0
+
+
+# ------------------------------------------------------------- moderation queue
+
+def make_moderator(client, email="mod@example.org"):
+    register(client, email=email)
+    app_module._connection.execute(
+        "UPDATE users SET is_moderator = 1 WHERE email = ?", (email,))
+    app_module._connection.commit()
+
+
+def test_queue_requires_a_moderator(client):
+    assert client.get("/api/moderation/queue").status_code == 401
+    register(client)
+    assert client.get("/api/moderation/queue").status_code == 403
+
+
+def test_queue_lists_held_reviews_with_the_model_s_reasoning(client, stub_moderation):
+    stub_moderation("escalated")
+    register(client, email="author@example.org")
+    post_review(client, body="Something the classifier was unsure about.")
+    client.cookies.clear()
+
+    make_moderator(client)
+    body = client.get("/api/moderation/queue").json()
+    assert body["total"] == 1
+    entry = body["results"][0]
+    assert entry["status"] == "escalated"
+    assert entry["moderation"]["reason"] == "stubbed"
+    assert entry["authorEmail"] == "author@example.org"
+
+
+def test_moderator_can_publish_a_held_review(client, stub_moderation):
+    stub_moderation("escalated")
+    register(client, email="author@example.org")
+    post_review(client)
+    client.cookies.clear()
+
+    make_moderator(client)
+    review_id = client.get("/api/moderation/queue").json()["results"][0]["id"]
+    assert client.post(f"/api/moderation/reviews/{review_id}", json={"status": "approved"},
+                       headers={"X-CSRF-Token": csrf(client)}).status_code == 200
+
+    client.cookies.clear()
+    assert client.get("/api/churches/n1/reviews").json()["total"] == 1
+
+    # The human decision is recorded separately from the model's.
+    row = app_module._connection.execute(
+        "SELECT decided_by, mod_verdict FROM reviews WHERE id = ?", (review_id,)).fetchone()
+    assert row["decided_by"] is not None and row["mod_verdict"] == "escalated"
+
+
+def test_moderator_cannot_set_an_arbitrary_status(client, stub_moderation):
+    stub_moderation("escalated")
+    register(client, email="author@example.org")
+    post_review(client)
+    client.cookies.clear()
+    make_moderator(client)
+    review_id = client.get("/api/moderation/queue").json()["results"][0]["id"]
+    assert client.post(f"/api/moderation/reviews/{review_id}", json={"status": "deleted"},
+                       headers={"X-CSRF-Token": csrf(client)}).status_code == 422

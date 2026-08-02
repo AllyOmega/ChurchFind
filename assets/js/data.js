@@ -13,6 +13,16 @@
   var STATE_URL = 'data/states/';
   var API = 'api';
   var NOMINATIM = 'https://nominatim.openstreetmap.org';
+
+  // OpenStreetMap's public tiles are fine for local use and small deployments,
+  // but their usage policy rules out anything with real traffic. The server can
+  // override this with CHURCHFIND_TILE_URL; it also has to appear in the CSP,
+  // which is why the server owns the value rather than the page hardcoding it.
+  var DEFAULT_TILES = {
+    url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  };
+  var tiles = DEFAULT_TILES;
   var EARTH_RADIUS_MILES = 3958.8;
 
   var ADJACENT = {
@@ -69,6 +79,12 @@
     WY: ['MT', 'SD', 'NE', 'CO', 'UT', 'ID']
   };
 
+  // Must stay in step with scraper/service_times.py PERIODS.
+  var SERVICE_PERIODS = {
+    early: [0, 480], morning: [480, 720], midday: [720, 900],
+    afternoon: [900, 1080], evening: [1080, 1440]
+  };
+
   var mode = null;              // 'api' or 'static', decided by init()
   var metaCache = null;
   var stateCache = {};
@@ -97,6 +113,7 @@
       })
       .then(function (meta) {
         metaCache = meta;
+        if (meta.tiles && meta.tiles.url) tiles = meta.tiles;
         return { mode: mode, meta: meta };
       });
   }
@@ -116,6 +133,7 @@
         families: body.families,
         denominations: body.denominations,
         states: body.states,
+        tiles: body.tiles,
         dataset: body.dataset || {}
       };
     });
@@ -230,7 +248,13 @@
     if (params.denominations && params.denominations.length) {
       query.set('denomination', params.denominations.join(','));
     }
-    ['hasWebsite', 'hasPhone', 'hasServices', 'wheelchair'].forEach(function (key) {
+    if (params.serviceDays && params.serviceDays.length) {
+      query.set('service_days', params.serviceDays.join(','));
+    }
+    if (params.servicePeriods && params.servicePeriods.length) {
+      query.set('service_periods', params.servicePeriods.join(','));
+    }
+    ['hasWebsite', 'hasPhone', 'hasServices', 'wheelchair', 'hearingLoop'].forEach(function (key) {
       if (params[key]) query.set(key.replace(/[A-Z]/g, function (c) { return '_' + c.toLowerCase(); }), 'true');
     });
     query.set('sort', params.sort || 'distance');
@@ -241,6 +265,41 @@
       if (!response.ok) throw new Error('Search failed (' + response.status + ').');
       return response.json();
     });
+  }
+
+  /* Static mode has no parsed service columns -- the JSON files carry the raw
+     OSM tag. Rather than ship a second parser to the browser, the static build
+     matches on the same comma-wrapped strings the server derives, which the
+     scraper now writes into index.json per state. When they are absent the
+     filters simply do not appear (see renderServiceFilters). */
+  function matchesServiceTimes(church, params) {
+    var days = params.serviceDays || [];
+    var periods = params.servicePeriods || [];
+    if (!days.length && !periods.length) return true;
+
+    var pairs = church.service_pairs || '';
+    if (!pairs) return false;
+
+    var hours = [];
+    periods.forEach(function (period) {
+      var window = SERVICE_PERIODS[period];
+      if (!window) return;
+      for (var h = Math.floor(window[0] / 60); h <= Math.floor((window[1] - 1) / 60); h++) {
+        hours.push(h < 10 ? '0' + h : String(h));
+      }
+    });
+
+    // Day + period together means "a service at that time on that day", which
+    // is only answerable because the pairs were kept together.
+    if (days.length && hours.length) {
+      return days.some(function (day) {
+        return hours.some(function (hour) { return pairs.indexOf(',' + day + '-' + hour) !== -1; });
+      });
+    }
+    if (days.length) {
+      return days.some(function (day) { return pairs.indexOf(',' + day + '-') !== -1; });
+    }
+    return hours.some(function (hour) { return pairs.indexOf('-' + hour) !== -1; });
   }
 
   function searchStatic(params) {
@@ -261,6 +320,8 @@
       if (params.hasPhone && !church.phone) continue;
       if (params.hasServices && !church.services) continue;
       if (params.wheelchair && church.wheelchair !== 'yes') continue;
+      if (params.hearingLoop && church.hearing_loop !== 'yes') continue;
+      if (!matchesServiceTimes(church, params)) continue;
 
       var distance = near ? haversine(params.lat, params.lon, church.lat, church.lon) : null;
       if (near && distance > params.radius) continue;
@@ -388,8 +449,11 @@
     });
   }
 
+  function tileConfig() { return tiles; }
+
   global.ChurchData = {
     init: init,
+    tileConfig: tileConfig,
     mode: currentMode,
     hasAccounts: hasAccounts,
     meta: meta,

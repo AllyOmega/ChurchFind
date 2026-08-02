@@ -12,6 +12,7 @@ over the whole country instead of per-state downloads.
 import os
 import sys
 from pathlib import Path
+from urllib.parse import urlparse
 
 from fastapi import Cookie, Depends, FastAPI, Header, HTTPException, Request, Response
 from fastapi.responses import FileResponse, JSONResponse
@@ -22,12 +23,32 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scraper"))
 
 import auth  # noqa: E402
+import moderation  # noqa: E402
 import queries  # noqa: E402
 from db import connect, init_schema  # noqa: E402
 from normalize import FAMILY_LABELS  # noqa: E402
+from service_times import PERIOD_LABELS, PERIODS as SERVICE_PERIODS  # noqa: E402
 from states import STATE_NAMES  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
+
+# OSM's public tiles are fine for local use but their usage policy rules out
+# real traffic -- point this at your own tile server or a commercial provider
+# before deploying. The CSP below is derived from it, so overriding the URL is
+# enough; there is no second place to edit.
+TILE_URL = os.environ.get(
+    "CHURCHFIND_TILE_URL", "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+)
+TILE_ATTRIBUTION = os.environ.get(
+    "CHURCHFIND_TILE_ATTRIBUTION",
+    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+)
+
+
+def _tile_origin():
+    """Scheme + host of the tile URL, for the CSP img-src allowance."""
+    parsed = urlparse(TILE_URL)
+    return f"{parsed.scheme}://{parsed.netloc}" if parsed.scheme and parsed.netloc else ""
 
 app = FastAPI(title="ChurchFind", version="1.0", docs_url="/api/docs", redoc_url=None)
 
@@ -67,7 +88,7 @@ async def security_headers(request: Request, call_next):
     # scripts and styles are files.
     response.headers["Content-Security-Policy"] = (
         "default-src 'self'; "
-        "img-src 'self' data: https://tile.openstreetmap.org; "
+        f"img-src 'self' data: {_tile_origin()}; "
         "connect-src 'self' https://nominatim.openstreetmap.org; "
         "script-src 'self'; style-src 'self'; "
         "form-action 'self'; frame-ancestors 'none'; base-uri 'none'"
@@ -132,6 +153,13 @@ def require_user(user=Depends(current_user)):
     return user
 
 
+def require_moderator(user=Depends(require_user)):
+    row = db().execute("SELECT is_moderator FROM users WHERE id = ?", (user["id"],)).fetchone()
+    if not row or not row["is_moderator"]:
+        raise HTTPException(403, "Moderator access required.")
+    return user
+
+
 def require_csrf(session=Depends(current_session), x_csrf_token: str = Header(default=None)):
     """Every state-changing request on an authenticated session carries this."""
     if session is None:
@@ -177,6 +205,16 @@ class HomePayload(BaseModel):
     label: str = Field(default="", max_length=200)
 
 
+class ReviewPayload(BaseModel):
+    church_id: str = Field(max_length=40)
+    rating: int = Field(ge=1, le=5)
+    body: str = Field(min_length=1, max_length=moderation.MAX_REVIEW_CHARS)
+
+
+class ModerationDecision(BaseModel):
+    status: str = Field(pattern="^(approved|rejected)$")
+
+
 class ReportPayload(BaseModel):
     church_id: str = Field(max_length=40)
     field: str = Field(max_length=40)
@@ -202,6 +240,21 @@ def meta():
     if _facets_cache is None:
         _facets_cache = queries.facets(db(), FAMILY_LABELS, STATE_NAMES)
         _facets_cache["dataset"] = queries.dataset_meta(db())
+        _facets_cache["tiles"] = {"url": TILE_URL, "attribution": TILE_ATTRIBUTION}
+        _facets_cache["servicePeriods"] = [
+            {"key": key, "label": PERIOD_LABELS[key]} for key in
+            ("early", "morning", "midday", "afternoon", "evening")
+        ]
+        _facets_cache["weekdays"] = [
+            {"key": str(i), "label": label} for i, label in enumerate(
+                ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+            )
+        ]
+        # How many records the time filters can actually see -- honest, because
+        # only ~3% of churches have any service time recorded at all.
+        _facets_cache["withServiceTimes"] = db().execute(
+            "SELECT COUNT(*) FROM churches WHERE service_pairs <> ''"
+        ).fetchone()[0]
     return _facets_cache
 
 
@@ -218,6 +271,9 @@ def search_churches(
     has_phone: bool = False,
     has_services: bool = False,
     wheelchair: bool = False,
+    hearing_loop: bool = False,
+    service_days: str = None,
+    service_periods: str = None,
     sort: str = "distance",
     limit: int = 50,
     offset: int = 0,
@@ -238,6 +294,9 @@ def search_churches(
         "denominations": [d for d in (denomination or "").split(",") if d],
         "has_website": has_website, "has_phone": has_phone,
         "has_services": has_services, "wheelchair": wheelchair,
+        "hearing_loop": hearing_loop,
+        "service_days": [d for d in (service_days or "").split(",") if d.isdigit() and 0 <= int(d) <= 6],
+        "service_periods": [p for p in (service_periods or "").split(",") if p in SERVICE_PERIODS],
         "sort": sort, "limit": limit, "offset": offset,
     })
 
@@ -476,6 +535,150 @@ def report_correction(payload: ReportPayload, user=Depends(require_user), _=Depe
         "note": "Thanks. Corrections also need fixing in OpenStreetMap to survive "
                 "the next scrape: https://www.openstreetmap.org/fixthemap",
     }
+
+
+# ------------------------------------------------------------------- reviews
+
+def public_review(row, include_moderation=False):
+    review = {
+        "id": row["id"],
+        "churchId": row["church_id"],
+        "rating": row["rating"],
+        "body": row["body"],
+        "author": row["display_name"] or "Anonymous",
+        "createdAt": row["created_at"],
+        "status": row["status"],
+    }
+    if include_moderation:
+        review["moderation"] = {
+            "verdict": row["mod_verdict"],
+            "categories": [c for c in (row["mod_categories"] or "").split(",") if c],
+            "reason": row["mod_reason"],
+            "model": row["mod_model"],
+            "at": row["mod_at"],
+        }
+        review["authorEmail"] = row["email"]
+    return review
+
+
+@app.get("/api/churches/{church_id}/reviews")
+def list_reviews(church_id: str, user=Depends(current_user)):
+    """Approved reviews, plus the caller's own however it is doing in the queue.
+
+    Someone who has just written a review should see it with its status rather
+    than watch it vanish -- that is the difference between "held for review" and
+    "the site ate my post".
+    """
+    rows = db().execute(
+        """SELECT r.*, u.display_name, u.email FROM reviews r
+           JOIN users u ON u.id = r.user_id
+           WHERE r.church_id = ? AND (r.status = 'approved' OR r.user_id = ?)
+           ORDER BY r.created_at DESC""",
+        (church_id, user["id"] if user else -1),
+    ).fetchall()
+
+    reviews = []
+    for row in rows:
+        item = public_review(row)
+        item["mine"] = bool(user and row["user_id"] == user["id"])
+        # A held or rejected review is only ever visible to its author.
+        if item["status"] != "approved" and not item["mine"]:
+            continue
+        reviews.append(item)
+
+    approved = [r for r in reviews if r["status"] == "approved"]
+    average = round(sum(r["rating"] for r in approved) / len(approved), 1) if approved else None
+    return {"total": len(approved), "average": average, "results": reviews}
+
+
+@app.post("/api/reviews")
+def write_review(payload: ReviewPayload, user=Depends(require_user), _=Depends(require_csrf)):
+    church = queries.get_church(db(), payload.church_id)
+    if church is None:
+        raise HTTPException(404, "No church with that id.")
+
+    body = payload.body.strip()
+    if not body:
+        raise HTTPException(422, "Write something before posting.")
+
+    # Moderation runs before the row is written, so there is no window in which
+    # an unmoderated review exists in a readable state.
+    result = moderation.moderate(body, church["name"], payload.rating)
+    now = auth.iso(auth.now())
+
+    db().execute(
+        """INSERT INTO reviews
+           (user_id, church_id, rating, body, status, created_at, updated_at,
+            mod_model, mod_verdict, mod_reason, mod_categories, mod_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+           ON CONFLICT(user_id, church_id) DO UPDATE SET
+             rating = excluded.rating, body = excluded.body,
+             status = excluded.status, updated_at = excluded.updated_at,
+             mod_model = excluded.mod_model, mod_verdict = excluded.mod_verdict,
+             mod_reason = excluded.mod_reason, mod_categories = excluded.mod_categories,
+             mod_at = excluded.mod_at, decided_by = NULL, decided_at = ''""",
+        (user["id"], payload.church_id, payload.rating, body, result["status"], now, now,
+         result["model"], result["verdict"], result["reason"],
+         ",".join(result["categories"]), now),
+    )
+    db().commit()
+
+    # The author is told what happened to their review, but not which rule it
+    # tripped -- a detailed explanation is a specification for evading it.
+    messages = {
+        "approved": "Your review is published.",
+        "rejected": "Your review was not published because it does not meet the "
+                    "review guidelines.",
+        "escalated": "Your review has been sent to a moderator and will appear "
+                     "if approved.",
+        "pending": "Your review is awaiting moderation and will appear if approved.",
+    }
+    return {"ok": True, "status": result["status"], "message": messages[result["status"]]}
+
+
+@app.delete("/api/reviews/{review_id}")
+def delete_review(review_id: int, user=Depends(require_user), _=Depends(require_csrf)):
+    cursor = db().execute(
+        "DELETE FROM reviews WHERE id = ? AND user_id = ?", (review_id, user["id"])
+    )
+    db().commit()
+    if not cursor.rowcount:
+        raise HTTPException(404, "No review of yours with that id.")
+    return {"ok": True}
+
+
+# --------------------------------------------------------------- moderation queue
+
+@app.get("/api/moderation/queue")
+def moderation_queue(limit: int = 50, moderator=Depends(require_moderator)):
+    rows = db().execute(
+        """SELECT r.*, u.display_name, u.email FROM reviews r
+           JOIN users u ON u.id = r.user_id
+           WHERE r.status IN ('pending', 'escalated')
+           ORDER BY r.created_at ASC LIMIT ?""",
+        (max(1, min(limit, 200)),),
+    ).fetchall()
+    return {
+        "total": len(rows),
+        "moderationAvailable": moderation.available(),
+        "results": [public_review(row, include_moderation=True) for row in rows],
+    }
+
+
+@app.post("/api/moderation/reviews/{review_id}")
+def decide_review(review_id: int, payload: ModerationDecision,
+                  moderator=Depends(require_moderator), _=Depends(require_csrf)):
+    """A human decision. Recorded separately from the model's so the two are
+    never confused when auditing what happened to a review."""
+    cursor = db().execute(
+        "UPDATE reviews SET status = ?, decided_by = ?, decided_at = ?, updated_at = ? "
+        "WHERE id = ?",
+        (payload.status, moderator["id"], auth.iso(auth.now()), auth.iso(auth.now()), review_id),
+    )
+    db().commit()
+    if not cursor.rowcount:
+        raise HTTPException(404, "No review with that id.")
+    return {"ok": True, "status": payload.status}
 
 
 # ------------------------------------------------------------------- the site

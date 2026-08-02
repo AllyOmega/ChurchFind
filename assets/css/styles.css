@@ -466,3 +466,32 @@ input[type="range"] { width: 100%; accent-color: var(--indigo); }
 .chips-chosen { margin-top: .5rem; }
 .chips-chosen .chip { white-space: normal; text-align: left; }
 .chip-x { font-size: 1.05em; line-height: 1; opacity: .8; }
+
+/* Shown when tiles fail to load. The markers are still positioned correctly
+   relative to each other, so the pane keeps its value -- this just explains
+   why the background is grey instead of leaving people guessing. */
+.map-warning {
+  position: absolute; inset: auto 1rem 1rem 1rem;
+  z-index: 500;
+  padding: .8rem 1rem;
+  background: var(--card); color: var(--ink);
+  border: 1px solid var(--rule); border-left: 3px solid var(--gold);
+  border-radius: var(--radius); box-shadow: var(--shadow);
+  font-size: .84rem;
+}
+.map-warning strong { display: block; margin-bottom: .25rem; }
+.map-warning p { margin: 0 0 .3rem; color: var(--ink-soft); }
+.map-warning-host { font-size: .78rem; color: var(--ink-faint); }
+.map-pane { position: relative; }
+
+/* -------------------------------------------------- service-time & accessibility */
+
+.filter-note { margin: .5rem 0 0; font-size: .76rem; color: var(--ink-faint); line-height: 1.4; }
+.chips-period { margin-top: .4rem; }
+.chip-day { min-width: 3rem; justify-content: center; }
+
+/* A record nobody has edited in years should look less confident than a fresh
+   one, without being hidden -- it may still be perfectly correct. */
+.stale {
+  margin: .3rem 0 0; font-size: .8rem; color: var(--ink-faint); font-style: italic;
+}

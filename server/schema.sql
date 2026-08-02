@@ -29,7 +29,15 @@ CREATE TABLE IF NOT EXISTS churches (
   email         TEXT NOT NULL DEFAULT '',
   services      TEXT NOT NULL DEFAULT '',
   hours         TEXT NOT NULL DEFAULT '',
-  wheelchair    TEXT NOT NULL DEFAULT ''
+  wheelchair    TEXT NOT NULL DEFAULT '',
+  hearing_loop  TEXT NOT NULL DEFAULT '',
+  toilets_wheelchair TEXT NOT NULL DEFAULT '',
+  updated       TEXT NOT NULL DEFAULT '',   -- OSM last-edit date, YYYY-MM-DD
+  -- Parsed out of `services` at build time by scraper/service_times.py.
+  -- Day and time together as ",6-0900,3-1900," -- see scraper/service_times.py
+  -- on why they are pairs rather than two independent sets.
+  service_pairs TEXT NOT NULL DEFAULT '',
+  service_text  TEXT NOT NULL DEFAULT ''    -- human-readable rendering
 );
 
 CREATE INDEX IF NOT EXISTS idx_churches_state  ON churches(state);
@@ -42,6 +50,7 @@ CREATE INDEX IF NOT EXISTS idx_churches_denom  ON churches(denomination);
 CREATE INDEX IF NOT EXISTS idx_churches_website  ON churches(state) WHERE website  <> '';
 CREATE INDEX IF NOT EXISTS idx_churches_phone    ON churches(state) WHERE phone    <> '';
 CREATE INDEX IF NOT EXISTS idx_churches_services ON churches(state) WHERE services <> '';
+CREATE INDEX IF NOT EXISTS idx_churches_svcpairs ON churches(state) WHERE service_pairs <> '';
 
 -- Radius search. Points are stored as degenerate boxes; the R-tree narrows to a
 -- bounding box and exact haversine runs over what survives.
@@ -74,7 +83,8 @@ CREATE TABLE IF NOT EXISTS users (
   home_lat       REAL,
   home_lon       REAL,
   home_label     TEXT NOT NULL DEFAULT '',
-  is_active      INTEGER NOT NULL DEFAULT 1
+  is_active      INTEGER NOT NULL DEFAULT 1,
+  is_moderator   INTEGER NOT NULL DEFAULT 0
 );
 
 -- Sessions hold the SHA-256 of the cookie token, never the token. Someone who
@@ -125,3 +135,38 @@ CREATE TABLE IF NOT EXISTS auth_attempts (
 );
 
 CREATE INDEX IF NOT EXISTS idx_attempts_bucket ON auth_attempts(bucket, at);
+
+-- ------------------------------------------------------------------- reviews
+
+-- Reviews are the one place a user's own words become public, so nothing here
+-- is published without passing moderation. `status` is the gate; the default is
+-- deliberately `pending`, so a row that somehow skips the moderation path is
+-- invisible rather than live.
+CREATE TABLE IF NOT EXISTS reviews (
+  id            INTEGER PRIMARY KEY,
+  user_id       INTEGER NOT NULL REFERENCES users(id)    ON DELETE CASCADE,
+  church_id     TEXT    NOT NULL REFERENCES churches(id) ON DELETE CASCADE,
+  rating        INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
+  body          TEXT    NOT NULL,
+  status        TEXT    NOT NULL DEFAULT 'pending'
+                CHECK (status IN ('pending', 'approved', 'rejected', 'escalated')),
+  created_at    TEXT    NOT NULL,
+  updated_at    TEXT    NOT NULL,
+  -- Moderation record. Kept alongside the review so a human reviewing the queue
+  -- can see what the model decided and why, and so a bad call is auditable.
+  mod_model     TEXT    NOT NULL DEFAULT '',
+  mod_verdict   TEXT    NOT NULL DEFAULT '',
+  mod_reason    TEXT    NOT NULL DEFAULT '',
+  mod_categories TEXT   NOT NULL DEFAULT '',   -- comma-separated
+  mod_at        TEXT    NOT NULL DEFAULT '',
+  -- Set when a human overrides the model, so the two are never confused.
+  decided_by    INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  decided_at    TEXT    NOT NULL DEFAULT '',
+  UNIQUE (user_id, church_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_reviews_church ON reviews(church_id, status, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_reviews_queue  ON reviews(status, created_at) WHERE status IN ('pending', 'escalated');
+
+-- Moderators are flagged on the user row rather than in a roles table -- there
+-- are exactly two levels and no prospect of a third.

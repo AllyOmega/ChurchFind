@@ -29,7 +29,10 @@
       hasWebsite: false,
       hasPhone: false,
       hasServices: false,
-      wheelchair: false
+      wheelchair: false,
+      hearingLoop: false,
+      serviceDays: [],
+      servicePeriods: []
     },
     sort: 'distance'
   };
@@ -42,6 +45,8 @@
   var mapUnavailable = false;
   var markerLayer = null;
   var markersById = {};
+  var tileFailures = 0;
+  var tilesLoaded = 0;
 
   var dom = {};
 
@@ -117,6 +122,9 @@
       reset: $('reset-filters'),
       website: $('filter-website'), phone: $('filter-phone'),
       services: $('filter-services'), wheelchair: $('filter-wheelchair'),
+      hearing: $('filter-hearing'), serviceBlock: $('service-block'),
+      serviceDays: $('service-day-chips'), servicePeriods: $('service-period-chips'),
+      serviceNote: $('service-note'),
       stateGrid: $('state-grid'), aboutStats: $('about-stats'),
       heroCount: $('hero-count'), heroStates: $('hero-states'),
       colophon: $('colophon-meta'), toast: $('toast'),
@@ -165,8 +173,9 @@
       }, 250);
     });
 
-    ['website', 'phone', 'services', 'wheelchair'].forEach(function (key) {
+    ['website', 'phone', 'services', 'wheelchair', 'hearing'].forEach(function (key) {
       var filterKey = key === 'wheelchair' ? 'wheelchair'
+        : key === 'hearing' ? 'hearingLoop'
         : 'has' + key.charAt(0).toUpperCase() + key.slice(1);
       dom[key].addEventListener('change', function () {
         state.filters[filterKey] = dom[key].checked;
@@ -218,6 +227,8 @@
       : formatNumber(stateCount) + (stateCount === 1 ? ' state' : ' states') +
         (hasDC ? ' and DC' : '');
 
+    renderServiceFilters(meta);
+
     dom.chips.textContent = '';
     meta.families.forEach(function (info) {
       var chip = el('button', {
@@ -263,6 +274,59 @@
     dom.colophon.textContent = 'Snapshot of OpenStreetMap taken ' + snapshot + ' · ' +
       formatNumber(meta.total) + ' churches · scraped ' +
       (dataset.generated_at || '').slice(0, 10) + '.';
+  }
+
+  var WEEKDAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  var PERIOD_FALLBACK = [
+    { key: 'early', label: 'Before 8am' }, { key: 'morning', label: 'Morning' },
+    { key: 'midday', label: 'Midday' }, { key: 'afternoon', label: 'Afternoon' },
+    { key: 'evening', label: 'Evening' }
+  ];
+
+  /* Only 3% of churches have a service time recorded, so the panel says so
+     rather than letting someone filter to almost nothing and conclude the site
+     is broken. */
+  function renderServiceFilters(meta) {
+    dom.serviceBlock.hidden = false;
+
+    dom.serviceDays.textContent = '';
+    WEEKDAY_LABELS.forEach(function (label, index) {
+      var chip = el('button', {
+        type: 'button', class: 'chip chip-day', 'aria-pressed': 'false',
+        'aria-label': label
+      }, [el('span', { text: label })]);
+      chip.addEventListener('click', function () {
+        toggleInList(state.filters.serviceDays, String(index), chip);
+      });
+      dom.serviceDays.appendChild(chip);
+    });
+
+    dom.servicePeriods.textContent = '';
+    (meta.servicePeriods || PERIOD_FALLBACK).forEach(function (period) {
+      var chip = el('button', {
+        type: 'button', class: 'chip', 'aria-pressed': 'false'
+      }, [el('span', { text: period.label })]);
+      chip.addEventListener('click', function () {
+        toggleInList(state.filters.servicePeriods, period.key, chip);
+      });
+      dom.servicePeriods.appendChild(chip);
+    });
+
+    var known = meta.withServiceTimes;
+    dom.serviceNote.textContent = known != null
+      ? 'Only ' + formatNumber(known) + ' churches have a service time recorded in ' +
+        'OpenStreetMap, so these filters search a small slice of the data.'
+      : 'Service times come from OpenStreetMap and most churches have none recorded.';
+  }
+
+  function toggleInList(list, value, chip) {
+    var index = list.indexOf(value);
+    if (index === -1) list.push(value);
+    else list.splice(index, 1);
+    var on = index === -1;
+    chip.setAttribute('aria-pressed', on ? 'true' : 'false');
+    chip.classList.toggle('is-on', on);
+    rerun();
   }
 
   function renderAccount(user) {
@@ -410,6 +474,8 @@
       denominations: filters.denominations,
       hasWebsite: filters.hasWebsite, hasPhone: filters.hasPhone,
       hasServices: filters.hasServices, wheelchair: filters.wheelchair,
+      hearingLoop: filters.hearingLoop,
+      serviceDays: filters.serviceDays, servicePeriods: filters.servicePeriods,
       sort: state.sort, limit: PAGE_SIZE, offset: offset || 0
     };
     if (state.mode === 'near' && state.origin) {
@@ -557,17 +623,20 @@
   function resetFilters() {
     state.filters = {
       radius: 25, name: '', families: [], denominations: [],
-      hasWebsite: false, hasPhone: false, hasServices: false, wheelchair: false
+      hasWebsite: false, hasPhone: false, hasServices: false, wheelchair: false,
+      hearingLoop: false, serviceDays: [], servicePeriods: []
     };
     dom.radius.value = 25;
     dom.radiusOut.textContent = '25';
     dom.nameFilter.value = '';
-    ['website', 'phone', 'services', 'wheelchair'].forEach(function (key) {
+    ['website', 'phone', 'services', 'wheelchair', 'hearing'].forEach(function (key) {
       dom[key].checked = false;
     });
-    Array.prototype.forEach.call(dom.chips.children, function (chip) {
-      chip.setAttribute('aria-pressed', 'false');
-      chip.classList.remove('is-on');
+    [dom.chips, dom.serviceDays, dom.servicePeriods].forEach(function (group) {
+      Array.prototype.forEach.call(group.children, function (chip) {
+        chip.setAttribute('aria-pressed', 'false');
+        chip.classList.remove('is-on');
+      });
     });
     renderDenominationOptions();
     rerun();
@@ -673,9 +742,24 @@
     if (save) actions.push(save);
 
     var meta = [];
-    if (church.services) meta.push(el('p', { class: 'services', text: 'Services: ' + church.services }));
+    if (church.service_text || church.services) {
+      meta.push(el('p', { class: 'services',
+        text: 'Services: ' + (church.service_text || church.services) }));
+    }
     else if (church.hours) meta.push(el('p', { class: 'services', text: 'Open: ' + church.hours }));
-    if (church.wheelchair === 'yes') meta.push(el('p', { class: 'access', text: '♿ Wheelchair accessible' }));
+    var access = [];
+    if (church.wheelchair === 'yes') access.push('♿ Wheelchair accessible');
+    if (church.hearing_loop === 'yes') access.push('👂 Hearing loop');
+    if (access.length) meta.push(el('p', { class: 'access', text: access.join(' · ') }));
+    if (church.updated) {
+      // A record nobody has touched in years deserves a quieter presentation
+      // than one edited last month.
+      var year = parseInt(church.updated.slice(0, 4), 10);
+      if (year && year <= new Date().getFullYear() - 4) {
+        meta.push(el('p', { class: 'stale',
+          text: 'Last checked in OpenStreetMap ' + church.updated.slice(0, 4) + ' — call ahead' }));
+      }
+    }
     if (church.note) meta.push(el('p', { class: 'note', text: 'Your note: ' + church.note }));
 
     var address = addressLine(church);
@@ -723,15 +807,57 @@
     if (map || mapUnavailable) return;
     if (typeof L === 'undefined') { disableMap(); return; }
     try {
+      var tiles = ChurchData.tileConfig();
       map = L.map('map', { scrollWheelZoom: false });
-      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      }).addTo(map);
+
+      var layer = L.tileLayer(tiles.url, {
+        maxZoom: 19, attribution: tiles.attribution, crossOrigin: true
+      });
+
+      // Without this the basemap just stays grey and nobody can tell whether the
+      // tile host is blocked, the URL is wrong, or there is simply no data there.
+      layer.on('tileerror', function () {
+        tileFailures++;
+        if (!tilesLoaded && tileFailures >= 3) showTileWarning();
+      });
+      layer.on('tileload', function () {
+        tilesLoaded++;
+        hideTileWarning();
+      });
+
+      layer.addTo(map);
       markerLayer = L.layerGroup().addTo(map);
       map.setView([39.5, -98.35], 4);
     } catch (error) {
       disableMap();
+    }
+  }
+
+  /* The markers are still positioned correctly relative to each other, so the
+     pane stays useful without a basemap -- this explains the grey rather than
+     hiding the map entirely. */
+  function showTileWarning() {
+    var pane = document.querySelector('.map-pane');
+    if (!pane || pane.querySelector('.map-warning')) return;
+    pane.appendChild(el('div', { class: 'map-warning' }, [
+      el('strong', { text: 'Background map unavailable' }),
+      el('p', { text: 'Map tiles could not be loaded, so only the church markers are ' +
+                      'drawn. This is usually a blocked or unreachable tile server. ' +
+                      'The results list is unaffected.' }),
+      el('p', { class: 'map-warning-host', text: 'Tiles requested from ' + tileHost() })
+    ]));
+  }
+
+  function hideTileWarning() {
+    var warning = document.querySelector('.map-warning');
+    if (warning) warning.remove();
+  }
+
+  function tileHost() {
+    try {
+      return new URL(ChurchData.tileConfig().url).host;
+    } catch (error) {
+      return 'the configured tile server';
     }
   }
 

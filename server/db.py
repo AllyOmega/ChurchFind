@@ -54,9 +54,71 @@ def connect(path=None, readonly=False):
     return connection
 
 
+# Columns added to `churches` after the first release. `CREATE TABLE IF NOT
+# EXISTS` is a no-op on an existing table, so a schema.sql that grows a column
+# silently does nothing -- and then the index referencing it fails. These are
+# applied before the schema script runs.
+_ADDED_USER_COLUMNS = [
+    ("is_moderator", "INTEGER NOT NULL DEFAULT 0"),
+]
+
+_ADDED_CHURCH_COLUMNS = [
+    ("hearing_loop", "TEXT NOT NULL DEFAULT ''"),
+    ("toilets_wheelchair", "TEXT NOT NULL DEFAULT ''"),
+    ("updated", "TEXT NOT NULL DEFAULT ''"),
+    ("service_pairs", "TEXT NOT NULL DEFAULT ''"),
+    ("service_text", "TEXT NOT NULL DEFAULT ''"),
+]
+
+
+def _migrate_table(connection, table, columns):
+    """Add any column the current schema expects but this file predates."""
+    exists = connection.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?", (table,)
+    ).fetchone()
+    if not exists:
+        return []
+    present = {row["name"] for row in connection.execute(f"PRAGMA table_info({table})")}
+    added = []
+    for column, definition in columns:
+        if column not in present:
+            connection.execute(f"ALTER TABLE {table} ADD COLUMN {column} {definition}")
+            added.append(f"{table}.{column}")
+    if added:
+        connection.commit()
+    return added
+
+
+def _migrate_churches(connection):
+    """Add any column the current schema expects but this file predates.
+
+    Only ever adds -- nothing here drops or rewrites data. The church rows are a
+    rebuildable cache, but saved_churches and correction_reports have foreign
+    keys into them, so recreating the table wholesale is not an option.
+    """
+    exists = connection.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name='churches'"
+    ).fetchone()
+    if not exists:
+        return []
+
+    present = {row["name"] for row in connection.execute("PRAGMA table_info(churches)")}
+    added = []
+    for column, definition in _ADDED_CHURCH_COLUMNS:
+        if column not in present:
+            connection.execute(f"ALTER TABLE churches ADD COLUMN {column} {definition}")
+            added.append(column)
+    if added:
+        connection.commit()
+    return added
+
+
 def init_schema(connection):
+    added = _migrate_churches(connection)
+    added += _migrate_table(connection, "users", _ADDED_USER_COLUMNS)
     connection.executescript(SCHEMA.read_text())
     connection.commit()
+    return added
 
 
 def bounding_box(lat, lon, radius_miles):

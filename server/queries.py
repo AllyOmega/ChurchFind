@@ -8,11 +8,13 @@ from a request ever reaches the statement text.
 import re
 
 from db import bounding_box
+from service_times import PERIODS as SERVICE_PERIODS
 
 CHURCH_COLUMNS = [
     "id", "name", "denomination", "family", "address", "city", "state",
     "postcode", "lat", "lon", "website", "phone", "email", "services",
-    "hours", "wheelchair",
+    "hours", "wheelchair", "hearing_loop", "toilets_wheelchair", "updated",
+    "service_pairs", "service_text",
 ]
 
 SORTS = {
@@ -70,6 +72,35 @@ def _filter_clauses(params):
 
     if params.get("wheelchair"):
         clauses.append("c.wheelchair = 'yes'")
+
+    if params.get("hearing_loop"):
+        clauses.append("c.hearing_loop = 'yes'")
+
+    # Service-time search over the ",D-HHMM," pairs. Selecting a day AND a
+    # period asks for a service at that time *on that day* -- matching them
+    # independently would answer "Sunday evening" with a church that has a
+    # Sunday morning service and a Thursday evening one.
+    days = params.get("service_days") or []
+    periods = params.get("service_periods") or []
+    hours = []
+    for period in periods:
+        window = SERVICE_PERIODS.get(period)
+        if window:
+            hours.extend(range(window[0] // 60, (window[1] - 1) // 60 + 1))
+
+    if days and hours:
+        patterns = [f"%,{day}-{hour:02d}%" for day in days for hour in hours]
+    elif days:
+        patterns = [f"%,{day}-%" for day in days]
+    elif hours:
+        # Any day, including the `x` day used when the source gave no weekday.
+        patterns = [f"%-{hour:02d}%" for hour in set(hours)]
+    else:
+        patterns = []
+
+    if patterns:
+        clauses.append("(" + " OR ".join("c.service_pairs LIKE ?" for _ in patterns) + ")")
+        values.extend(patterns)
 
     match = fts_query(params.get("q"))
     if match:

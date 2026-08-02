@@ -16,7 +16,9 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scraper"))
 
+import service_times  # noqa: E402
 from db import connect, init_schema  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -26,8 +28,17 @@ INDEX_PATH = ROOT / "data" / "index.json"
 COLUMNS = [
     "id", "name", "denomination", "family", "address", "city", "state",
     "postcode", "lat", "lon", "website", "phone", "email", "services",
-    "hours", "wheelchair",
+    "hours", "wheelchair", "hearing_loop", "toilets_wheelchair", "updated",
 ]
+
+# Added after the first scrape. A data/ tree written by an older scraper simply
+# lacks them, and that should degrade to empty rather than refusing to build --
+# re-scraping 51 states takes the better part of an hour.
+OPTIONAL = {"hearing_loop", "toilets_wheelchair", "updated"}
+
+# Derived at build time rather than stored by the scraper: the parser lives with
+# the site, so improving it only needs a rebuild, not a 45-minute re-scrape.
+DERIVED = ["service_pairs", "service_text"]
 
 
 def load_state(path):
@@ -38,12 +49,18 @@ def load_state(path):
     """
     payload = json.loads(path.read_text())
     position = {field: i for i, field in enumerate(payload["fields"])}
-    missing = [column for column in COLUMNS if column not in position]
+    missing = [c for c in COLUMNS if c not in position and c not in OPTIONAL]
     if missing:
         raise SystemExit(f"{path.name} is missing column(s): {', '.join(missing)}")
 
     for row in payload["churches"]:
-        yield tuple(row[position[column]] for column in COLUMNS)
+        values = [row[position[column]] if column in position else ""
+                  for column in COLUMNS]
+        raw_services = values[COLUMNS.index("services")]
+        yield tuple(values) + (
+            service_times.to_pairs(raw_services),
+            service_times.describe(raw_services),
+        )
 
 
 def rebuild(connection):
@@ -60,11 +77,12 @@ def rebuild(connection):
     cursor.execute("DELETE FROM churches_geo")
     cursor.execute("DELETE FROM churches")
 
-    placeholders = ",".join("?" * len(COLUMNS))
+    all_columns = COLUMNS + DERIVED
+    placeholders = ",".join("?" * len(all_columns))
     # OR IGNORE, not a plain INSERT: a church sitting on a state line comes back
     # from both states' Overpass queries, so the same OSM id appears in two
     # files. First file wins -- the rows are identical anyway.
-    insert = f"INSERT OR IGNORE INTO churches ({','.join(COLUMNS)}) VALUES ({placeholders})"
+    insert = f"INSERT OR IGNORE INTO churches ({','.join(all_columns)}) VALUES ({placeholders})"
 
     total = 0
     seen = set()
