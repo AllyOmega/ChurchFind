@@ -1,0 +1,367 @@
+/* ChurchFind — a warm, print-ish palette rather than the usual SaaS gradient.
+   Light and dark both come from the same custom properties. */
+
+:root {
+  --paper: #faf8f5;
+  --card: #ffffff;
+  --ink: #1b2130;
+  --ink-soft: #5a6274;
+  --ink-faint: #8b91a0;
+  --rule: #e3ddd4;
+  --indigo: #33477f;
+  --indigo-soft: #5b7ac9;
+  --gold: #b4791f;
+  --gold-soft: #f0c46a;
+  --danger: #a23b2c;
+  --ok: #2f6b46;
+  --radius: 10px;
+  --shadow: 0 1px 2px rgba(27, 33, 48, .06), 0 6px 18px rgba(27, 33, 48, .05);
+  --max: 1440px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #14161c;
+    --card: #1c1f28;
+    --ink: #e9e6e1;
+    --ink-soft: #a7adbb;
+    --ink-faint: #767d8d;
+    --rule: #2c3040;
+    --indigo: #8ba4e8;
+    --indigo-soft: #5b7ac9;
+    --gold: #e0aa54;
+    --gold-soft: #b4791f;
+    --danger: #e08272;
+    --ok: #74c194;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 6px 18px rgba(0, 0, 0, .25);
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 16px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 { line-height: 1.2; margin: 0; font-weight: 650; letter-spacing: -.015em; }
+a { color: var(--indigo); }
+code {
+  font: .88em/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  background: color-mix(in srgb, var(--indigo) 10%, transparent);
+  padding: .12em .38em;
+  border-radius: 4px;
+}
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------ masthead */
+
+.masthead {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; flex-wrap: wrap;
+  padding: 1rem clamp(1rem, 4vw, 3rem);
+  border-bottom: 1px solid var(--rule);
+  background: var(--card);
+}
+
+.brand { display: flex; align-items: center; gap: .55rem; text-decoration: none; color: var(--ink); }
+.brand-mark { font-size: 1.5rem; }
+.brand-text { font-size: 1.3rem; letter-spacing: -.02em; font-weight: 400; }
+.brand-text strong { font-weight: 700; color: var(--indigo); }
+
+.masthead-nav { display: flex; gap: clamp(.8rem, 2vw, 1.6rem); font-size: .92rem; flex-wrap: wrap; }
+.masthead-nav a { color: var(--ink-soft); text-decoration: none; }
+.masthead-nav a:hover { color: var(--indigo); text-decoration: underline; }
+
+/* ---------------------------------------------------------------------- hero */
+
+.hero {
+  padding: clamp(2.5rem, 7vw, 5rem) clamp(1rem, 4vw, 3rem);
+  background:
+    radial-gradient(1100px 380px at 12% -10%, color-mix(in srgb, var(--gold-soft) 22%, transparent), transparent),
+    radial-gradient(900px 420px at 92% 0%, color-mix(in srgb, var(--indigo-soft) 18%, transparent), transparent);
+  border-bottom: 1px solid var(--rule);
+}
+
+.hero-inner { max-width: 720px; margin: 0 auto; text-align: center; }
+.hero h1 { font-size: clamp(2rem, 5.5vw, 3.1rem); }
+.hero-sub { color: var(--ink-soft); font-size: clamp(1rem, 2vw, 1.12rem); margin: .9rem 0 2rem; }
+.hero-sub strong { color: var(--ink); font-weight: 650; }
+
+.search { display: flex; gap: .5rem; flex-wrap: wrap; justify-content: center; }
+.search-field { flex: 1 1 320px; min-width: 0; }
+
+.search input[type="search"], .filters input[type="search"] {
+  width: 100%;
+  padding: .8rem 1rem;
+  font-size: 1rem;
+  color: var(--ink);
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.search input:focus-visible, .filters input:focus-visible, select:focus-visible {
+  outline: 2px solid var(--indigo); outline-offset: 1px;
+}
+
+.btn {
+  padding: .8rem 1.15rem;
+  font: inherit; font-size: .95rem;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn-primary { background: var(--indigo); color: #fff; box-shadow: var(--shadow); }
+.btn-primary:hover { filter: brightness(1.08); }
+.btn-ghost { background: var(--card); color: var(--ink); border-color: var(--rule); box-shadow: var(--shadow); }
+.btn-ghost:hover { border-color: var(--indigo); color: var(--indigo); }
+@media (prefers-color-scheme: dark) { .btn-primary { color: #10131a; } }
+
+.search-status { min-height: 1.4rem; margin: 1rem 0 0; font-size: .92rem; color: var(--ink-soft); }
+.search-status.is-error { color: var(--danger); }
+.search-status.is-ok { color: var(--ok); }
+
+/* -------------------------------------------------------------------- layout */
+
+.layout {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(1rem, 2vw, 1.75rem);
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: clamp(1.5rem, 4vw, 2.5rem) clamp(1rem, 4vw, 3rem);
+  align-items: start;
+}
+
+/* Set when Leaflet or the tile host can't be reached -- results take the space. */
+.layout.no-map { grid-template-columns: 250px minmax(0, 1fr); }
+
+@media (max-width: 1100px) {
+  .layout { grid-template-columns: 220px minmax(0, 1fr); }
+  .layout.no-map { grid-template-columns: 220px minmax(0, 1fr); }
+  .map-pane { grid-column: 1 / -1; order: 3; }
+}
+@media (max-width: 720px) {
+  .layout { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ------------------------------------------------------------------- filters */
+
+.filters {
+  position: sticky; top: 1rem;
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 1.1rem;
+  box-shadow: var(--shadow);
+}
+@media (max-width: 720px) { .filters { position: static; } }
+
+.filters-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 1rem; }
+.filters-head h2 { font-size: 1rem; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-soft); }
+
+.link-btn {
+  background: none; border: 0; padding: 0; cursor: pointer;
+  font: inherit; font-size: .85rem; color: var(--indigo); text-decoration: underline;
+}
+
+.filter-block { margin-bottom: 1.25rem; }
+.filter-block > label, .filter-label {
+  display: block; margin-bottom: .45rem;
+  font-size: .85rem; font-weight: 600; color: var(--ink-soft);
+}
+
+input[type="range"] { width: 100%; accent-color: var(--indigo); }
+
+.chips { display: flex; flex-wrap: wrap; gap: .35rem; }
+.chip {
+  display: inline-flex; align-items: center; gap: .35rem;
+  padding: .3rem .55rem;
+  font: inherit; font-size: .8rem;
+  background: transparent; color: var(--ink-soft);
+  border: 1px solid var(--rule); border-radius: 999px;
+  cursor: pointer; white-space: nowrap;
+}
+.chip:hover { border-color: var(--indigo); color: var(--indigo); }
+.chip.is-on { background: var(--indigo); border-color: var(--indigo); color: #fff; }
+@media (prefers-color-scheme: dark) { .chip.is-on { color: #10131a; } }
+.chip-count { font-variant-numeric: tabular-nums; opacity: .65; font-size: .92em; }
+
+.check {
+  display: flex; align-items: center; gap: .5rem;
+  margin-bottom: .35rem; font-size: .88rem; color: var(--ink-soft); cursor: pointer;
+}
+.check input { accent-color: var(--indigo); }
+
+/* ------------------------------------------------------------------- results */
+
+.results { min-width: 0; }
+.results-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;
+}
+.results-head h2 { font-size: 1.05rem; font-weight: 600; }
+.sort { font-size: .85rem; color: var(--ink-soft); display: flex; align-items: center; gap: .4rem; }
+.sort select {
+  font: inherit; font-size: .85rem; padding: .35rem .5rem;
+  color: var(--ink); background: var(--card);
+  border: 1px solid var(--rule); border-radius: 7px;
+}
+
+.church-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .7rem; }
+
+.church-card {
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-left: 3px solid transparent;
+  border-radius: var(--radius);
+  padding: .9rem 1rem;
+  cursor: pointer;
+  transition: border-color .15s, transform .15s;
+}
+.church-card:hover { border-left-color: var(--gold); transform: translateX(2px); }
+.church-card:focus-visible { outline: 2px solid var(--indigo); outline-offset: 2px; }
+.church-card.is-active { border-left-color: var(--indigo); box-shadow: var(--shadow); }
+
+.card-head { display: flex; align-items: baseline; justify-content: space-between; gap: .75rem; }
+.church-name { font-size: 1.02rem; font-weight: 620; }
+.distance {
+  font-size: .82rem; font-weight: 600; color: var(--gold);
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.distance.muted { color: var(--ink-faint); font-weight: 400; }
+
+.badge {
+  display: inline-block; margin: .45rem 0 .1rem;
+  padding: .12rem .5rem;
+  font-size: .74rem; font-weight: 600; letter-spacing: .01em;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--indigo) 12%, transparent);
+  color: var(--indigo);
+}
+.badge.fam-catholic       { background: color-mix(in srgb, #7b3fa0 15%, transparent); color: #7b3fa0; }
+.badge.fam-baptist        { background: color-mix(in srgb, #2f6b46 15%, transparent); color: #2f6b46; }
+.badge.fam-methodist      { background: color-mix(in srgb, #b4791f 18%, transparent); color: #8d5d14; }
+.badge.fam-lutheran       { background: color-mix(in srgb, #2b6f86 15%, transparent); color: #2b6f86; }
+.badge.fam-presbyterian   { background: color-mix(in srgb, #3d5aa8 15%, transparent); color: #3d5aa8; }
+.badge.fam-anglican       { background: color-mix(in srgb, #8a3b62 15%, transparent); color: #8a3b62; }
+.badge.fam-orthodox       { background: color-mix(in srgb, #a23b2c 15%, transparent); color: #a23b2c; }
+.badge.fam-pentecostal    { background: color-mix(in srgb, #c2621a 16%, transparent); color: #9c4e12; }
+.badge.fam-nondenominational { background: color-mix(in srgb, #4a7a5e 15%, transparent); color: #3d6b50; }
+.badge.fam-restorationist { background: color-mix(in srgb, #5c5f9e 15%, transparent); color: #5c5f9e; }
+.badge.fam-peace          { background: color-mix(in srgb, #6b7a3d 16%, transparent); color: #5a6733; }
+.badge.fam-unknown        { background: color-mix(in srgb, var(--ink-faint) 15%, transparent); color: var(--ink-faint); }
+
+@media (prefers-color-scheme: dark) {
+  .badge.fam-catholic       { color: #cf9ce8; }
+  .badge.fam-baptist        { color: #7ec89c; }
+  .badge.fam-methodist      { color: #e0aa54; }
+  .badge.fam-lutheran       { color: #79c0d8; }
+  .badge.fam-presbyterian   { color: #97afea; }
+  .badge.fam-anglican       { color: #dd93b4; }
+  .badge.fam-orthodox       { color: #e08272; }
+  .badge.fam-pentecostal    { color: #eb9c5c; }
+  .badge.fam-nondenominational { color: #8dc3a4; }
+  .badge.fam-restorationist { color: #a3a6e6; }
+  .badge.fam-peace          { color: #b3c47a; }
+}
+
+.address { margin: .3rem 0 0; font-size: .88rem; color: var(--ink-soft); }
+.address.muted { color: var(--ink-faint); font-style: italic; }
+.services, .access { margin: .3rem 0 0; font-size: .84rem; color: var(--ink-soft); }
+
+.actions { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .65rem; }
+.action {
+  font-size: .8rem; text-decoration: none;
+  padding: .25rem .6rem;
+  color: var(--indigo);
+  border: 1px solid var(--rule); border-radius: 999px;
+}
+.action:hover { border-color: var(--indigo); background: color-mix(in srgb, var(--indigo) 8%, transparent); }
+
+.load-more { display: block; width: 100%; margin-top: 1rem; }
+
+/* ----------------------------------------------------------------------- map */
+
+.map-pane {
+  position: sticky; top: 1rem;
+  border: 1px solid var(--rule); border-radius: var(--radius);
+  overflow: hidden; box-shadow: var(--shadow);
+}
+@media (max-width: 1100px) { .map-pane { position: static; } }
+
+#map { height: min(72vh, 760px); min-height: 380px; background: var(--rule); }
+@media (max-width: 1100px) { #map { height: 420px; } }
+
+.popup strong { display: block; font-size: .95rem; margin-bottom: .2rem; }
+.popup-den { color: var(--indigo); font-size: .8rem; font-weight: 600; }
+.popup-addr, .popup-dist { font-size: .82rem; color: var(--ink-soft); }
+.popup a { font-size: .82rem; display: inline-block; margin-top: .35rem; }
+.leaflet-popup-content-wrapper { border-radius: var(--radius); }
+
+/* ------------------------------------------------------------ browse & about */
+
+.browse, .about { border-top: 1px solid var(--rule); padding: clamp(2.5rem, 6vw, 4rem) clamp(1rem, 4vw, 3rem); }
+.about { background: var(--card); }
+.section-inner { max-width: var(--max); margin: 0 auto; }
+.browse h2, .about h2 { font-size: clamp(1.35rem, 3vw, 1.75rem); }
+.section-sub { color: var(--ink-soft); margin: .5rem 0 1.75rem; font-size: .95rem; }
+
+.state-grid {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; gap: .5rem;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+}
+.state-card {
+  width: 100%;
+  display: flex; align-items: baseline; justify-content: space-between; gap: .5rem;
+  padding: .6rem .8rem;
+  font: inherit; text-align: left;
+  background: var(--card); color: var(--ink);
+  border: 1px solid var(--rule); border-radius: var(--radius);
+  cursor: pointer;
+}
+.state-card:hover { border-color: var(--indigo); color: var(--indigo); }
+.state-name { font-size: .92rem; }
+.state-count { font-size: .8rem; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+
+.about-grid { display: grid; gap: 2rem; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.about-grid h3 { font-size: 1rem; margin-bottom: .5rem; }
+.about-grid p { margin: 0; color: var(--ink-soft); font-size: .93rem; }
+
+.stats { margin: 0; display: grid; grid-template-columns: 1fr auto; gap: .3rem .75rem; font-size: .9rem; }
+.stats dt { color: var(--ink-soft); }
+.stats dd { margin: 0; font-variant-numeric: tabular-nums; font-weight: 600; text-align: right; }
+
+/* ----------------------------------------------------------- footer & toasts */
+
+.colophon {
+  padding: 2rem clamp(1rem, 4vw, 3rem) 3rem;
+  border-top: 1px solid var(--rule);
+  font-size: .85rem; color: var(--ink-soft);
+  max-width: var(--max); margin: 0 auto;
+}
+.colophon p { margin: 0 0 .4rem; }
+.colophon-meta { color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+
+.toast {
+  position: fixed; left: 50%; bottom: 1.25rem; transform: translateX(-50%);
+  z-index: 1000; max-width: min(90vw, 460px);
+  padding: .7rem 1rem;
+  background: var(--ink); color: var(--paper);
+  border-radius: var(--radius); box-shadow: var(--shadow);
+  font-size: .87rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}

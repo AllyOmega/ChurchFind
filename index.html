@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ChurchFind — Find a church near you</title>
+<meta name="description" content="Search more than a hundred thousand churches across the United States by location, denomination and distance. Open data from OpenStreetMap.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>⛪</text></svg>">
+<link rel="stylesheet" href="assets/vendor/leaflet/leaflet.css">
+<link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+
+<header class="masthead">
+  <a class="brand" href="./">
+    <span class="brand-mark" aria-hidden="true">⛪</span>
+    <span class="brand-text">Church<strong>Find</strong></span>
+  </a>
+  <nav class="masthead-nav">
+    <a href="#browse">Browse by state</a>
+    <a href="#about">About the data</a>
+    <a href="https://github.com/AllyOmega/ChurchFind" rel="noopener">GitHub</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="hero-inner">
+    <h1>Find a church near you</h1>
+    <p class="hero-sub">
+      Search <strong id="hero-count">thousands of</strong> congregations across all 50 states —
+      by town, ZIP code, denomination or distance.
+    </p>
+
+    <form class="search" id="search-form" role="search">
+      <div class="search-field">
+        <label class="sr-only" for="location-input">Town, ZIP code or address</label>
+        <input id="location-input" type="search" autocomplete="postal-code"
+               placeholder="Enter a town, ZIP code or address" spellcheck="false">
+      </div>
+      <button type="button" class="btn btn-ghost" id="geolocate-btn" title="Use my current location">
+        <span aria-hidden="true">◎</span> Use my location
+      </button>
+      <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+
+    <p class="search-status" id="search-status" role="status" aria-live="polite"></p>
+  </div>
+</section>
+
+<main class="layout" id="results-layout" hidden>
+
+  <aside class="filters" id="filters">
+    <div class="filters-head">
+      <h2>Refine</h2>
+      <button type="button" class="link-btn" id="reset-filters">Reset</button>
+    </div>
+
+    <div class="filter-block">
+      <label for="radius-input">
+        Within <output id="radius-output">25</output> miles
+      </label>
+      <input type="range" id="radius-input" min="1" max="100" step="1" value="25">
+    </div>
+
+    <div class="filter-block">
+      <label for="name-filter">Name contains</label>
+      <input type="search" id="name-filter" placeholder="e.g. Grace, St. Mary" spellcheck="false">
+    </div>
+
+    <div class="filter-block">
+      <span class="filter-label">Denomination</span>
+      <div class="chips" id="family-chips"></div>
+    </div>
+
+    <div class="filter-block">
+      <span class="filter-label">Only show</span>
+      <label class="check"><input type="checkbox" id="filter-website"> Has a website</label>
+      <label class="check"><input type="checkbox" id="filter-phone"> Has a phone number</label>
+      <label class="check"><input type="checkbox" id="filter-services"> Lists service times</label>
+      <label class="check"><input type="checkbox" id="filter-wheelchair"> Wheelchair accessible</label>
+    </div>
+  </aside>
+
+  <section class="results" aria-label="Search results">
+    <div class="results-head">
+      <h2 id="results-count">No results yet</h2>
+      <label class="sort">
+        Sort
+        <select id="sort-select">
+          <option value="distance">Nearest first</option>
+          <option value="name">Name A–Z</option>
+          <option value="denomination">Denomination</option>
+        </select>
+      </label>
+    </div>
+    <ol class="church-list" id="church-list"></ol>
+    <button type="button" class="btn btn-ghost load-more" id="load-more" hidden>Show more</button>
+  </section>
+
+  <section class="map-pane" aria-label="Map of results">
+    <div id="map"></div>
+  </section>
+
+</main>
+
+<section class="browse" id="browse">
+  <div class="section-inner">
+    <h2>Browse by state</h2>
+    <p class="section-sub">Every state is a separate data file, loaded only when you open it.</p>
+    <ul class="state-grid" id="state-grid"></ul>
+  </div>
+</section>
+
+<section class="about" id="about">
+  <div class="section-inner">
+    <h2>About the data</h2>
+    <div class="about-grid">
+      <div>
+        <h3>Where it comes from</h3>
+        <p>
+          Every record is scraped from <a href="https://www.openstreetmap.org" rel="noopener">OpenStreetMap</a>
+          through the <a href="https://overpass-api.de" rel="noopener">Overpass API</a> — specifically, every
+          feature tagged <code>amenity=place_of_worship</code> with <code>religion=christian</code> inside a
+          US state boundary. Nothing is hand-entered, and nothing is taken from a site that forbids scraping.
+        </p>
+      </div>
+      <div>
+        <h3>What it is not</h3>
+        <p>
+          OpenStreetMap is volunteer-maintained, so coverage is uneven: a rural county may be thinner than a
+          city, denominations are often blank, and a congregation that has moved or closed can linger. Treat
+          this as a starting point and call ahead. Found something wrong?
+          <a href="https://www.openstreetmap.org/fixthemap" rel="noopener">Fix it at the source</a> and it
+          will flow into the next scrape.
+        </p>
+      </div>
+      <div>
+        <h3>Snapshot</h3>
+        <dl class="stats" id="about-stats"></dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="colophon">
+  <p>
+    Church data © <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap contributors</a>,
+    available under the <a href="https://opendatacommons.org/licenses/odbl/" rel="noopener">Open Database License</a>.
+    Geocoding by <a href="https://nominatim.org" rel="noopener">Nominatim</a>. Map tiles by OpenStreetMap.
+  </p>
+  <p class="colophon-meta" id="colophon-meta"></p>
+</footer>
+
+<div class="toast" id="toast" role="alert" aria-live="assertive" hidden></div>
+
+<script src="assets/vendor/leaflet/leaflet.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>

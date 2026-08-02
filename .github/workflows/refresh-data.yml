@@ -1,0 +1,53 @@
+name: Refresh church data
+
+# OpenStreetMap changes constantly, so the committed snapshot goes stale. This
+# re-runs the scrape on the 1st of each month and commits the result only if
+# something actually changed.
+#
+# The scrape hits a free, shared API and takes roughly 30-45 minutes. If you
+# forked this and don't want that traffic, delete this file -- the site works
+# fine on whatever snapshot is committed.
+
+on:
+  schedule:
+    - cron: '17 4 1 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Scrape OpenStreetMap
+        run: python scraper/scrape_churches.py --force
+        working-directory: scraper
+
+      - name: Validate the generated data
+        run: python validate.py
+        working-directory: scraper
+
+      - name: Refresh the README stats block
+        run: python update_readme.py
+        working-directory: scraper
+
+      - name: Commit if the snapshot moved
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- data/ README.md; then
+            echo "No change in data/ -- nothing to commit."
+            exit 0
+          fi
+          total=$(python -c "import json;print(f\"{json.load(open('data/index.json'))['totals']['churches']:,}\")")
+          git add data/ README.md
+          git commit -m "data: refresh OpenStreetMap snapshot (${total} churches)"
+          git push
