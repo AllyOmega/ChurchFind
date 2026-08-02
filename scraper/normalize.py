@@ -255,5 +255,10 @@ def normalize(element, state_code):
         # Last edit in OSM, so the site can mark records nobody has touched in
         # years rather than presenting every row with equal confidence.
         "updated": (element.get("timestamp") or "")[:10],
+        # An exact join to Wikipedia. Matching by name would be guesswork --
+        # there are hundreds of St Mary's -- but these tags are set by mappers
+        # who looked at the specific building.
+        "wikipedia": tags.get("wikipedia", "").strip(),
+        "wikidata": tags.get("wikidata", "").strip(),
         "denomination_raw": tags.get("denomination", "").strip(),
     }

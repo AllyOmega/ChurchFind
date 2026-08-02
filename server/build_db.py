@@ -26,17 +26,19 @@ ROOT = Path(__file__).resolve().parent.parent
 STATE_DIR = ROOT / "data" / "states"
 INDEX_PATH = ROOT / "data" / "index.json"
 CHURCHMANSHIP_PATH = ROOT / "data" / "churchmanship.json"
+CHURCHMANSHIP_WIKI_PATH = ROOT / "data" / "churchmanship-wikipedia.json"
 
 COLUMNS = [
     "id", "name", "denomination", "family", "address", "city", "state",
     "postcode", "lat", "lon", "website", "phone", "email", "services",
     "hours", "wheelchair", "hearing_loop", "toilets_wheelchair", "updated",
+    "wikipedia", "wikidata",
 ]
 
 # Added after the first scrape. A data/ tree written by an older scraper simply
 # lacks them, and that should degrade to empty rather than refusing to build --
 # re-scraping 51 states takes the better part of an hour.
-OPTIONAL = {"hearing_loop", "toilets_wheelchair", "updated"}
+OPTIONAL = {"hearing_loop", "toilets_wheelchair", "updated", "wikipedia", "wikidata"}
 
 # Derived at build time rather than stored by the scraper: the parser lives with
 # the site, so improving it only needs a rebuild, not a 45-minute re-scrape.
@@ -143,36 +145,54 @@ def load_churchmanship(connection, cursor):
     recomputed from it plus whatever votes exist. A re-scrape therefore never
     discards a submission.
     """
-    if not CHURCHMANSHIP_PATH.exists():
-        return 0
-    scores = json.loads(CHURCHMANSHIP_PATH.read_text()).get("scores", {})
+    # Each source is scored separately and merged here, rather than by scoring
+    # the concatenated text: a phrase appearing on both the parish website and
+    # in its Wikipedia article is one fact learned twice, not two facts.
+    per_source = {}
+    for path, source in ((CHURCHMANSHIP_PATH, "website"),
+                         (CHURCHMANSHIP_WIKI_PATH, "wikipedia")):
+        if not path.exists():
+            continue
+        for church_id, score in json.loads(path.read_text()).get("scores", {}).items():
+            score.setdefault("source", source)
+            per_source.setdefault(church_id, []).append(score)
+
+    scores = {church_id: churchmanship.merge_sources(found)
+              for church_id, found in per_source.items()}
+    scores = {k: v for k, v in scores.items() if v}
     if not scores:
         return 0
 
     known = {row[0] for row in cursor.execute("SELECT id FROM churches")}
     applied = 0
+    by_source = {}
     for church_id, score in scores.items():
         if church_id not in known:
             continue
         cursor.execute(
             """INSERT INTO churchmanship
-                 (church_id, scraped_ceremonial, scraped_theology, scraped_confidence, evidence)
-               VALUES (?, ?, ?, ?, ?)
+                 (church_id, scraped_ceremonial, scraped_theology, scraped_confidence,
+                  scraped_source, evidence)
+               VALUES (?, ?, ?, ?, ?, ?)
                ON CONFLICT(church_id) DO UPDATE SET
                  scraped_ceremonial = excluded.scraped_ceremonial,
                  scraped_theology   = excluded.scraped_theology,
                  scraped_confidence = excluded.scraped_confidence,
+                 scraped_source     = excluded.scraped_source,
                  evidence           = excluded.evidence""",
             (church_id, score["ceremonial"], score["theology"], score["confidence"],
-             ",".join(score.get("matched", []))),
+             score.get("source", ""), ",".join(score.get("matched", []))),
         )
         applied += 1
+        label = score.get("source", "website")
+        by_source[label] = by_source.get(label, 0) + 1
 
     connection.commit()
     for church_id in scores:
         if church_id in known:
             recompute(connection, church_id)
-    print(f"\n  Applied {applied:,} scraped churchmanship scores.")
+    detail = ", ".join(f"{n} {name}" for name, n in sorted(by_source.items()))
+    print(f"\n  Applied {applied:,} scraped churchmanship scores ({detail}).")
     return applied
 
 

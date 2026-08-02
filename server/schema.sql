@@ -33,6 +33,8 @@ CREATE TABLE IF NOT EXISTS churches (
   hearing_loop  TEXT NOT NULL DEFAULT '',
   toilets_wheelchair TEXT NOT NULL DEFAULT '',
   updated       TEXT NOT NULL DEFAULT '',   -- OSM last-edit date, YYYY-MM-DD
+  wikipedia     TEXT NOT NULL DEFAULT '',   -- OSM wikipedia tag, e.g. "en:Title"
+  wikidata      TEXT NOT NULL DEFAULT '',   -- OSM wikidata tag, e.g. "Q12345"
   -- Parsed out of `services` at build time by scraper/service_times.py.
   -- Day and time together as ",6-0900,3-1900," -- see scraper/service_times.py
   -- on why they are pairs rather than two independent sets.
@@ -187,6 +189,10 @@ CREATE TABLE IF NOT EXISTS churchmanship (
   scraped_ceremonial REAL,
   scraped_theology   REAL,
   scraped_confidence REAL NOT NULL DEFAULT 0,
+  -- Which scrape produced it: 'website', 'wikipedia', or 'website+wikipedia'.
+  -- Shown to the reader, because "the parish says so" and "an encyclopedia
+  -- article about the building says so" are not the same claim.
+  scraped_source     TEXT NOT NULL DEFAULT '',
   evidence           TEXT NOT NULL DEFAULT '',   -- comma-separated matched phrases
   updated_at         TEXT NOT NULL DEFAULT ''
 );

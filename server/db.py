@@ -62,10 +62,16 @@ _ADDED_USER_COLUMNS = [
     ("is_moderator", "INTEGER NOT NULL DEFAULT 0"),
 ]
 
+_ADDED_CHURCHMANSHIP_COLUMNS = [
+    ("scraped_source", "TEXT NOT NULL DEFAULT ''"),
+]
+
 _ADDED_CHURCH_COLUMNS = [
     ("hearing_loop", "TEXT NOT NULL DEFAULT ''"),
     ("toilets_wheelchair", "TEXT NOT NULL DEFAULT ''"),
     ("updated", "TEXT NOT NULL DEFAULT ''"),
+    ("wikipedia", "TEXT NOT NULL DEFAULT ''"),
+    ("wikidata", "TEXT NOT NULL DEFAULT ''"),
     ("service_pairs", "TEXT NOT NULL DEFAULT ''"),
     ("service_text", "TEXT NOT NULL DEFAULT ''"),
 ]
@@ -116,6 +122,7 @@ def _migrate_churches(connection):
 def init_schema(connection):
     added = _migrate_churches(connection)
     added += _migrate_table(connection, "users", _ADDED_USER_COLUMNS)
+    added += _migrate_table(connection, "churchmanship", _ADDED_CHURCHMANSHIP_COLUMNS)
     connection.executescript(SCHEMA.read_text())
     connection.commit()
     return added

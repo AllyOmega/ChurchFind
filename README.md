@@ -129,9 +129,9 @@ So the home state renders immediately and the neighbours, listed in an adjacency
 from an abandoned search cannot leak into the current one.
 
 Each state file stores churches as positional arrays rather than objects, with the column
-names given once in a `fields` key. Repeating nineteen key names across a hundred thousand
-records costs several megabytes for nothing; the site expands rows back into objects on
-load.
+names given once in a `fields` key. Repeating twenty-one key names across a hundred
+thousand records costs several megabytes for nothing; the site expands rows back into
+objects on load.
 
 ```jsonc
 {
@@ -139,11 +139,12 @@ load.
   "count": 1990,
   "fields": ["id", "name", "denomination", "family", "address", "city", "state",
              "postcode", "lat", "lon", "website", "phone", "email", "services",
-             "hours", "wheelchair", "hearing_loop", "toilets_wheelchair", "updated"],
+             "hours", "wheelchair", "hearing_loop", "toilets_wheelchair", "updated",
+             "wikipedia", "wikidata"],
   "churches": [
     ["n358950246", "Antioch Baptist Church", "Baptist", "baptist",
      "2500 Lafayette Street", "Denver", "CO", "80205", 39.753465, -104.970488,
-     "", "", "", "", "", "", "", "", "2026-05-14"]
+     "", "", "", "", "", "", "", "", "2026-05-14", "", ""]
   ]
 }
 ```
@@ -497,21 +498,69 @@ Three things are deliberately **not** used:
   spectrum and separate nothing.
 - **Denomination or province.** ACNA and TEC parishes both span the full range.
 
-### How little the scrape actually knows
+### Where the text comes from
 
 This is the honest part. Of 2,815 Anglican and Episcopal churches in the dataset,
 **seven** have any worship descriptor in their OSM service times. OpenStreetMap
-simply does not record this. The only real signal is a parish's own website, and
-only about a third have one recorded — `scraper/fetch_sites.py` fetches those,
-respecting `robots.txt`, one request at a time with a delay, a User-Agent naming
-the project and a contact URL, and at most two pages per parish (the homepage and
-one page that looks like it describes worship). Results are cached on disk so a
-rerun does not re-fetch what it already has.
+simply does not record this, so the text has to come from somewhere else. Two
+sources do it:
+
+**The parish website** (`scraper/fetch_sites.py`), for the roughly third of
+parishes that have one recorded. This is the better source — a parish describing
+its own worship, now. It fetches under `robots.txt`, one request at a time with a
+delay, a User-Agent naming the project and a contact URL, and at most two pages
+per parish (the homepage and one page that looks like it describes worship).
+
+**The linked Wikipedia article** (`scraper/fetch_wikipedia.py`). OSM carries
+`wikipedia` and `wikidata` tags, which makes this an *exact* join — no fuzzy name
+matching, no guessing which of the hundreds of St Mary's this is. About 420 US
+Anglican churches carry one, and roughly two thirds of those have no website
+recorded, so it reaches parishes the site scrape cannot.
+
+Wikipedia is weaker evidence and is capped lower (0.45 against 0.65). An article
+is usually about a *building* — its architect, its NRHP listing, the fire of 1908
+— written by someone other than the parish, possibly years ago. Where it does
+describe worship it is excellent: "well known as a prominent center of
+Anglo-Catholic worship" settles the question in one sentence. But only 21% of the
+384 linked English articles produced any score at all. The UI names which source
+a reading came from, because "the parish says so" and "an encyclopedia article
+about the building says so" are different claims.
+
+Both cache their text — not just the score — on disk. Fetching is the expensive,
+externally visible part; scoring is free and the lexicon changes. A lexicon fix
+should be a rescore, not a re-crawl.
+
+### What measuring against Wikipedia caught
+
+Running the lexicon over 384 real articles falsified three of its patterns, all
+of which had been quietly wrong on parish websites too:
+
+- **`the society`** fired 20 times, as often as "book of common prayer". It was
+  meant to catch the Anglo-Catholic Society of St Wilfrid and St Hilda. It was
+  catching the historical society, the missionary society, the aid society — and
+  scoring those parishes +1.0 on theology from one coincidental phrase.
+- **A bare `1662` or `1928`** was treated as the Prayer Book. Only 28% of those
+  mentions sat anywhere near prayer-book words; the rest were ordinary dates. A
+  parish hall built in 1928 was being moved half a point up the ceremonial axis.
+- **Bare "the gospel"** separated nothing. Every tradition preaches it, and in a
+  parish history it is what missionaries brought to the frontier.
+
+Twenty-seven of the 105 articles that scored before the fix rested *entirely* on
+those patterns. Removing them dropped the hit rate from 27% to 21%, which is the
+right direction: the missing 6% were noise. The readings that remain are checkable
+— Church of St Mary the Virgin in Manhattan, "Smoky Mary's", comes out at +0.81
+ceremonial and +0.76 theology, which is exactly where anyone who knows it would
+put it.
 
 Everything downstream is built around that weakness:
 
-- **A scraped score never exceeds 0.65 confidence.** A website is evidence, not
-  testimony.
+- **A scraped score never exceeds its source's cap** — 0.65 for a website, 0.45
+  for Wikipedia. Evidence, not testimony.
+- **Two sources that agree count for more, two that disagree for less.** A
+  website calling a parish Anglo-Catholic while its article describes a plain
+  preaching box is a parish that changed or a source that is wrong; either way
+  the meter hedges. Merging can never exceed the better source's cap, so adding
+  a weak source can sharpen a reading but not manufacture certainty.
 - **No match means no score.** A parish with nothing to go on shows as unknown,
   not as a confident "middle" — zero and no-data are different answers, and
   conflating them invents a claim.
@@ -604,8 +653,10 @@ scraper/scrape_churches.py     the Overpass scrape
 scraper/normalize.py           OSM tags -> flat records, denomination and state mapping
 scraper/states.py              state codes and centroids
 scraper/service_times.py       OSM opening_hours -> searchable (day, time) pairs
-scraper/churchmanship.py       the two-axis Anglican scorer and the vote blend
+scraper/churchmanship.py       the two-axis Anglican scorer, source merge, vote blend
 scraper/fetch_sites.py         robots-respecting fetch of Anglican parish websites
+scraper/fetch_wikipedia.py     Wikipedia extracts, joined exactly via OSM wiki tags
+scraper/test_churchmanship.py  19 tests over the scorer, several from measurements
 scraper/validate.py            consistency checks over data/
 scraper/test_scrape.py         5 tests over index bookkeeping
 scraper/update_readme.py       regenerates the stats block in this file
@@ -618,7 +669,8 @@ server/moderation.py           review moderation with Claude, fail-closed
 server/app.py                  FastAPI routes and the static host
 server/test_api.py             77 tests over the API, weighted to the security-critical parts
 server/test_moderation.py      24 tests over moderation, with the Claude call stubbed
-data/churchmanship.json        scraped churchmanship scores, merged in at build time
+data/churchmanship.json        churchmanship from parish websites
+data/churchmanship-wikipedia.json  churchmanship from Wikipedia, merged at build time
 .nojekyll                      tells GitHub Pages to serve the tree as-is
 ```
 

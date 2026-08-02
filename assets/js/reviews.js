@@ -351,9 +351,22 @@
     node.appendChild(el('p', { class: 'cm-confidence', text:
       data.votes
         ? strength + ', from ' + data.votes + (data.votes === 1 ? ' submission' : ' submissions') +
-          (data.source === 'community' ? '' : ' and the parish website')
-        : strength + ', from the parish website only' }));
+          (data.source === 'community' ? '' : ' and ' + scrapedSourceName(data))
+        : strength + ', from ' + scrapedSourceName(data) + ' only' }));
     return node;
+  }
+
+  // Naming the source is the point: a parish describing its own worship and an
+  // encyclopedia article about the building are different kinds of claim, and
+  // the second is likelier to be describing how things were decades ago.
+  var SOURCE_NAMES = {
+    'website': 'the parish website',
+    'wikipedia': 'the Wikipedia article',
+    'website+wikipedia': 'the parish website and Wikipedia'
+  };
+
+  function scrapedSourceName(data) {
+    return SOURCE_NAMES[data.scrapedSource] || 'the parish website';
   }
 
   function open(target) {
@@ -394,10 +407,16 @@
       if (data.evidence && data.evidence.length) {
         host.appendChild(el('details', { class: 'cm-evidence' }, [
           el('summary', { text: 'What this is based on' }),
-          el('p', { text: 'Phrases found on the parish website: ' + data.evidence.join(', ') + '.' }),
+          el('p', { text: 'Phrases found on ' + scrapedSourceName(data) + ': ' +
+            data.evidence.join(', ') + '.' }),
           el('p', { class: 'cm-caveat', text:
             'Dedications are deliberately ignored — St Mary the Virgin tells you about ' +
-            'the founding decade, not about this Sunday.' })
+            'the founding decade, not about this Sunday.' }),
+          data.scrapedSource && data.scrapedSource.indexOf('wikipedia') !== -1
+            ? el('p', { class: 'cm-caveat', text:
+                'Wikipedia articles describe buildings and history more often than ' +
+                'worship, and may be years out of date, so they count for less here.' })
+            : null
         ]));
       }
     } else {

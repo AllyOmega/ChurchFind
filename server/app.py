@@ -606,6 +606,10 @@ def get_churchmanship(church_id: str, user=Depends(current_user)):
         "confidence": row["confidence"],
         "votes": row["votes"],
         "source": row["source"],
+        # Which scrape produced the prior -- "website", "wikipedia" or both.
+        # "The parish says so" and "an encyclopedia article about the building
+        # says so" are different claims and the reader is entitled to know which.
+        "scrapedSource": row["scraped_source"],
         # The phrases that produced the scraped half, so nobody has to take the
         # number on faith.
         "evidence": [e for e in (row["evidence"] or "").split(",") if e],

@@ -55,7 +55,12 @@ LEXICON = [
     (r"\bbroad church\b",                       0.0,  0.0, 1.0),
     (r"\blow church\b",                        -0.7, -0.9, 2.5),
     (r"\bhigh church\b",                       +0.6, +0.9, 2.5),
-    (r"forward in faith|society of (?:st )?wilfrid|the society\b", +1.0, +0.6, 2.5),
+    # "The Society" is what Anglo-Catholics call the Society of St Wilfrid and
+    # St Hilda, but the bare phrase cannot be used: in ordinary prose it means
+    # the historical society, the missionary society, the altar guild society.
+    # Measured against 384 linked Wikipedia articles it fired 20 times, as often
+    # as "book of common prayer", and almost every hit was a different society.
+    (r"forward in faith|society of (?:st\.? )?wilfrid", +1.0, +0.6, 2.5),
     (r"walsingham|society of mary",            +1.0, +0.5, 2.0),
 
     # -- what the liturgy is called -------------------------------------------
@@ -85,7 +90,13 @@ LEXICON = [
     (r"\bsanctus bell|\bgenuflect",            +0.7, +0.8, 1.5),
 
     # -- Prayer Book: traditional, but says little about theology --------------
-    (r"book of common prayer|\b1662\b|\b1928\b|\bbcp\b", +0.1, +0.5, 1.0),
+    # A bare year cannot stand in for the Prayer Book. Across the same 384
+    # articles only 28% of "1662"/"1928" mentions sat anywhere near prayer-book
+    # words; the rest were ordinary dates -- a hall built in 1928, a parish
+    # founded in 1662. The year now has to name what it is a year of.
+    (r"book of common prayer|\bbcp\b"
+     r"|\b(?:1662|1928|1979)\s+(?:prayer ?book|liturgy|rite|missal)"
+     r"|(?:prayer ?book)\s+of\s+(?:1662|1928|1979)", +0.1, +0.5, 1.0),
     (r"\btraditional language\b|\bthee and thou\b", +0.1, +0.6, 1.0),
 
     # -- evangelical / low-church markers -------------------------------------
@@ -95,7 +106,11 @@ LEXICON = [
     (r"worship band|worship team|contemporary worship", -0.4, -0.9, 1.8),
     (r"praise (?:and|&) worship",              -0.4, -0.8, 1.5),
     (r"small groups?|home groups?|life groups?|\bcell groups?\b", -0.4, -0.5, 1.2),
-    (r"gospel[- ]cent(?:re|er)ed|\bthe gospel\b", -0.6, -0.4, 1.2),
+    # "Gospel-centred" is evangelical branding. Bare "the gospel" is not: every
+    # tradition preaches it, and in a parish history it is what missionaries
+    # brought to the frontier. It matched 16 of the 384 articles and separated
+    # nothing, so only the compound survives.
+    (r"gospel[- ]cent(?:re|er)ed", -0.6, -0.4, 1.2),
     (r"\baltar call\b|\bcome to (?:christ|faith)\b", -0.7, -0.7, 1.5),
     (r"\bchurch plant(?:ing)?\b",              -0.5, -0.6, 1.2),
     (r"\binformal\b|\bcasual\b|\bcome as you are\b", -0.2, -0.8, 1.2),
@@ -111,6 +126,17 @@ _COMPILED = [(re.compile(pattern, re.IGNORECASE), theology, ceremonial, strength
 # strength accumulates; this is the scale, not a threshold.
 CONFIDENCE_SCALE = 8.0
 MAX_SCRAPED_CONFIDENCE = 0.65   # a website is evidence, not testimony
+
+# Not every source is worth the same. A parish website is the parish describing
+# its own worship now. A Wikipedia article is usually about a *building* -- its
+# architect, its NRHP listing, the fire of 1908 -- written by someone else,
+# possibly years ago. It is real evidence and it reaches parishes with no
+# website at all, but it is weaker and it is more likely to be stale, so it
+# carries its own lower ceiling.
+SOURCE_CAPS = {
+    "website": 0.65,
+    "wikipedia": 0.45,
+}
 
 # How much a scraped estimate counts against user submissions, in units of
 # votes. At full confidence the prior is worth two votes: a third real
@@ -144,11 +170,14 @@ def label(axis, value):
     return "Unknown"
 
 
-def score(text):
+def score(text, source="website"):
     """Score a blob of text. Returns None when nothing at all matched.
 
     Returning None matters: a parish we know nothing about must show as unknown,
     not as a confident "middle". Zero and no-data are different answers.
+
+    `source` picks the confidence ceiling from SOURCE_CAPS and is recorded on
+    the result, so the UI can say where a reading came from.
     """
     if not text:
         return None
@@ -170,18 +199,75 @@ def score(text):
     if not matched:
         return None
 
-    confidence = min(weight_sum / CONFIDENCE_SCALE, 1.0) * MAX_SCRAPED_CONFIDENCE
+    cap = SOURCE_CAPS.get(source, MAX_SCRAPED_CONFIDENCE)
+    confidence = min(weight_sum / CONFIDENCE_SCALE, 1.0) * cap
 
     return {
         "theology": _clamp(theology_sum / weight_sum),
         "ceremonial": _clamp(ceremonial_sum / weight_sum),
         "confidence": round(confidence, 3),
+        "source": source,
         "matched": sorted(set(matched))[:12],
     }
 
 
 def _clamp(value):
     return round(max(-1.0, min(1.0, value)), 3)
+
+
+def merge_sources(scores):
+    """Combine per-source estimates for one parish into a single reading.
+
+    Two independent sources that agree are worth more than either alone, and two
+    that disagree are worth less -- the same principle as `blend` applies to
+    votes. A parish website calling itself Anglo-Catholic while its Wikipedia
+    article describes a plain preaching box is a parish that changed, or a
+    source that is wrong, and either way the meter should hedge.
+
+    The combined confidence can never exceed the best cap among the contributing
+    sources, so adding a weak source can sharpen a reading but cannot manufacture
+    certainty the evidence does not support.
+    """
+    scores = [s for s in scores if s]
+    if not scores:
+        return None
+    if len(scores) == 1:
+        return dict(scores[0])
+
+    weights = [max(s["confidence"], 1e-6) for s in scores]
+    total = sum(weights)
+
+    def axis(name):
+        return _clamp(sum(s[name] * w for s, w in zip(scores, weights)) / total)
+
+    # Distance between the two furthest-apart readings, over the 2-D box whose
+    # diagonal is 2*sqrt(2). 0 is perfect agreement, 1 is opposite corners.
+    spread = 0.0
+    for i, a in enumerate(scores):
+        for b in scores[i + 1:]:
+            distance = ((a["ceremonial"] - b["ceremonial"]) ** 2
+                        + (a["theology"] - b["theology"]) ** 2) ** 0.5
+            spread = max(spread, distance / (2 * 2 ** 0.5))
+
+    best = max(s["confidence"] for s in scores)
+    cap = max(SOURCE_CAPS.get(s.get("source", "website"), MAX_SCRAPED_CONFIDENCE)
+              for s in scores)
+    # Agreement adds up to a third again; disagreement takes away up to half.
+    confidence = best * (1.0 + 0.33 * (1 - spread) - 0.5 * spread)
+
+    matched = []
+    for s in scores:
+        for phrase in s.get("matched", []):
+            if phrase not in matched:
+                matched.append(phrase)
+
+    return {
+        "ceremonial": axis("ceremonial"),
+        "theology": axis("theology"),
+        "confidence": round(min(max(confidence, 0.0), cap), 3),
+        "source": "+".join(sorted({s.get("source", "website") for s in scores})),
+        "matched": sorted(matched)[:12],
+    }
 
 
 def blend(scraped, votes):

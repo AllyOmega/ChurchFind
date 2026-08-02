@@ -437,6 +437,23 @@ def test_base_schema_and_migration_list_agree():
     for column, _ in db_module._ADDED_USER_COLUMNS:
         assert column in user_columns, f"{column} is in the migration list but not in schema.sql"
 
+    cm_columns = {row["name"] for row in
+                  connection.execute("PRAGMA table_info(churchmanship)")}
+    for column, _ in db_module._ADDED_CHURCHMANSHIP_COLUMNS:
+        assert column in cm_columns, f"{column} is in the migration list but not in schema.sql"
+
+
+def test_build_columns_match_the_scraper_fields():
+    """build_db reads state files positionally by name. A field added to the
+    scraper but not to build_db's COLUMNS is silently dropped on the way into
+    the database, and nothing else notices."""
+    import build_db
+    import scrape_churches
+
+    assert set(build_db.COLUMNS) <= set(scrape_churches.FIELDS)
+    missing = set(scrape_churches.FIELDS) - set(build_db.COLUMNS)
+    assert not missing, f"scraper writes {missing} but build_db never reads them"
+
 
 def test_query_columns_all_exist():
     """queries.CHURCH_COLUMNS is interpolated into SQL; every name must be real."""
