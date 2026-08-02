@@ -170,3 +170,34 @@ CREATE INDEX IF NOT EXISTS idx_reviews_queue  ON reviews(status, created_at) WHE
 
 -- Moderators are flagged on the user row rather than in a roles table -- there
 -- are exactly two levels and no prospect of a third.
+
+-- ------------------------------------------------------------ churchmanship
+
+-- Two-axis estimate for Anglican parishes. The scraped_* columns are what the
+-- website analysis produced; the plain columns are that blended with user
+-- submissions. Keeping both means a bad scrape can be re-run without losing
+-- votes, and a moderator can see which part of the number is whose.
+CREATE TABLE IF NOT EXISTS churchmanship (
+  church_id          TEXT PRIMARY KEY REFERENCES churches(id) ON DELETE CASCADE,
+  ceremonial         REAL,
+  theology           REAL,
+  confidence         REAL NOT NULL DEFAULT 0,
+  votes              INTEGER NOT NULL DEFAULT 0,
+  source             TEXT NOT NULL DEFAULT 'estimated',
+  scraped_ceremonial REAL,
+  scraped_theology   REAL,
+  scraped_confidence REAL NOT NULL DEFAULT 0,
+  evidence           TEXT NOT NULL DEFAULT '',   -- comma-separated matched phrases
+  updated_at         TEXT NOT NULL DEFAULT ''
+);
+
+CREATE TABLE IF NOT EXISTS churchmanship_votes (
+  user_id     INTEGER NOT NULL REFERENCES users(id)    ON DELETE CASCADE,
+  church_id   TEXT    NOT NULL REFERENCES churches(id) ON DELETE CASCADE,
+  ceremonial  REAL    NOT NULL CHECK (ceremonial BETWEEN -1 AND 1),
+  theology    REAL    NOT NULL CHECK (theology   BETWEEN -1 AND 1),
+  created_at  TEXT    NOT NULL,
+  PRIMARY KEY (user_id, church_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_cmvotes_church ON churchmanship_votes(church_id);

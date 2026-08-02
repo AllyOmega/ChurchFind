@@ -1,0 +1,154 @@
+{
+ "scores": {
+  "n10019000914": {
+   "ceremonial": 0.14,
+   "confidence": 0.203,
+   "matched": [
+    "book of common prayer",
+    "thirty-nine articles"
+   ],
+   "theology": -0.38
+  },
+  "n10138744770": {
+   "ceremonial": 0.288,
+   "confidence": 0.65,
+   "matched": [
+    "blessed sacrament",
+    "book of common prayer",
+    "confession",
+    "evangelical",
+    "incense",
+    "the gospel",
+    "the mass"
+   ],
+   "theology": 0.174
+  },
+  "n11193962333": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "1928"
+   ],
+   "theology": 0.1
+  },
+  "n11606240133": {
+   "ceremonial": -0.5,
+   "confidence": 0.098,
+   "matched": [
+    "small groups"
+   ],
+   "theology": -0.4
+  },
+  "n11787436824": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "theology": 0.1
+  },
+  "n1192381367": {
+   "ceremonial": -0.5,
+   "confidence": 0.081,
+   "matched": [
+    "renewal"
+   ],
+   "theology": -0.2
+  },
+  "n1211580452": {
+   "ceremonial": 0.55,
+   "confidence": 0.163,
+   "matched": [
+    "book of common prayer",
+    "traditional language"
+   ],
+   "theology": 0.1
+  },
+  "n12245499548": {
+   "ceremonial": 0.65,
+   "confidence": 0.26,
+   "matched": [
+    "acolyte",
+    "procession",
+    "vestment"
+   ],
+   "theology": 0.225
+  },
+  "n12493163651": {
+   "ceremonial": -0.55,
+   "confidence": 0.195,
+   "matched": [
+    "church plant",
+    "life groups"
+   ],
+   "theology": -0.45
+  },
+  "n12549162990": {
+   "ceremonial": -0.5,
+   "confidence": 0.301,
+   "matched": [
+    "evangelical",
+    "small group"
+   ],
+   "theology": -0.738
+  },
+  "n12835341634": {
+   "ceremonial": 0.836,
+   "confidence": 0.358,
+   "matched": [
+    "acolyte",
+    "incense",
+    "vestment"
+   ],
+   "theology": 0.391
+  },
+  "n12875631385": {
+   "ceremonial": -0.445,
+   "confidence": 0.179,
+   "matched": [
+    "renewal",
+    "the gospel"
+   ],
+   "theology": -0.418
+  },
+  "n13007086948": {
+   "ceremonial": 0.011,
+   "confidence": 0.463,
+   "matched": [
+    "book of common prayer",
+    "casual",
+    "confession",
+    "procession",
+    "the gospel"
+   ],
+   "theology": 0.033
+  },
+  "n13027743684": {
+   "ceremonial": -0.305,
+   "confidence": 0.358,
+   "matched": [
+    "book of common prayer",
+    "casual",
+    "sermon series",
+    "the gospel"
+   ],
+   "theology": -0.286
+  },
+  "n13333035511": {
+   "ceremonial": -0.8,
+   "confidence": 0.098,
+   "matched": [
+    "casual"
+   ],
+   "theology": -0.2
+  },
+  "n13818232736": {
+   "ceremonial": -0.4,
+   "confidence": 0.098,
+   "matched": [
+    "the gospel"
+   ],
+   "theology": -0.6
+  }
+ }
+}

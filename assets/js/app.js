@@ -746,6 +746,15 @@
     var save = saveButton(church);
     if (save) actions.push(save);
 
+    if (church.family === 'anglican' && ChurchAccount.available()) {
+      var cm = el('button', {
+        type: 'button', class: 'action',
+        'aria-label': 'Churchmanship of ' + church.name, text: 'Churchmanship'
+      });
+      cm.addEventListener('click', function () { ChurchManship.open(church); });
+      actions.push(cm);
+    }
+
     if (ChurchAccount.available()) {
       var reviews = el('button', {
         type: 'button', class: 'action',
@@ -775,6 +784,19 @@
       }
     }
     if (church.note) meta.push(el('p', { class: 'note', text: 'Your note: ' + church.note }));
+
+    // The inline meter renders only when there is an estimate; an empty meter
+    // would read as "middle", which is a claim we have not earned.
+    if (church.family === 'anglican' && church.cm_confidence) {
+      var inline = ChurchManship.meter({
+        known: true,
+        ceremonial: church.cm_ceremonial, theology: church.cm_theology,
+        ceremonialLabel: '', theologyLabel: '',
+        confidence: church.cm_confidence, votes: church.cm_votes || 0,
+        source: church.cm_source
+      }, true);
+      if (inline) meta.push(inline);
+    }
 
     var address = addressLine(church);
     var aside = state.mode === 'near' && church.distance != null

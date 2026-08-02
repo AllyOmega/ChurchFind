@@ -23,10 +23,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scraper"))
 
 import auth  # noqa: E402
+import build_db  # noqa: E402
 import moderation  # noqa: E402
 import queries  # noqa: E402
 from db import connect, init_schema  # noqa: E402
 from normalize import FAMILY_LABELS  # noqa: E402
+from churchmanship import LABELS as CM_LABELS, label as cm_label  # noqa: E402
 from service_times import PERIOD_LABELS, PERIODS as SERVICE_PERIODS  # noqa: E402
 from states import STATE_NAMES  # noqa: E402
 
@@ -216,6 +218,13 @@ class ModerationDecision(BaseModel):
     status: str = Field(pattern="^(approved|rejected)$")
 
 
+class ChurchmanshipVote(BaseModel):
+    church_id: str = Field(max_length=40)
+    # -1..+1 on both axes; the UI offers five steps but the API takes the range.
+    ceremonial: float = Field(ge=-1, le=1)
+    theology: float = Field(ge=-1, le=1)
+
+
 class ReportPayload(BaseModel):
     church_id: str = Field(max_length=40)
     field: str = Field(max_length=40)
@@ -253,6 +262,13 @@ def meta():
         ]
         # How many records the time filters can actually see -- honest, because
         # only ~3% of churches have any service time recorded at all.
+        _facets_cache["churchmanshipLabels"] = {
+            axis: [{"min": low, "max": high, "label": name} for low, high, name in bands]
+            for axis, bands in CM_LABELS.items()
+        }
+        _facets_cache["withChurchmanship"] = db().execute(
+            "SELECT COUNT(*) FROM churchmanship WHERE confidence > 0"
+        ).fetchone()[0]
         _facets_cache["withServiceTimes"] = db().execute(
             "SELECT COUNT(*) FROM churches WHERE service_pairs <> ''"
         ).fetchone()[0]
@@ -560,6 +576,73 @@ def public_review(row, include_moderation=False):
         }
         review["authorEmail"] = row["email"]
     return review
+
+
+@app.get("/api/churchmanship/{church_id}")
+def get_churchmanship(church_id: str, user=Depends(current_user)):
+    """The estimate, what produced it, and the caller's own submission."""
+    row = db().execute(
+        "SELECT * FROM churchmanship WHERE church_id = ?", (church_id,)
+    ).fetchone()
+    mine = None
+    if user:
+        vote = db().execute(
+            "SELECT ceremonial, theology FROM churchmanship_votes "
+            "WHERE user_id = ? AND church_id = ?", (user["id"], church_id)
+        ).fetchone()
+        if vote:
+            mine = {"ceremonial": vote["ceremonial"], "theology": vote["theology"]}
+
+    if row is None:
+        return {"churchId": church_id, "known": False, "mine": mine}
+
+    return {
+        "churchId": church_id,
+        "known": row["confidence"] > 0 or row["votes"] > 0,
+        "ceremonial": row["ceremonial"],
+        "theology": row["theology"],
+        "ceremonialLabel": cm_label("ceremonial", row["ceremonial"]),
+        "theologyLabel": cm_label("theology", row["theology"]),
+        "confidence": row["confidence"],
+        "votes": row["votes"],
+        "source": row["source"],
+        # The phrases that produced the scraped half, so nobody has to take the
+        # number on faith.
+        "evidence": [e for e in (row["evidence"] or "").split(",") if e],
+        "mine": mine,
+    }
+
+
+@app.post("/api/churchmanship")
+def submit_churchmanship(payload: ChurchmanshipVote, user=Depends(require_user),
+                         _=Depends(require_csrf)):
+    church = queries.get_church(db(), payload.church_id)
+    if church is None:
+        raise HTTPException(404, "No church with that id.")
+    if church["family"] != "anglican":
+        raise HTTPException(422, "Churchmanship only applies to Anglican and Episcopal churches.")
+
+    db().execute(
+        """INSERT INTO churchmanship_votes (user_id, church_id, ceremonial, theology, created_at)
+           VALUES (?, ?, ?, ?, ?)
+           ON CONFLICT(user_id, church_id) DO UPDATE SET
+             ceremonial = excluded.ceremonial, theology = excluded.theology,
+             created_at = excluded.created_at""",
+        (user["id"], payload.church_id, payload.ceremonial, payload.theology,
+         auth.iso(auth.now())),
+    )
+    db().commit()
+    blended = build_db.recompute(db(), payload.church_id)
+    return {"ok": True, "churchmanship": blended}
+
+
+@app.delete("/api/churchmanship/{church_id}")
+def withdraw_churchmanship(church_id: str, user=Depends(require_user), _=Depends(require_csrf)):
+    db().execute("DELETE FROM churchmanship_votes WHERE user_id = ? AND church_id = ?",
+                 (user["id"], church_id))
+    db().commit()
+    build_db.recompute(db(), church_id)
+    return {"ok": True}
 
 
 @app.get("/api/churches/{church_id}/reviews")

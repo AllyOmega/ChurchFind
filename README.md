@@ -4,7 +4,9 @@ A static site for finding a church near you anywhere in the United States, backe
 scraped snapshot of OpenStreetMap.
 
 Type a town or ZIP code, pick a denomination, drag the radius slider, and get a ranked
-list with addresses, phone numbers, websites, service times and a map.
+list with addresses, phone numbers, websites, service times and a map. Anglican parishes
+also carry a two-axis churchmanship reading, because "Episcopal" tells you almost nothing
+about what a Sunday there is like.
 
 It runs two ways. Open the folder with any static file server and it works off the
 bundled JSON — no build, no server, no API keys. Start the API server as well and the
@@ -69,10 +71,19 @@ python3 -m http.server 8000
 # open http://localhost:8000
 ```
 
-To deploy this way, point GitHub Pages at the repository root (Settings → Pages → Deploy
-from a branch → `main` / `/`). Any static host works the same — there is nothing to build.
-Accounts are unavailable, and the page says so in a banner rather than leaving you to
-wonder where the sign-in button went.
+To deploy this way, point GitHub Pages at the repository root: **Settings → Pages →
+Deploy from a branch**, then pick the branch and `/ (root)`. It does not have to be
+`main` — Pages will serve any branch in the repository, so a working branch can be
+published without merging anything. The site appears at
+`https://<user>.github.io/<repo>/` a minute or two later. `.nojekyll` is committed so
+Pages copies the tree verbatim instead of running it through Jekyll. Any other static
+host works the same; there is nothing to build.
+
+What you get is the static half: search, both denomination filters, service times,
+radius, the map, and browse-by-state, over all 235,784 churches. What you do not get is
+anything that needs the API — accounts, saved churches, correction reports, reviews and
+churchmanship voting all require the server. The page detects this at boot and says so
+in a banner rather than leaving you to wonder where the sign-in button went.
 
 ### With the API server
 
@@ -273,6 +284,8 @@ state to filter it, and cannot answer "grace, anywhere" at all.
 | `sessions` | SHA-256 of the cookie token, CSRF digest, expiry, user agent |
 | `saved_churches` | user → church, with a private note |
 | `correction_reports` | queue for a human; the fix belongs upstream in OSM |
+| `reviews` | the text, the model's verdict, and a human's separately |
+| `churchmanship` + `churchmanship_votes` | the blended reading, and one row per voter |
 | `auth_attempts` | throttle history, pruned after 24 hours |
 
 ### The security decisions
@@ -443,6 +456,85 @@ raw OSM values onto families; anything unrecognised keeps its own label and land
 "Other" rather than disappearing. Both the API and the static build produce identical
 results — the two code paths are checked against each other.
 
+## The churchmanship meter
+
+Denomination stops being useful exactly where Anglicans need it most. Two parishes
+can both be Episcopal and share nothing about a Sunday morning — one with incense,
+a sung mass and a server's guild, the other with a worship band and a sermon series.
+The name on the sign predicts neither, which is why people ask around instead of
+looking anything up.
+
+So Anglican churches get a second reading, on **two axes rather than one**:
+
+```
+ceremonial   -1 plain, informal, preaching-centred
+             +1 vestments, incense, chant, procession
+
+theology     -1 Reformed / Evangelical
+             +1 Anglo-Catholic
+```
+
+Collapsing those into a single low-to-high line is the usual shorthand and it is
+wrong in both off-diagonal corners. A 1662 Prayer Book parish with Reformed
+doctrine is ceremonially high and theologically Protestant. A charismatic parish
+with a strong sacramental theology and a drum kit is the reverse. One axis cannot
+describe either without lying about the other.
+
+### Where the numbers come from
+
+`scraper/churchmanship.py` scores text against about fifty weighted phrases, each
+carrying a direction on both axes and a strength. "Anglo-Catholic" is a parish
+telling you directly and weighs 3.0; owning a processional cross weighs 0.8. Each
+phrase counts once however often it appears — a page that says "mass" forty times
+is one parish, not forty pieces of evidence.
+
+Three things are deliberately **not** used:
+
+- **Dedications.** St Mary the Virgin and All Souls read as Anglo-Catholic to a
+  British ear, but a dedication records the fashion of the founding decade, not
+  what happens there now. Scoring on it would systematically mislabel old parishes.
+- **"Holy Communion" and "Eucharist" on their own.** Both are used across the whole
+  spectrum and separate nothing.
+- **Denomination or province.** ACNA and TEC parishes both span the full range.
+
+### How little the scrape actually knows
+
+This is the honest part. Of 2,815 Anglican and Episcopal churches in the dataset,
+**seven** have any worship descriptor in their OSM service times. OpenStreetMap
+simply does not record this. The only real signal is a parish's own website, and
+only about a third have one recorded — `scraper/fetch_sites.py` fetches those,
+respecting `robots.txt`, one request at a time with a delay, a User-Agent naming
+the project and a contact URL, and at most two pages per parish (the homepage and
+one page that looks like it describes worship). Results are cached on disk so a
+rerun does not re-fetch what it already has.
+
+Everything downstream is built around that weakness:
+
+- **A scraped score never exceeds 0.65 confidence.** A website is evidence, not
+  testimony.
+- **No match means no score.** A parish with nothing to go on shows as unknown,
+  not as a confident "middle" — zero and no-data are different answers, and
+  conflating them invents a claim.
+- **The matched phrases are shown.** Open the disclosure on the card and you see
+  exactly which words produced the reading, so a wrong one is arguable rather than
+  mysterious.
+
+### User submissions outweigh it
+
+Signed-in users place a parish on both axes themselves. The scraped estimate is a
+prior worth at most two votes, so a third real submission outweighs even a
+confident scrape — which is the point of asking.
+
+Confidence tracks **agreement, not count**. Five submissions that contradict each
+other describe a parish people genuinely read differently, and the meter says so
+rather than averaging them into a confident middle. Votes also take over as the
+confidence signal as they accumulate rather than only ever raising it; otherwise a
+confident scrape could paper over exactly the disagreement worth surfacing.
+
+The card shows the source in words — "from the parish website only", "blended",
+"from N submissions" — because a number with no provenance is the failure mode
+this whole feature is trying to avoid.
+
 ## Map tiles
 
 The basemap is OpenStreetMap's public tile server by default, which their
@@ -462,7 +554,8 @@ its value. Earlier versions just showed a silent grey rectangle.
 Ordered by what the data already supports.
 
 **Done**
-- Service-time search, reviews with LLM moderation, and a moderation queue — above.
+- Service-time search, reviews with LLM moderation, a moderation queue, and the
+  two-axis Anglican churchmanship meter — above.
 - Accessibility beyond `wheelchair=yes`: the scraper now also captures `hearing_loop`
   and `toilets:wheelchair`, and the panel filters on the first.
 - Stale-record flags: the scrape now requests OSM's per-feature edit timestamp
@@ -480,6 +573,10 @@ Ordered by what the data already supports.
 - **Claimed listings** — let a congregation verify itself and correct its own entry,
   with changes pushed back to OpenStreetMap so everyone downstream benefits.
 - **"New near home"** — a monthly digest, which needs the email path above first.
+- **Churchmanship as a filter, not just a label.** The axes exist and are stored; what
+  is missing is "show me high-church parishes within 20 miles". That wants enough
+  coverage to be worth offering — right now most Anglican parishes have no score at
+  all, and a filter that silently drops the unknowns would be worse than none.
 
 One I would still push back on: **attendance or "popularity" figures** are not in
 the data and cannot be estimated from it honestly.
@@ -507,6 +604,8 @@ scraper/scrape_churches.py     the Overpass scrape
 scraper/normalize.py           OSM tags -> flat records, denomination and state mapping
 scraper/states.py              state codes and centroids
 scraper/service_times.py       OSM opening_hours -> searchable (day, time) pairs
+scraper/churchmanship.py       the two-axis Anglican scorer and the vote blend
+scraper/fetch_sites.py         robots-respecting fetch of Anglican parish websites
 scraper/validate.py            consistency checks over data/
 scraper/update_readme.py       regenerates the stats block in this file
 server/schema.sql              the database, churches and accounts
@@ -516,8 +615,10 @@ server/queries.py              church search: R*Tree radius, FTS5 names
 server/auth.py                 argon2id, sessions, CSRF, throttling
 server/moderation.py           review moderation with Claude, fail-closed
 server/app.py                  FastAPI routes and the static host
-server/test_api.py             68 tests over the API, weighted to the security-critical parts
+server/test_api.py             77 tests over the API, weighted to the security-critical parts
 server/test_moderation.py      24 tests over moderation, with the Claude call stubbed
+data/churchmanship.json        scraped churchmanship scores, merged in at build time
+.nojekyll                      tells GitHub Pages to serve the tree as-is
 ```
 
 ## Licence

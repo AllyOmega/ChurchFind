@@ -18,12 +18,14 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scraper"))
 
+import churchmanship  # noqa: E402
 import service_times  # noqa: E402
 from db import connect, init_schema  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 STATE_DIR = ROOT / "data" / "states"
 INDEX_PATH = ROOT / "data" / "index.json"
+CHURCHMANSHIP_PATH = ROOT / "data" / "churchmanship.json"
 
 COLUMNS = [
     "id", "name", "denomination", "family", "address", "city", "state",
@@ -126,10 +128,90 @@ def rebuild(connection):
             ],
         )
 
+    load_churchmanship(connection, cursor)
+
     connection.commit()
     cursor.execute("ANALYZE")
     connection.commit()
     return total
+
+
+def load_churchmanship(connection, cursor):
+    """Apply scraped churchmanship scores, preserving any user votes.
+
+    The scraped half is replaced wholesale; the blended columns are then
+    recomputed from it plus whatever votes exist. A re-scrape therefore never
+    discards a submission.
+    """
+    if not CHURCHMANSHIP_PATH.exists():
+        return 0
+    scores = json.loads(CHURCHMANSHIP_PATH.read_text()).get("scores", {})
+    if not scores:
+        return 0
+
+    known = {row[0] for row in cursor.execute("SELECT id FROM churches")}
+    applied = 0
+    for church_id, score in scores.items():
+        if church_id not in known:
+            continue
+        cursor.execute(
+            """INSERT INTO churchmanship
+                 (church_id, scraped_ceremonial, scraped_theology, scraped_confidence, evidence)
+               VALUES (?, ?, ?, ?, ?)
+               ON CONFLICT(church_id) DO UPDATE SET
+                 scraped_ceremonial = excluded.scraped_ceremonial,
+                 scraped_theology   = excluded.scraped_theology,
+                 scraped_confidence = excluded.scraped_confidence,
+                 evidence           = excluded.evidence""",
+            (church_id, score["ceremonial"], score["theology"], score["confidence"],
+             ",".join(score.get("matched", []))),
+        )
+        applied += 1
+
+    connection.commit()
+    for church_id in scores:
+        if church_id in known:
+            recompute(connection, church_id)
+    print(f"\n  Applied {applied:,} scraped churchmanship scores.")
+    return applied
+
+
+def recompute(connection, church_id):
+    """Blend the scraped estimate with user votes and store the result."""
+    row = connection.execute(
+        "SELECT scraped_ceremonial, scraped_theology, scraped_confidence "
+        "FROM churchmanship WHERE church_id = ?", (church_id,)
+    ).fetchone()
+    scraped = None
+    if row and row["scraped_confidence"]:
+        scraped = {"ceremonial": row["scraped_ceremonial"],
+                   "theology": row["scraped_theology"],
+                   "confidence": row["scraped_confidence"]}
+
+    votes = [(v["ceremonial"], v["theology"]) for v in connection.execute(
+        "SELECT ceremonial, theology FROM churchmanship_votes WHERE church_id = ?",
+        (church_id,))]
+
+    blended = churchmanship.blend(scraped, votes)
+    if blended is None:
+        connection.execute("DELETE FROM churchmanship WHERE church_id = ? "
+                           "AND scraped_confidence = 0", (church_id,))
+        connection.commit()
+        return None
+
+    connection.execute(
+        """INSERT INTO churchmanship (church_id, ceremonial, theology, confidence,
+                                      votes, source, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
+           ON CONFLICT(church_id) DO UPDATE SET
+             ceremonial = excluded.ceremonial, theology = excluded.theology,
+             confidence = excluded.confidence, votes = excluded.votes,
+             source = excluded.source, updated_at = excluded.updated_at""",
+        (church_id, blended["ceremonial"], blended["theology"], blended["confidence"],
+         blended["votes"], blended["source"]),
+    )
+    connection.commit()
+    return blended
 
 
 def main():

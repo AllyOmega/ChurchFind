@@ -645,3 +645,114 @@ def test_moderator_cannot_set_an_arbitrary_status(client, stub_moderation):
     review_id = client.get("/api/moderation/queue").json()["results"][0]["id"]
     assert client.post(f"/api/moderation/reviews/{review_id}", json={"status": "deleted"},
                        headers={"X-CSRF-Token": csrf(client)}).status_code == 422
+
+
+# ---------------------------------------------------------------- churchmanship
+
+@pytest.fixture
+def anglican_church(client):
+    """n2 is Catholic in the base fixture; make one Anglican to vote on."""
+    app_module._connection.execute(
+        "UPDATE churches SET family = 'anglican', denomination = 'Episcopal' WHERE id = 'n2'")
+    app_module._connection.execute("DELETE FROM churchmanship")
+    app_module._connection.execute("DELETE FROM churchmanship_votes")
+    app_module._connection.commit()
+    return "n2"
+
+
+def vote(client, church_id, ceremonial, theology):
+    return client.post("/api/churchmanship",
+                       json={"church_id": church_id, "ceremonial": ceremonial,
+                             "theology": theology},
+                       headers={"X-CSRF-Token": csrf(client)})
+
+
+def test_unknown_church_is_reported_as_unknown_not_middle(client, anglican_church):
+    """Zero and no-data are different answers; conflating them invents a claim."""
+    body = client.get(f"/api/churchmanship/{anglican_church}").json()
+    assert body["known"] is False
+    assert "ceremonial" not in body or body.get("ceremonial") is None
+
+
+def test_a_single_vote_creates_an_estimate(client, anglican_church):
+    register(client)
+    assert vote(client, anglican_church, 0.5, 1.0).status_code == 200
+
+    body = client.get(f"/api/churchmanship/{anglican_church}").json()
+    assert body["known"] is True
+    assert body["votes"] == 1
+    assert body["ceremonialLabel"] == "High church"
+    assert body["theologyLabel"] == "Anglo-Catholic"
+    assert body["mine"] == {"ceremonial": 0.5, "theology": 1.0}
+
+
+def test_votes_are_one_per_user_and_updatable(client, anglican_church):
+    register(client)
+    vote(client, anglican_church, 1.0, 1.0)
+    vote(client, anglican_church, -1.0, -1.0)
+    body = client.get(f"/api/churchmanship/{anglican_church}").json()
+    assert body["votes"] == 1
+    assert body["ceremonial"] == -1.0
+
+
+def test_disagreement_lowers_confidence(client, anglican_church):
+    """Three people who contradict each other describe a parish that is hard to
+    place. The meter has to get less sure, not average them into a confident
+    middle."""
+    agreeing = []
+    for index, pair in enumerate([(0.9, 0.9), (1.0, 0.8), (0.8, 1.0)]):
+        client.cookies.clear()
+        register(client, email=f"agree{index}@example.org")
+        vote(client, anglican_church, *pair)
+        agreeing.append(client.get(f"/api/churchmanship/{anglican_church}").json())
+    confident = agreeing[-1]["confidence"]
+
+    app_module._connection.execute("DELETE FROM churchmanship_votes")
+    app_module._connection.execute("DELETE FROM churchmanship")
+    app_module._connection.commit()
+
+    for index, pair in enumerate([(1.0, 1.0), (-1.0, -1.0), (0.0, 0.0)]):
+        client.cookies.clear()
+        register(client, email=f"differ{index}@example.org")
+        vote(client, anglican_church, *pair)
+    conflicted = client.get(f"/api/churchmanship/{anglican_church}").json()
+
+    assert conflicted["confidence"] < confident
+    assert conflicted["votes"] == 3
+
+
+def test_withdrawing_the_only_vote_returns_to_unknown(client, anglican_church):
+    register(client)
+    vote(client, anglican_church, 0.5, 0.5)
+    assert client.get(f"/api/churchmanship/{anglican_church}").json()["known"] is True
+
+    client.delete(f"/api/churchmanship/{anglican_church}",
+                  headers={"X-CSRF-Token": csrf(client)})
+    assert client.get(f"/api/churchmanship/{anglican_church}").json()["known"] is False
+
+
+def test_only_anglican_churches_can_be_scored(client):
+    """n1 is Baptist. Churchmanship is an Anglican concept and applying it
+    elsewhere would be a category error, not just noise."""
+    register(client)
+    assert vote(client, "n1", 0.5, 0.5).status_code == 422
+
+
+def test_vote_requires_sign_in_and_csrf(client, anglican_church):
+    assert client.post("/api/churchmanship",
+                       json={"church_id": anglican_church, "ceremonial": 0, "theology": 0}
+                       ).status_code == 401
+    register(client)
+    assert client.post("/api/churchmanship",
+                       json={"church_id": anglican_church, "ceremonial": 0, "theology": 0}
+                       ).status_code == 403
+
+
+@pytest.mark.parametrize("payload", [
+    {"ceremonial": 2, "theology": 0}, {"ceremonial": 0, "theology": -5},
+])
+def test_out_of_range_votes_rejected(client, anglican_church, payload):
+    register(client)
+    payload = dict(payload, church_id=anglican_church)
+    assert client.post("/api/churchmanship", json=payload,
+                       headers={"X-CSRF-Token": csrf(client)}).status_code == 422

@@ -536,3 +536,42 @@ input[type="range"] { width: 100%; accent-color: var(--indigo); }
 .review-form select:focus-visible, .review-form textarea:focus-visible {
   outline: 2px solid var(--indigo); outline-offset: 1px;
 }
+
+/* ---------------------------------------------------------- churchmanship */
+
+.cm-meter { margin: .5rem 0 0; }
+.cm-axis { display: grid; grid-template-columns: 5.5rem 1fr auto; gap: .5rem;
+           align-items: center; margin-bottom: .3rem; }
+.cm-axis-label { font-size: .78rem; color: var(--ink-soft); }
+.cm-track {
+  position: relative; height: 6px; border-radius: 3px;
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--indigo) 30%, transparent),
+    var(--rule) 50%,
+    color-mix(in srgb, #7b3fa0 35%, transparent));
+}
+.cm-fill {
+  position: absolute; top: 50%; width: 10px; height: 10px;
+  margin: -5px 0 0 -5px; border-radius: 50%;
+  background: var(--ink); border: 2px solid var(--card);
+}
+.cm-value { font-size: .76rem; color: var(--ink-soft); white-space: nowrap; }
+.cm-confidence { margin: .25rem 0 0; font-size: .74rem; color: var(--ink-faint); font-style: italic; }
+.cm-compact .cm-axis-label { font-size: .72rem; }
+.cm-compact .cm-value { display: none; }
+
+.cm-dialog { width: min(94vw, 460px); }
+.cm-intro { margin: 0 0 1rem; font-size: .86rem; color: var(--ink-soft); }
+.cm-none { font-size: .88rem; color: var(--ink-soft); }
+.cm-evidence { margin: .8rem 0; font-size: .82rem; color: var(--ink-soft); }
+.cm-evidence summary { cursor: pointer; color: var(--indigo); }
+.cm-evidence p { margin: .4rem 0 0; }
+.cm-caveat { color: var(--ink-faint); font-size: .78rem; }
+.cm-form { display: flex; flex-direction: column; gap: .3rem; margin-top: 1rem;
+           padding-top: 1rem; border-top: 1px solid var(--rule); }
+.cm-form label { font-size: .85rem; font-weight: 600; color: var(--ink-soft); margin-top: .4rem; }
+.cm-form select {
+  font: inherit; font-size: .9rem; padding: .45rem .55rem;
+  color: var(--ink); background: var(--paper);
+  border: 1px solid var(--rule); border-radius: 8px;
+}

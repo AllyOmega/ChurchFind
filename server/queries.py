@@ -152,6 +152,12 @@ def search(connection, params):
     ).fetchone()[0]
 
     columns = ", ".join(f"c.{name}" for name in CHURCH_COLUMNS)
+    # LEFT JOIN so a church with no estimate still comes back, with NULLs the
+    # caller turns into "unknown" rather than a fabricated middle.
+    base = base.replace("FROM churches c",
+                        "FROM churches c LEFT JOIN churchmanship m ON m.church_id = c.id", 1)
+    columns += (", m.ceremonial AS cm_ceremonial, m.theology AS cm_theology, "
+                "m.confidence AS cm_confidence, m.votes AS cm_votes, m.source AS cm_source")
     rows = connection.execute(
         f"SELECT {columns}, {distance_select} {base}{where} "
         f"ORDER BY {SORTS[sort]} LIMIT ? OFFSET ?",
@@ -162,9 +168,13 @@ def search(connection, params):
 
 
 def get_church(connection, church_id):
-    columns = ", ".join(CHURCH_COLUMNS)
+    columns = ", ".join(f"c.{name}" for name in CHURCH_COLUMNS)
     row = connection.execute(
-        f"SELECT {columns} FROM churches WHERE id = ?", (church_id,)
+        f"SELECT {columns}, m.ceremonial AS cm_ceremonial, m.theology AS cm_theology, "
+        f"m.confidence AS cm_confidence, m.votes AS cm_votes, m.source AS cm_source, "
+        f"m.evidence AS cm_evidence "
+        f"FROM churches c LEFT JOIN churchmanship m ON m.church_id = c.id "
+        f"WHERE c.id = ?", (church_id,)
     ).fetchone()
     return dict(row) if row else None
 

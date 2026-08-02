@@ -254,3 +254,219 @@
 
   global.ChurchReviews = { open: open, openQueue: openQueue };
 })(window);
+
+/* ------------------------------------------------------------ churchmanship */
+
+/* Two axes, because one line from "low" to "high" collapses things that vary
+ * independently -- a Prayer Book parish can be high-ceremonial and firmly
+ * Protestant, and one axis has to lie about one of those.
+ *
+ * Everything here is hedged on purpose. The estimate comes from reading a
+ * parish's own website, which is weak evidence, so the meter shows its
+ * confidence, names the phrases that produced it, and invites correction.
+ */
+(function (global) {
+  'use strict';
+
+  var AXES = [
+    { key: 'ceremonial', label: 'Ceremonial', low: 'Low church', high: 'High church' },
+    { key: 'theology', label: 'Tradition', low: 'Evangelical', high: 'Anglo-Catholic' }
+  ];
+  var STEPS = [
+    { value: -1, text: 'Strongly' }, { value: -0.5, text: 'Somewhat' },
+    { value: 0, text: 'Middle' },
+    { value: 0.5, text: 'Somewhat' }, { value: 1, text: 'Strongly' }
+  ];
+
+  var dialog = null;
+  var church = null;
+
+  function el(tag, attrs, children) {
+    var node = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) {
+      if (k === 'class') node.className = attrs[k];
+      else if (k === 'text') node.textContent = attrs[k];
+      else if (attrs[k] !== null && attrs[k] !== undefined && attrs[k] !== false) {
+        node.setAttribute(k, attrs[k]);
+      }
+    });
+    (children || []).forEach(function (c) {
+      if (c) node.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+    });
+    return node;
+  }
+
+  function readCookie(name) {
+    var m = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+    return m ? decodeURIComponent(m[1]) : '';
+  }
+
+  function request(method, path, body) {
+    var options = { method: method, credentials: 'same-origin', headers: { Accept: 'application/json' } };
+    if (method !== 'GET') {
+      options.headers['X-CSRF-Token'] = readCookie('cf_csrf');
+      if (body !== undefined) {
+        options.headers['Content-Type'] = 'application/json';
+        options.body = JSON.stringify(body);
+      }
+    }
+    return fetch('api' + path, options).then(function (response) {
+      return response.json().catch(function () { return {}; }).then(function (payload) {
+        if (!response.ok) {
+          var detail = payload.detail;
+          if (Array.isArray(detail)) detail = (detail[0] || {}).msg || 'That did not work.';
+          throw new Error(detail || 'That did not work.');
+        }
+        return payload;
+      });
+    });
+  }
+
+  /* The inline meter on a search-result card. Deliberately shows nothing at all
+     when there is no estimate -- an empty meter reads as "middle", which is a
+     claim we have not earned. */
+  function meter(data, compact) {
+    if (!data || !data.known) return null;
+    var node = el('div', { class: 'cm-meter' + (compact ? ' cm-compact' : '') });
+
+    AXES.forEach(function (axis) {
+      var value = data[axis.key];
+      if (value === null || value === undefined) return;
+      var percent = ((value + 1) / 2) * 100;
+      var marker = el('span', { class: 'cm-fill' });
+      // Set through CSSOM, not a style attribute: the CSP is style-src 'self'
+      // with no unsafe-inline, which blocks the attribute but not this.
+      marker.style.left = percent.toFixed(1) + '%';
+      node.appendChild(el('div', { class: 'cm-axis' }, [
+        el('span', { class: 'cm-axis-label', text: axis.label }),
+        el('div', { class: 'cm-track', role: 'img',
+                    'aria-label': axis.label + ': ' + data[axis.key + 'Label'] +
+                                  ' (' + axis.low + ' to ' + axis.high + ')' }, [marker]),
+        el('span', { class: 'cm-value', text: data[axis.key + 'Label'] || '' })
+      ]));
+    });
+
+    var strength = data.confidence >= 0.5 ? 'reasonably confident'
+      : data.confidence >= 0.25 ? 'a rough guess' : 'a very rough guess';
+    node.appendChild(el('p', { class: 'cm-confidence', text:
+      data.votes
+        ? strength + ', from ' + data.votes + (data.votes === 1 ? ' submission' : ' submissions') +
+          (data.source === 'community' ? '' : ' and the parish website')
+        : strength + ', from the parish website only' }));
+    return node;
+  }
+
+  function open(target) {
+    church = target;
+    build();
+    dialog.querySelector('.cm-title').textContent = church.name;
+    dialog.querySelector('.cm-body').textContent = 'Loading…';
+    dialog.showModal();
+    refresh();
+  }
+
+  function build() {
+    if (dialog) return dialog;
+    dialog = el('dialog', { class: 'review-dialog cm-dialog' });
+    dialog.innerHTML = [
+      '<form method="dialog" class="auth-close-form">',
+      '  <button value="cancel" class="auth-close" aria-label="Close">&times;</button>',
+      '</form>',
+      '<h2 class="cm-title"></h2>',
+      '<p class="cm-intro">Churchmanship on two axes. These are estimates, not labels the ',
+      'parish chose for itself — if you know it, please correct them.</p>',
+      '<div class="cm-body"></div>'
+    ].join('');
+    document.body.appendChild(dialog);
+    return dialog;
+  }
+
+  function refresh() {
+    return request('GET', '/churchmanship/' + encodeURIComponent(church.id)).then(render);
+  }
+
+  function render(data) {
+    var host = dialog.querySelector('.cm-body');
+    host.textContent = '';
+
+    if (data.known) {
+      host.appendChild(meter(data));
+      if (data.evidence && data.evidence.length) {
+        host.appendChild(el('details', { class: 'cm-evidence' }, [
+          el('summary', { text: 'What this is based on' }),
+          el('p', { text: 'Phrases found on the parish website: ' + data.evidence.join(', ') + '.' }),
+          el('p', { class: 'cm-caveat', text:
+            'Dedications are deliberately ignored — St Mary the Virgin tells you about ' +
+            'the founding decade, not about this Sunday.' })
+        ]));
+      }
+    } else {
+      host.appendChild(el('p', { class: 'cm-none', text:
+        'No estimate yet. Nothing was found on a website for this parish, so ' +
+        'the first person to answer sets it.' }));
+    }
+
+    if (!ChurchAccount.user()) {
+      var prompt = el('button', { type: 'button', class: 'btn btn-primary',
+                                  text: 'Sign in to add your reading' });
+      prompt.addEventListener('click', function () {
+        dialog.close();
+        ChurchAccount.open('signin', 'Sign in to add your reading of a parish.');
+      });
+      host.appendChild(prompt);
+      return;
+    }
+
+    var form = el('form', { class: 'cm-form' });
+    var inputs = {};
+    AXES.forEach(function (axis) {
+      var select = el('select', { id: 'cm-' + axis.key });
+      STEPS.forEach(function (step) {
+        var text = step.value === 0 ? 'Middle'
+          : step.text + ' ' + (step.value < 0 ? axis.low : axis.high).toLowerCase();
+        select.appendChild(el('option', { value: String(step.value), text: text }));
+      });
+      select.value = data.mine ? String(nearestStep(data.mine[axis.key])) : '0';
+      inputs[axis.key] = select;
+      form.appendChild(el('label', { for: 'cm-' + axis.key, text: axis.label }));
+      form.appendChild(select);
+    });
+
+    var error = el('p', { class: 'auth-error' });
+    var submit = el('button', { type: 'submit', class: 'btn btn-primary',
+                                text: data.mine ? 'Update my reading' : 'Submit' });
+    form.appendChild(error);
+    form.appendChild(submit);
+
+    if (data.mine) {
+      var withdraw = el('button', { type: 'button', class: 'link-btn', text: 'Withdraw mine' });
+      withdraw.addEventListener('click', function () {
+        request('DELETE', '/churchmanship/' + encodeURIComponent(church.id)).then(refresh);
+      });
+      form.appendChild(withdraw);
+    }
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      error.textContent = '';
+      submit.disabled = true;
+      request('POST', '/churchmanship', {
+        church_id: church.id,
+        ceremonial: Number(inputs.ceremonial.value),
+        theology: Number(inputs.theology.value)
+      }).then(refresh)
+        .catch(function (err) { error.textContent = err.message; })
+        .then(function () { submit.disabled = false; });
+    });
+
+    host.appendChild(form);
+  }
+
+  function nearestStep(value) {
+    return STEPS.reduce(function (best, step) {
+      return Math.abs(step.value - value) < Math.abs(best - value) ? step.value : best;
+    }, 0);
+  }
+
+  global.ChurchManship = { open: open, meter: meter };
+})(window);

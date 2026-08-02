@@ -4,3 +4,5 @@ __pycache__/
 
 churchfind.db*
 server/churchfind.db*
+
+data/sites-cache/
