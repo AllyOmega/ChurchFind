@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-02T07:10:29Z",
+  "generated_at": "2026-08-02T07:32:12Z",
   "osm_snapshot": "2026-08-02T07:07:06Z",
   "source": "OpenStreetMap via Overpass API",
   "license": "ODbL 1.0",
@@ -62,6 +62,1956 @@
       "label": "Other",
       "count": 2823
     }
+  },
+  "denominations": {
+    "anglican": [
+      {
+        "label": "Episcopal",
+        "count": 2305
+      },
+      {
+        "label": "Anglican",
+        "count": 510
+      }
+    ],
+    "baptist": [
+      {
+        "label": "Baptist",
+        "count": 37897
+      },
+      {
+        "label": "Southern Baptist",
+        "count": 457
+      },
+      {
+        "label": "Missionary Baptist",
+        "count": 45
+      },
+      {
+        "label": "Free Will Baptist",
+        "count": 31
+      },
+      {
+        "label": "Independent Baptist",
+        "count": 26
+      },
+      {
+        "label": "Primitive Baptist",
+        "count": 18
+      },
+      {
+        "label": "American Baptist",
+        "count": 6
+      }
+    ],
+    "catholic": [
+      {
+        "label": "Roman Catholic",
+        "count": 7761
+      },
+      {
+        "label": "Catholic",
+        "count": 6017
+      },
+      {
+        "label": "Ukrainian Greek Catholic",
+        "count": 74
+      },
+      {
+        "label": "Greek Catholic",
+        "count": 61
+      },
+      {
+        "label": "Maronite",
+        "count": 18
+      },
+      {
+        "label": "Byzantine Catholic",
+        "count": 10
+      },
+      {
+        "label": "Old Catholic",
+        "count": 4
+      }
+    ],
+    "lutheran": [
+      {
+        "label": "Lutheran",
+        "count": 8700
+      },
+      {
+        "label": "Evangelical Lutheran",
+        "count": 336
+      },
+      {
+        "label": "Lutheran (Missouri Synod)",
+        "count": 1
+      }
+    ],
+    "methodist": [
+      {
+        "label": "Methodist",
+        "count": 11699
+      },
+      {
+        "label": "United Methodist",
+        "count": 2385
+      },
+      {
+        "label": "African Methodist Episcopal",
+        "count": 496
+      },
+      {
+        "label": "Church of the Nazarene",
+        "count": 440
+      },
+      {
+        "label": "AME Zion",
+        "count": 383
+      },
+      {
+        "label": "Wesleyan",
+        "count": 157
+      },
+      {
+        "label": "Free Methodist",
+        "count": 31
+      }
+    ],
+    "nondenominational": [
+      {
+        "label": "Non-denominational",
+        "count": 1360
+      },
+      {
+        "label": "Evangelical",
+        "count": 728
+      },
+      {
+        "label": "Interdenominational",
+        "count": 11
+      },
+      {
+        "label": "Community Church",
+        "count": 6
+      }
+    ],
+    "orthodox": [
+      {
+        "label": "Orthodox",
+        "count": 867
+      },
+      {
+        "label": "Greek Orthodox",
+        "count": 512
+      },
+      {
+        "label": "Russian Orthodox",
+        "count": 92
+      },
+      {
+        "label": "Coptic Orthodox",
+        "count": 60
+      },
+      {
+        "label": "Romanian Orthodox",
+        "count": 44
+      },
+      {
+        "label": "Serbian Orthodox",
+        "count": 39
+      },
+      {
+        "label": "Armenian Apostolic",
+        "count": 36
+      },
+      {
+        "label": "Antiochian Orthodox",
+        "count": 30
+      },
+      {
+        "label": "Ethiopian Orthodox",
+        "count": 29
+      },
+      {
+        "label": "Oriental Orthodox",
+        "count": 2
+      }
+    ],
+    "other": [
+      {
+        "label": "Protestant",
+        "count": 916
+      },
+      {
+        "label": "Christ Scientist",
+        "count": 233
+      },
+      {
+        "label": "Latter Day Saints",
+        "count": 201
+      },
+      {
+        "label": "Presbyterian Church Usa",
+        "count": 124
+      },
+      {
+        "label": "Christian And Missionary Alliance",
+        "count": 58
+      },
+      {
+        "label": "Free Evangelical",
+        "count": 52
+      },
+      {
+        "label": "Ukrainian Orthodox",
+        "count": 46
+      },
+      {
+        "label": "United",
+        "count": 46
+      },
+      {
+        "label": "Churches Of Christ",
+        "count": 38
+      },
+      {
+        "label": "Anabaptist",
+        "count": 30
+      },
+      {
+        "label": "Presbyterian Church In America",
+        "count": 24
+      },
+      {
+        "label": "Community Of Christ",
+        "count": 23
+      },
+      {
+        "label": "Global Methodist",
+        "count": 23
+      },
+      {
+        "label": "La Luz Del Mundo",
+        "count": 22
+      },
+      {
+        "label": "Orthodox Presbyterian Church",
+        "count": 21
+      },
+      {
+        "label": "Church Of The Nazarene",
+        "count": 20
+      },
+      {
+        "label": "New Apostolic",
+        "count": 20
+      },
+      {
+        "label": "Evangelical Covenant",
+        "count": 19
+      },
+      {
+        "label": "Unity",
+        "count": 19
+      },
+      {
+        "label": "Church Of The Brethren",
+        "count": 18
+      },
+      {
+        "label": "Messianic Jewish",
+        "count": 18
+      },
+      {
+        "label": "None",
+        "count": 18
+      },
+      {
+        "label": "Brethren In Christ",
+        "count": 16
+      },
+      {
+        "label": "United Reformed",
+        "count": 15
+      },
+      {
+        "label": "Evangelical Free Church Of America",
+        "count": 14
+      },
+      {
+        "label": "Calvary Chapel",
+        "count": 13
+      },
+      {
+        "label": "Christian Methodist Episcopal",
+        "count": 13
+      },
+      {
+        "label": "Independent",
+        "count": 13
+      },
+      {
+        "label": "Albanian Orthodox",
+        "count": 12
+      },
+      {
+        "label": "Apostolic Assembly Of The Faith In Christ Jesus",
+        "count": 12
+      },
+      {
+        "label": "Spiritist",
+        "count": 12
+      },
+      {
+        "label": "Biblical",
+        "count": 11
+      },
+      {
+        "label": "Evangelical Free",
+        "count": 11
+      },
+      {
+        "label": "Iglesia Ni Cristo",
+        "count": 11
+      },
+      {
+        "label": "Churches Of Christ In Christian Union",
+        "count": 10
+      },
+      {
+        "label": "Evangelical Presbyterian Church",
+        "count": 10
+      },
+      {
+        "label": "Lutheran Church Missouri Synod",
+        "count": 10
+      },
+      {
+        "label": "Alliance",
+        "count": 9
+      },
+      {
+        "label": "Church Of God Of Prophecy",
+        "count": 9
+      },
+      {
+        "label": "Vineyard",
+        "count": 9
+      },
+      {
+        "label": "Covenant",
+        "count": 8
+      },
+      {
+        "label": "Methodist Episcopal",
+        "count": 8
+      },
+      {
+        "label": "Neo Pentecostal",
+        "count": 8
+      },
+      {
+        "label": "Bulgarian Orthodox",
+        "count": 7
+      },
+      {
+        "label": "Christian Science",
+        "count": 7
+      },
+      {
+        "label": "Polish Catholic",
+        "count": 7
+      },
+      {
+        "label": "Swedenborgian",
+        "count": 7
+      },
+      {
+        "label": "Syriac Orthodox",
+        "count": 7
+      },
+      {
+        "label": "United Pentecostal",
+        "count": 7
+      },
+      {
+        "label": "Apostolic Faith",
+        "count": 6
+      },
+      {
+        "label": "Assyrian",
+        "count": 6
+      },
+      {
+        "label": "Christian Community",
+        "count": 6
+      },
+      {
+        "label": "Gospel",
+        "count": 6
+      },
+      {
+        "label": "Holiness",
+        "count": 6
+      },
+      {
+        "label": "Berean",
+        "count": 5
+      },
+      {
+        "label": "Christian Reformed Church In North America",
+        "count": 5
+      },
+      {
+        "label": "Cumberland Presbyterian Church",
+        "count": 5
+      },
+      {
+        "label": "Eastern Orthodox",
+        "count": 5
+      },
+      {
+        "label": "Lutheran (elca)",
+        "count": 5
+      },
+      {
+        "label": "Missionary",
+        "count": 5
+      },
+      {
+        "label": "Polish National Catholic",
+        "count": 5
+      },
+      {
+        "label": "Reformed Baptist",
+        "count": 5
+      },
+      {
+        "label": "Reformed Church In America",
+        "count": 5
+      },
+      {
+        "label": "Society Of Friends",
+        "count": 5
+      },
+      {
+        "label": "Traditionalist Catholic",
+        "count": 5
+      },
+      {
+        "label": "United Brethren",
+        "count": 5
+      },
+      {
+        "label": "Anglican Catholic",
+        "count": 4
+      },
+      {
+        "label": "Chaldean Catholic",
+        "count": 4
+      },
+      {
+        "label": "Christadelphian",
+        "count": 4
+      },
+      {
+        "label": "Cogic",
+        "count": 4
+      },
+      {
+        "label": "Congregationalist",
+        "count": 4
+      },
+      {
+        "label": "Elca",
+        "count": 4
+      },
+      {
+        "label": "Eritrean Orthodox",
+        "count": 4
+      },
+      {
+        "label": "Friends",
+        "count": 4
+      },
+      {
+        "label": "Grace Brethren",
+        "count": 4
+      },
+      {
+        "label": "Pentecostal Holiness",
+        "count": 4
+      },
+      {
+        "label": "Scientist",
+        "count": 4
+      },
+      {
+        "label": "Spiritualist",
+        "count": 4
+      },
+      {
+        "label": "Syro Malabar Catholic",
+        "count": 4
+      },
+      {
+        "label": "Ukrainian Catholic",
+        "count": 4
+      },
+      {
+        "label": "Undenominational",
+        "count": 4
+      },
+      {
+        "label": "Advent Christian",
+        "count": 3
+      },
+      {
+        "label": "Apostolic Pentecostal",
+        "count": 3
+      },
+      {
+        "label": "Calvinist",
+        "count": 3
+      },
+      {
+        "label": "Church Of South India",
+        "count": 3
+      },
+      {
+        "label": "Confessional Lutheran",
+        "count": 3
+      },
+      {
+        "label": "Efca",
+        "count": 3
+      },
+      {
+        "label": "Evangelical Covenant Church",
+        "count": 3
+      },
+      {
+        "label": "Evangelical Free Church",
+        "count": 3
+      },
+      {
+        "label": "Free Lutheran",
+        "count": 3
+      },
+      {
+        "label": "Indian Orthodox",
+        "count": 3
+      },
+      {
+        "label": "Macedonian Orthodox",
+        "count": 3
+      },
+      {
+        "label": "Non Denominational Evangelical",
+        "count": 3
+      },
+      {
+        "label": "Pca",
+        "count": 3
+      },
+      {
+        "label": "Pcusa",
+        "count": 3
+      },
+      {
+        "label": "United Brethren In Christ",
+        "count": 3
+      },
+      {
+        "label": "Uniting",
+        "count": 3
+      },
+      {
+        "label": "Wisconsin Evangelical Lutheran Synod",
+        "count": 3
+      },
+      {
+        "label": "African Methodist",
+        "count": 2
+      },
+      {
+        "label": "African Union Methodist Protestant",
+        "count": 2
+      },
+      {
+        "label": "Bible Church",
+        "count": 2
+      },
+      {
+        "label": "Calvary",
+        "count": 2
+      },
+      {
+        "label": "Calvary Baptist",
+        "count": 2
+      },
+      {
+        "label": "Christian Church",
+        "count": 2
+      },
+      {
+        "label": "Church Of God In Christ (cogic)",
+        "count": 2
+      },
+      {
+        "label": "Church Of God In Christ Mennonite",
+        "count": 2
+      },
+      {
+        "label": "Church Of Jesus Christ Of Latter Day Saints",
+        "count": 2
+      },
+      {
+        "label": "Conservative",
+        "count": 2
+      },
+      {
+        "label": "Cowboy Church",
+        "count": 2
+      },
+      {
+        "label": "Evangelical Congregational",
+        "count": 2
+      },
+      {
+        "label": "First Assembly Of God",
+        "count": 2
+      },
+      {
+        "label": "Foursquare Gospel",
+        "count": 2
+      },
+      {
+        "label": "Freewill Baptist",
+        "count": 2
+      },
+      {
+        "label": "Fundamentalist Church Of Jesus Christ Of Latter Day Saints",
+        "count": 2
+      },
+      {
+        "label": "Iglesia Filipina Independiente",
+        "count": 2
+      },
+      {
+        "label": "Independent Christian",
+        "count": 2
+      },
+      {
+        "label": "Jews For Jesus",
+        "count": 2
+      },
+      {
+        "label": "Lutheran Brethren",
+        "count": 2
+      },
+      {
+        "label": "Malankara Orthodox",
+        "count": 2
+      },
+      {
+        "label": "Masonic",
+        "count": 2
+      },
+      {
+        "label": "Metaphysical",
+        "count": 2
+      },
+      {
+        "label": "Metropolitan Community Church",
+        "count": 2
+      },
+      {
+        "label": "Missionary Church",
+        "count": 2
+      },
+      {
+        "label": "Multi Denominational",
+        "count": 2
+      },
+      {
+        "label": "No",
+        "count": 2
+      },
+      {
+        "label": "Non Denominational",
+        "count": 2
+      },
+      {
+        "label": "Nontrinitarian",
+        "count": 2
+      },
+      {
+        "label": "Oneness Pentecostal",
+        "count": 2
+      },
+      {
+        "label": "Open Bible",
+        "count": 2
+      },
+      {
+        "label": "Other",
+        "count": 2
+      },
+      {
+        "label": "Plymouth Brethren",
+        "count": 2
+      },
+      {
+        "label": "Rccg",
+        "count": 2
+      },
+      {
+        "label": "Redeemed Christian Church Of God",
+        "count": 2
+      },
+      {
+        "label": "Ruthenian Catholic",
+        "count": 2
+      },
+      {
+        "label": "Sovereign Grace Ministries",
+        "count": 2
+      },
+      {
+        "label": "The Church Of Jesus Christ Of Latter Day Saints",
+        "count": 2
+      },
+      {
+        "label": "United Church Of God",
+        "count": 2
+      },
+      {
+        "label": "United Presbyterian",
+        "count": 2
+      },
+      {
+        "label": "Universal",
+        "count": 2
+      },
+      {
+        "label": "Universalist",
+        "count": 2
+      },
+      {
+        "label": "A",
+        "count": 1
+      },
+      {
+        "label": "Acim",
+        "count": 1
+      },
+      {
+        "label": "Acts 29",
+        "count": 1
+      },
+      {
+        "label": "Affirming Pentecostal",
+        "count": 1
+      },
+      {
+        "label": "African Methodist Episcopalian",
+        "count": 1
+      },
+      {
+        "label": "African Orthodox",
+        "count": 1
+      },
+      {
+        "label": "Ag",
+        "count": 1
+      },
+      {
+        "label": "Alliance World Fellowship",
+        "count": 1
+      },
+      {
+        "label": "Amana Church Society",
+        "count": 1
+      },
+      {
+        "label": "Ame",
+        "count": 1
+      },
+      {
+        "label": "Ame And Baptist",
+        "count": 1
+      },
+      {
+        "label": "American Orthodox Catholic Church",
+        "count": 1
+      },
+      {
+        "label": "An Expanding Fellowship Of Churches United To Make Disciples Of Jesus Christ.\\",
+        "count": 1
+      },
+      {
+        "label": "Anglican Church In North America",
+        "count": 1
+      },
+      {
+        "label": "Anibaptist",
+        "count": 1
+      },
+      {
+        "label": "Aog",
+        "count": 1
+      },
+      {
+        "label": "Apostolic Christian",
+        "count": 1
+      },
+      {
+        "label": "Apostolic Lutheran",
+        "count": 1
+      },
+      {
+        "label": "Armenian Orthodox",
+        "count": 1
+      },
+      {
+        "label": "As",
+        "count": 1
+      },
+      {
+        "label": "Assemblies Of Yahweh",
+        "count": 1
+      },
+      {
+        "label": "Assembly Of Christian Churches",
+        "count": 1
+      },
+      {
+        "label": "Assyrian Church Of The East",
+        "count": 1
+      },
+      {
+        "label": "Babptist",
+        "count": 1
+      },
+      {
+        "label": "Babtist",
+        "count": 1
+      },
+      {
+        "label": "Baptist (cooperative Baptist Fellowship)",
+        "count": 1
+      },
+      {
+        "label": "Baptized Pentecostal",
+        "count": 1
+      },
+      {
+        "label": "Belarasian Autocephalous Orthodox",
+        "count": 1
+      },
+      {
+        "label": "Belarusian Orthodox",
+        "count": 1
+      },
+      {
+        "label": "Bethel Lutheran Church",
+        "count": 1
+      },
+      {
+        "label": "Bethelem",
+        "count": 1
+      },
+      {
+        "label": "Bible Baptist",
+        "count": 1
+      },
+      {
+        "label": "Bible Fellowship Church",
+        "count": 1
+      },
+      {
+        "label": "Bible Holiness",
+        "count": 1
+      },
+      {
+        "label": "Bible Methodist",
+        "count": 1
+      },
+      {
+        "label": "Black Hebrew Israelite",
+        "count": 1
+      },
+      {
+        "label": "Brethren (anibaptist)",
+        "count": 1
+      },
+      {
+        "label": "C&s",
+        "count": 1
+      },
+      {
+        "label": "Calvinistic Methodist",
+        "count": 1
+      },
+      {
+        "label": "Canaan",
+        "count": 1
+      },
+      {
+        "label": "Carthusians",
+        "count": 1
+      },
+      {
+        "label": "Catholic Roman",
+        "count": 1
+      },
+      {
+        "label": "Catholic Spirit",
+        "count": 1
+      },
+      {
+        "label": "Celestial Church Of Christ",
+        "count": 1
+      },
+      {
+        "label": "Chapel",
+        "count": 1
+      },
+      {
+        "label": "Chinese",
+        "count": 1
+      },
+      {
+        "label": "Chinese Church",
+        "count": 1
+      },
+      {
+        "label": "Christadelphia",
+        "count": 1
+      },
+      {
+        "label": "Christian Church (disciples Of Christ)",
+        "count": 1
+      },
+      {
+        "label": "Christian Fellowship Ministry",
+        "count": 1
+      },
+      {
+        "label": "Christian Mission",
+        "count": 1
+      },
+      {
+        "label": "Christian Missionary Alliance",
+        "count": 1
+      },
+      {
+        "label": "Christian Scientist",
+        "count": 1
+      },
+      {
+        "label": "Christian Union",
+        "count": 1
+      },
+      {
+        "label": "Christianity",
+        "count": 1
+      },
+      {
+        "label": "Chuch Of God",
+        "count": 1
+      },
+      {
+        "label": "Church Of Christ In Christian Union",
+        "count": 1
+      },
+      {
+        "label": "Church Of God (anderson, In)",
+        "count": 1
+      },
+      {
+        "label": "Church Of God (anderson, Indiana)",
+        "count": 1
+      },
+      {
+        "label": "Church Of God (cleveland Tn)",
+        "count": 1
+      },
+      {
+        "label": "Church Of God Anderson",
+        "count": 1
+      },
+      {
+        "label": "Church Of God Anderson In",
+        "count": 1
+      },
+      {
+        "label": "Church Of God Anderson Indiana",
+        "count": 1
+      },
+      {
+        "label": "Church Of God In Christ (http://cogic.net)",
+        "count": 1
+      },
+      {
+        "label": "Church Of God Ministries",
+        "count": 1
+      },
+      {
+        "label": "Church Of God Of Prophesy",
+        "count": 1
+      },
+      {
+        "label": "Church Of God Prophecy",
+        "count": 1
+      },
+      {
+        "label": "Church Of Our Lord Jesus Christ Of The Apostolic Faith",
+        "count": 1
+      },
+      {
+        "label": "Church Of The Apostles",
+        "count": 1
+      },
+      {
+        "label": "Church Of The Firstborn",
+        "count": 1
+      },
+      {
+        "label": "Church Of The Living God Cwff",
+        "count": 1
+      },
+      {
+        "label": "Church Of Tonga",
+        "count": 1
+      },
+      {
+        "label": "Cladic",
+        "count": 1
+      },
+      {
+        "label": "Cme",
+        "count": 1
+      },
+      {
+        "label": "Cog Anderson Ind",
+        "count": 1
+      },
+      {
+        "label": "Communion Of Reformed Evangelical Churches",
+        "count": 1
+      },
+      {
+        "label": "Community Church",
+        "count": 1
+      },
+      {
+        "label": "Congregational Church",
+        "count": 1
+      },
+      {
+        "label": "Congregational Holiness",
+        "count": 1
+      },
+      {
+        "label": "Congregational Holiness;congregational Holiness Church",
+        "count": 1
+      },
+      {
+        "label": "Congregational Methodist",
+        "count": 1
+      },
+      {
+        "label": "Conservative Baptist Of America",
+        "count": 1
+      },
+      {
+        "label": "Conservative Congregational",
+        "count": 1
+      },
+      {
+        "label": "Converge",
+        "count": 1
+      },
+      {
+        "label": "Cooperative Baptist",
+        "count": 1
+      },
+      {
+        "label": "Coptic",
+        "count": 1
+      },
+      {
+        "label": "Coptic Christian",
+        "count": 1
+      },
+      {
+        "label": "Cowboy",
+        "count": 1
+      },
+      {
+        "label": "Cutlerite",
+        "count": 1
+      },
+      {
+        "label": "Deciples Of Christ",
+        "count": 1
+      },
+      {
+        "label": "Di",
+        "count": 1
+      },
+      {
+        "label": "Djic",
+        "count": 1
+      },
+      {
+        "label": "Eastern Nicene",
+        "count": 1
+      },
+      {
+        "label": "Eckankar",
+        "count": 1
+      },
+      {
+        "label": "Ecumenic",
+        "count": 1
+      },
+      {
+        "label": "Ecumenical",
+        "count": 1
+      },
+      {
+        "label": "Episcopal (anglo Catholic)",
+        "count": 1
+      },
+      {
+        "label": "Episcopal/lutheran/presbyterian",
+        "count": 1
+      },
+      {
+        "label": "Ethiopian Evangelical",
+        "count": 1
+      },
+      {
+        "label": "Ethopian Orthodox Tewahedo",
+        "count": 1
+      },
+      {
+        "label": "Evangelical Baptist",
+        "count": 1
+      },
+      {
+        "label": "Evangelical Congregational Church",
+        "count": 1
+      },
+      {
+        "label": "Evangelical Covenant Church Of America",
+        "count": 1
+      },
+      {
+        "label": "Evangelical Friends Church",
+        "count": 1
+      },
+      {
+        "label": "Evangelical Friends Church International",
+        "count": 1
+      },
+      {
+        "label": "Evangelical Lutheran Chuch In America",
+        "count": 1
+      },
+      {
+        "label": "Evangelical Methodist",
+        "count": 1
+      },
+      {
+        "label": "Evangelical Protestant",
+        "count": 1
+      },
+      {
+        "label": "Evangelical: Spirit Filled, Finished Work",
+        "count": 1
+      },
+      {
+        "label": "Experimential",
+        "count": 1
+      },
+      {
+        "label": "Fbh (fire Baptised Holiness)",
+        "count": 1
+      },
+      {
+        "label": "Federated",
+        "count": 1
+      },
+      {
+        "label": "Fellowship Of Evangelical Churches",
+        "count": 1
+      },
+      {
+        "label": "Fire Baptized Holiness",
+        "count": 1
+      },
+      {
+        "label": "First Apostolic Church",
+        "count": 1
+      },
+      {
+        "label": "First Baptist",
+        "count": 1
+      },
+      {
+        "label": "First Bethren",
+        "count": 1
+      },
+      {
+        "label": "First United Presbyterian",
+        "count": 1
+      },
+      {
+        "label": "Firstborn",
+        "count": 1
+      },
+      {
+        "label": "Franciscan",
+        "count": 1
+      },
+      {
+        "label": "Free",
+        "count": 1
+      },
+      {
+        "label": "Free Church Of Scotland (continuing)",
+        "count": 1
+      },
+      {
+        "label": "Free Church Of Tonga",
+        "count": 1
+      },
+      {
+        "label": "Free Churches Of America",
+        "count": 1
+      },
+      {
+        "label": "Free Holiness",
+        "count": 1
+      },
+      {
+        "label": "Full Gospel Baptist",
+        "count": 1
+      },
+      {
+        "label": "Full Gospel Church",
+        "count": 1
+      },
+      {
+        "label": "Fundamental Baptist",
+        "count": 1
+      },
+      {
+        "label": "General Baptist",
+        "count": 1
+      },
+      {
+        "label": "God In Christ",
+        "count": 1
+      },
+      {
+        "label": "Gospel Hall",
+        "count": 1
+      },
+      {
+        "label": "Grearg",
+        "count": 1
+      },
+      {
+        "label": "Hispanic Church",
+        "count": 1
+      },
+      {
+        "label": "Holiness Pentecostal",
+        "count": 1
+      },
+      {
+        "label": "Holy Temple Of God",
+        "count": 1
+      },
+      {
+        "label": "House Of Aaron",
+        "count": 1
+      },
+      {
+        "label": "Hungarian Reformed",
+        "count": 1
+      },
+      {
+        "label": "Iglesia",
+        "count": 1
+      },
+      {
+        "label": "Igreja Universal",
+        "count": 1
+      },
+      {
+        "label": "Independent Fundamental",
+        "count": 1
+      },
+      {
+        "label": "Independent Fundamental Baptist",
+        "count": 1
+      },
+      {
+        "label": "Independent Fundamentalist Baptist",
+        "count": 1
+      },
+      {
+        "label": "Independent Lutheran",
+        "count": 1
+      },
+      {
+        "label": "Indian Shaker",
+        "count": 1
+      },
+      {
+        "label": "Interfaith",
+        "count": 1
+      },
+      {
+        "label": "Israel",
+        "count": 1
+      },
+      {
+        "label": "Iucecb",
+        "count": 1
+      },
+      {
+        "label": "Jehovah’s Witnesses",
+        "count": 1
+      },
+      {
+        "label": "Jesuit",
+        "count": 1
+      },
+      {
+        "label": "Jewish",
+        "count": 1
+      },
+      {
+        "label": "Knanaya Catholic",
+        "count": 1
+      },
+      {
+        "label": "Konkokyo",
+        "count": 1
+      },
+      {
+        "label": "Korean",
+        "count": 1
+      },
+      {
+        "label": "Korean American Presbyterian Church",
+        "count": 1
+      },
+      {
+        "label": "Korean Baptist",
+        "count": 1
+      },
+      {
+        "label": "Korean Methodist",
+        "count": 1
+      },
+      {
+        "label": "Korean Presbyterian Church Abroad",
+        "count": 1
+      },
+      {
+        "label": "La Mennais Brothers",
+        "count": 1
+      },
+      {
+        "label": "Laestadian Lutheran",
+        "count": 1
+      },
+      {
+        "label": "Latter Day Saint",
+        "count": 1
+      },
+      {
+        "label": "Latter Day Saint Bickertonite",
+        "count": 1
+      },
+      {
+        "label": "Lcms",
+        "count": 1
+      },
+      {
+        "label": "Lcms Lutheran",
+        "count": 1
+      },
+      {
+        "label": "Lds",
+        "count": 1
+      },
+      {
+        "label": "Liberal Catholic",
+        "count": 1
+      },
+      {
+        "label": "Local Churches",
+        "count": 1
+      },
+      {
+        "label": "Lutheran (lcms)",
+        "count": 1
+      },
+      {
+        "label": "Lutheran (missouri Synod)",
+        "count": 1
+      },
+      {
+        "label": "Lutheran Church Missouri Synod, English District",
+        "count": 1
+      },
+      {
+        "label": "Lutheran Lcms",
+        "count": 1
+      },
+      {
+        "label": "Lutheran Missouri Synod",
+        "count": 1
+      },
+      {
+        "label": "Malankara Orthodox Syrian",
+        "count": 1
+      },
+      {
+        "label": "Mar Thoma",
+        "count": 1
+      },
+      {
+        "label": "Mar Thoma Syrian",
+        "count": 1
+      },
+      {
+        "label": "Maranatha Christian Church",
+        "count": 1
+      },
+      {
+        "label": "Marthoma",
+        "count": 1
+      },
+      {
+        "label": "Melkite Greek Catholic",
+        "count": 1
+      },
+      {
+        "label": "Mennonite Brethren",
+        "count": 1
+      },
+      {
+        "label": "Messianic",
+        "count": 1
+      },
+      {
+        "label": "Messianic Community",
+        "count": 1
+      },
+      {
+        "label": "Messianic Judaism",
+        "count": 1
+      },
+      {
+        "label": "Methodist Protestant",
+        "count": 1
+      },
+      {
+        "label": "Metropolitan Community",
+        "count": 1
+      },
+      {
+        "label": "Michigan District Of The Missionary Church",
+        "count": 1
+      },
+      {
+        "label": "Missonary",
+        "count": 1
+      },
+      {
+        "label": "Missouri Synod Lutheran",
+        "count": 1
+      },
+      {
+        "label": "Multi",
+        "count": 1
+      },
+      {
+        "label": "Multidemoninational",
+        "count": 1
+      },
+      {
+        "label": "N/a",
+        "count": 1
+      },
+      {
+        "label": "Nazerene",
+        "count": 1
+      },
+      {
+        "label": "New Church",
+        "count": 1
+      },
+      {
+        "label": "New Jerusalem",
+        "count": 1
+      },
+      {
+        "label": "New Thought",
+        "count": 1
+      },
+      {
+        "label": "Non Denomination",
+        "count": 1
+      },
+      {
+        "label": "Non Sectarian Non Denominational",
+        "count": 1
+      },
+      {
+        "label": "Nondenomination",
+        "count": 1
+      },
+      {
+        "label": "Others",
+        "count": 1
+      },
+      {
+        "label": "Outreach Ministry",
+        "count": 1
+      },
+      {
+        "label": "Parish",
+        "count": 1
+      },
+      {
+        "label": "Pen33",
+        "count": 1
+      },
+      {
+        "label": "Penecostal New Age",
+        "count": 1
+      },
+      {
+        "label": "Pentacostal",
+        "count": 1
+      },
+      {
+        "label": "Pentecostal Free Will Baptist",
+        "count": 1
+      },
+      {
+        "label": "Pentecostalism",
+        "count": 1
+      },
+      {
+        "label": "Philadelphian",
+        "count": 1
+      },
+      {
+        "label": "Pillar Of Fire",
+        "count": 1
+      },
+      {
+        "label": "Polish National",
+        "count": 1
+      },
+      {
+        "label": "Presbyterian (pcusa)",
+        "count": 1
+      },
+      {
+        "label": "Primitive Methodist",
+        "count": 1
+      },
+      {
+        "label": "Progressive Catholic",
+        "count": 1
+      },
+      {
+        "label": "Reformed Episcopal",
+        "count": 1
+      },
+      {
+        "label": "Reformed Mennonite",
+        "count": 1
+      },
+      {
+        "label": "Reformed Methodist Union Episcopal",
+        "count": 1
+      },
+      {
+        "label": "Reformed Presbyterian",
+        "count": 1
+      },
+      {
+        "label": "Remnant Church",
+        "count": 1
+      },
+      {
+        "label": "Restoration Latter Day Saints",
+        "count": 1
+      },
+      {
+        "label": "Restored Rlds",
+        "count": 1
+      },
+      {
+        "label": "Rlds",
+        "count": 1
+      },
+      {
+        "label": "Romainian Church Of God",
+        "count": 1
+      },
+      {
+        "label": "Roman Catholica",
+        "count": 1
+      },
+      {
+        "label": "Romanian Penecostal",
+        "count": 1
+      },
+      {
+        "label": "Romanian Pentacostal",
+        "count": 1
+      },
+      {
+        "label": "Russian Evangelical",
+        "count": 1
+      },
+      {
+        "label": "Salem Lutheran Church",
+        "count": 1
+      },
+      {
+        "label": "Sbc",
+        "count": 1
+      },
+      {
+        "label": "Science Of Mind",
+        "count": 1
+      },
+      {
+        "label": "Science Of Mind And Spirit",
+        "count": 1
+      },
+      {
+        "label": "Scottish Episcopal",
+        "count": 1
+      },
+      {
+        "label": "Seventh Day Adventist Reformed",
+        "count": 1
+      },
+      {
+        "label": "Seventh Day Baptist",
+        "count": 1
+      },
+      {
+        "label": "Shiloh Apostolic",
+        "count": 1
+      },
+      {
+        "label": "Soma Communities",
+        "count": 1
+      },
+      {
+        "label": "Southern Baptist Convention",
+        "count": 1
+      },
+      {
+        "label": "Southern Methodist",
+        "count": 1
+      },
+      {
+        "label": "Spanish Apostolic Church",
+        "count": 1
+      },
+      {
+        "label": "Spiritual Science",
+        "count": 1
+      },
+      {
+        "label": "Spiritualism",
+        "count": 1
+      },
+      {
+        "label": "Strangite",
+        "count": 1
+      },
+      {
+        "label": "Syriac Catholic",
+        "count": 1
+      },
+      {
+        "label": "Tabernacle",
+        "count": 1
+      },
+      {
+        "label": "Temple Lot",
+        "count": 1
+      },
+      {
+        "label": "The Assemblies Of The Lord Jesus Christ",
+        "count": 1
+      },
+      {
+        "label": "The Redeemed Christian Church Of God",
+        "count": 1
+      },
+      {
+        "label": "Tibetan",
+        "count": 1
+      },
+      {
+        "label": "Ukrainian Catholic Church",
+        "count": 1
+      },
+      {
+        "label": "Unification",
+        "count": 1
+      },
+      {
+        "label": "Unification Church",
+        "count": 1
+      },
+      {
+        "label": "Uniity Of The Brethren",
+        "count": 1
+      },
+      {
+        "label": "Union African Methodist Episcopal",
+        "count": 1
+      },
+      {
+        "label": "Union American Methodist Episcopal",
+        "count": 1
+      },
+      {
+        "label": "Union American Methodist Episcopal Church",
+        "count": 1
+      },
+      {
+        "label": "Union Church Of Christ",
+        "count": 1
+      },
+      {
+        "label": "Unitarian Universalist Congregation",
+        "count": 1
+      },
+      {
+        "label": "United Brethern",
+        "count": 1
+      },
+      {
+        "label": "United Church",
+        "count": 1
+      },
+      {
+        "label": "United Church Of God In Christ",
+        "count": 1
+      },
+      {
+        "label": "United Church Of Lyndeborough",
+        "count": 1
+      },
+      {
+        "label": "United Evangelical Lutheran Church",
+        "count": 1
+      },
+      {
+        "label": "United Pentecostal (upc)",
+        "count": 1
+      },
+      {
+        "label": "United Pentecostal Church",
+        "count": 1
+      },
+      {
+        "label": "United Progressive Pentecostal",
+        "count": 1
+      },
+      {
+        "label": "Universal Catholic",
+        "count": 1
+      },
+      {
+        "label": "Universal Church Of The Kingdom Of God",
+        "count": 1
+      },
+      {
+        "label": "Universal Life Church",
+        "count": 1
+      },
+      {
+        "label": "Unknown",
+        "count": 1
+      },
+      {
+        "label": "Uua",
+        "count": 1
+      },
+      {
+        "label": "We",
+        "count": 1
+      },
+      {
+        "label": "Wels",
+        "count": 1
+      },
+      {
+        "label": "Wev",
+        "count": 1
+      },
+      {
+        "label": "Wisconsin Evangelical Lutheran Church",
+        "count": 1
+      },
+      {
+        "label": "Wisconsin Evangelical Lutheran Synod (wels)",
+        "count": 1
+      },
+      {
+        "label": "Word Of Faith, Charismatic",
+        "count": 1
+      },
+      {
+        "label": "Worldwide Missionary Movement (movimiento Misionero Mundial)",
+        "count": 1
+      }
+    ],
+    "peace": [
+      {
+        "label": "Mennonite",
+        "count": 336
+      },
+      {
+        "label": "Quaker",
+        "count": 258
+      },
+      {
+        "label": "Salvation Army",
+        "count": 76
+      },
+      {
+        "label": "Brethren",
+        "count": 61
+      },
+      {
+        "label": "Moravian",
+        "count": 32
+      },
+      {
+        "label": "Unitarian",
+        "count": 21
+      },
+      {
+        "label": "Unitarian Universalist",
+        "count": 9
+      }
+    ],
+    "pentecostal": [
+      {
+        "label": "Pentecostal",
+        "count": 3452
+      },
+      {
+        "label": "Assemblies of God",
+        "count": 624
+      },
+      {
+        "label": "Church of God",
+        "count": 298
+      },
+      {
+        "label": "Apostolic",
+        "count": 228
+      },
+      {
+        "label": "Church of God in Christ",
+        "count": 102
+      },
+      {
+        "label": "Foursquare",
+        "count": 69
+      },
+      {
+        "label": "Charismatic",
+        "count": 18
+      },
+      {
+        "label": "Full Gospel",
+        "count": 7
+      }
+    ],
+    "presbyterian": [
+      {
+        "label": "Presbyterian",
+        "count": 5977
+      },
+      {
+        "label": "United Church of Christ",
+        "count": 709
+      },
+      {
+        "label": "Reformed",
+        "count": 387
+      },
+      {
+        "label": "Congregational",
+        "count": 234
+      },
+      {
+        "label": "Dutch Reformed",
+        "count": 15
+      },
+      {
+        "label": "Christian Reformed",
+        "count": 13
+      }
+    ],
+    "restorationist": [
+      {
+        "label": "Latter-day Saints",
+        "count": 4360
+      },
+      {
+        "label": "Jehovah's Witnesses",
+        "count": 2000
+      },
+      {
+        "label": "Seventh-day Adventist",
+        "count": 1182
+      },
+      {
+        "label": "Church of Christ",
+        "count": 788
+      },
+      {
+        "label": "Christian Church",
+        "count": 222
+      },
+      {
+        "label": "Disciples of Christ",
+        "count": 118
+      },
+      {
+        "label": "Adventist",
+        "count": 23
+      }
+    ]
   },
   "states": [
     {

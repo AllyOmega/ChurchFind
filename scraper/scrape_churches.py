@@ -151,6 +151,17 @@ def family_counts(churches):
     return counts
 
 
+def denomination_counts(churches):
+    """Specific denominations within each family, for the second filter level."""
+    counts = {}
+    for church in churches:
+        label = church.get("denomination", "")
+        if label:
+            counts.setdefault(church["family"], {})
+            counts[church["family"]][label] = counts[church["family"]].get(label, 0) + 1
+    return counts
+
+
 def load_existing_summary(state_code):
     """Read a previously written state file so --force-less reruns can resume."""
     path = STATE_DIR / f"{state_code}.json"
@@ -163,7 +174,8 @@ def load_existing_summary(state_code):
     index = {field: i for i, field in enumerate(payload["fields"])}
     churches = [
         {"family": row[index["family"]], "website": row[index["website"]],
-         "phone": row[index["phone"]], "address": row[index["address"]]}
+         "phone": row[index["phone"]], "address": row[index["address"]],
+         "denomination": row[index["denomination"]]}
         for row in payload["churches"]
     ]
     return payload, churches
@@ -186,6 +198,7 @@ def main():
     summaries = []
     totals = {"churches": 0, "with_website": 0, "with_phone": 0, "with_address": 0}
     families = {}
+    denominations = {}
     failures = []
     osm_timestamps = []
 
@@ -223,6 +236,11 @@ def main():
         for family, count in counts.items():
             families[family] = families.get(family, 0) + count
 
+        for family, labels in denomination_counts(churches).items():
+            bucket = denominations.setdefault(family, {})
+            for label, count in labels.items():
+                bucket[label] = bucket.get(label, 0) + count
+
         with_website = sum(1 for c in churches if c["website"])
         with_phone = sum(1 for c in churches if c["phone"])
         with_address = sum(1 for c in churches if c["address"])
@@ -257,6 +275,15 @@ def main():
             for family, count in sorted(
                 families.items(), key=lambda kv: (kv[0] in ("unknown", "other"), -kv[1])
             )
+        },
+        # Specific denominations nested under their family, so the site can offer
+        # "Baptist" and then "Southern Baptist" without loading a state file.
+        "denominations": {
+            family: [
+                {"label": label, "count": count}
+                for label, count in sorted(labels.items(), key=lambda kv: (-kv[1], kv[0]))
+            ]
+            for family, labels in sorted(denominations.items())
         },
         "states": summaries,
     }

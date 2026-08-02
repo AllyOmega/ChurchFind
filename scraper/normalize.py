@@ -7,6 +7,29 @@ UI can offer as filter chips.
 
 import re
 
+from states import STATE_NAMES
+
+_CODES = set(STATE_NAMES)
+_NAMES_TO_CODE = {name.lower(): code for code, name in STATE_NAMES.items()}
+
+
+def canonical_state(raw, fallback):
+    """Return a two-letter code for a free-text `addr:state`.
+
+    OSM has "Ohio", "Tx", "tx", "W. Va." and "-IL" in this field. Anything that
+    does not resolve falls back to the state whose boundary the Overpass query
+    matched, which is authoritative -- an area query cannot be wrong about which
+    state contains a point, whereas a hand-typed tag can.
+    """
+    if not raw:
+        return fallback
+    letters = re.sub(r"[^A-Za-z]", "", raw).upper()
+    if letters in _CODES:
+        return letters
+    name = re.sub(r"[^a-z ]", "", raw.strip().lower()).strip()
+    return _NAMES_TO_CODE.get(name, fallback)
+
+
 # OSM denomination value -> (display label, family). The family is what the site
 # filters on; the label is what it prints. Values not listed here fall through to
 # `_titleize` with family "other", so an unmapped denomination still renders.
@@ -215,7 +238,7 @@ def normalize(element, state_code):
         "family": family,
         "address": build_address(tags),
         "city": tags.get("addr:city", "").strip(),
-        "state": tags.get("addr:state", "").strip() or state_code,
+        "state": canonical_state(tags.get("addr:state", ""), state_code),
         "postcode": tags.get("addr:postcode", "").strip(),
         "lat": round(float(lat), 6),
         "lon": round(float(lon), 6),
