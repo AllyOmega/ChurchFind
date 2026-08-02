@@ -1,26 +1,26 @@
 {
-  "generated_at": "2026-08-02T16:05:37Z",
-  "osm_snapshot": "2026-08-02T16:03:41Z",
+  "generated_at": "2026-08-02T18:44:01Z",
+  "osm_snapshot": "2026-08-02T18:39:21Z",
   "source": "OpenStreetMap via Overpass API",
   "license": "ODbL 1.0",
   "totals": {
-    "churches": 235761,
-    "with_website": 26453,
-    "with_phone": 22228,
-    "with_address": 70727
+    "churches": 235819,
+    "with_website": 26445,
+    "with_phone": 22213,
+    "with_address": 70756
   },
   "families": {
     "baptist": {
       "label": "Baptist",
-      "count": 38487
+      "count": 38496
     },
     "methodist": {
       "label": "Methodist & Wesleyan",
-      "count": 15587
+      "count": 15579
     },
     "catholic": {
       "label": "Catholic",
-      "count": 13954
+      "count": 13956
     },
     "lutheran": {
       "label": "Lutheran",
@@ -28,11 +28,11 @@
     },
     "restorationist": {
       "label": "Restorationist",
-      "count": 8688
+      "count": 8690
     },
     "presbyterian": {
       "label": "Presbyterian & Reformed",
-      "count": 7327
+      "count": 7325
     },
     "pentecostal": {
       "label": "Pentecostal & Charismatic",
@@ -44,11 +44,11 @@
     },
     "nondenominational": {
       "label": "Non-denominational",
-      "count": 2107
+      "count": 2104
     },
     "orthodox": {
       "label": "Orthodox",
-      "count": 1705
+      "count": 1710
     },
     "peace": {
       "label": "Anabaptist & Peace Churches",
@@ -56,11 +56,11 @@
     },
     "unknown": {
       "label": "Unspecified",
-      "count": 127632
+      "count": 127692
     },
     "other": {
       "label": "Other",
-      "count": 2839
+      "count": 2832
     }
   },
   "denominations": {
@@ -77,11 +77,11 @@
     "baptist": [
       {
         "label": "Baptist",
-        "count": 37902
+        "count": 37908
       },
       {
         "label": "Southern Baptist",
-        "count": 456
+        "count": 459
       },
       {
         "label": "Missionary Baptist",
@@ -107,11 +107,11 @@
     "catholic": [
       {
         "label": "Roman Catholic",
-        "count": 7770
+        "count": 7768
       },
       {
         "label": "Catholic",
-        "count": 6017
+        "count": 6021
       },
       {
         "label": "Ukrainian Greek Catholic",
@@ -151,11 +151,11 @@
     "methodist": [
       {
         "label": "Methodist",
-        "count": 11698
+        "count": 11700
       },
       {
         "label": "United Methodist",
-        "count": 2386
+        "count": 2378
       },
       {
         "label": "African Methodist Episcopal",
@@ -171,7 +171,7 @@
       },
       {
         "label": "Wesleyan",
-        "count": 157
+        "count": 155
       },
       {
         "label": "Free Methodist",
@@ -185,7 +185,7 @@
       },
       {
         "label": "Evangelical",
-        "count": 731
+        "count": 728
       },
       {
         "label": "Interdenominational",
@@ -199,11 +199,11 @@
     "orthodox": [
       {
         "label": "Orthodox",
-        "count": 859
+        "count": 865
       },
       {
         "label": "Greek Orthodox",
-        "count": 513
+        "count": 512
       },
       {
         "label": "Russian Orthodox",
@@ -241,11 +241,11 @@
     "other": [
       {
         "label": "Protestant",
-        "count": 933
+        "count": 930
       },
       {
         "label": "Christ Scientist",
-        "count": 233
+        "count": 232
       },
       {
         "label": "Latter Day Saints",
@@ -296,15 +296,15 @@
         "count": 22
       },
       {
-        "label": "New Apostolic",
-        "count": 21
-      },
-      {
         "label": "Orthodox Presbyterian Church",
         "count": 21
       },
       {
         "label": "Church Of The Nazarene",
+        "count": 20
+      },
+      {
+        "label": "New Apostolic",
         "count": 20
       },
       {
@@ -720,6 +720,10 @@
         "count": 2
       },
       {
+        "label": "Malankara Orthodox",
+        "count": 2
+      },
+      {
         "label": "Masonic",
         "count": 2
       },
@@ -996,10 +1000,6 @@
         "count": 1
       },
       {
-        "label": "Christian Congregation In The United States",
-        "count": 1
-      },
-      {
         "label": "Christian Fellowship Ministry",
         "count": 1
       },
@@ -1077,10 +1077,6 @@
       },
       {
         "label": "Church Of The Apostles",
-        "count": 1
-      },
-      {
-        "label": "Church Of The Apostolic Authority",
         "count": 1
       },
       {
@@ -1340,10 +1336,6 @@
         "count": 1
       },
       {
-        "label": "Holy Temple Of God",
-        "count": 1
-      },
-      {
         "label": "House Of Aaron",
         "count": 1
       },
@@ -1485,10 +1477,6 @@
       },
       {
         "label": "Lutheran Missouri Synod",
-        "count": 1
-      },
-      {
-        "label": "Malankara Orthodox",
         "count": 1
       },
       {
@@ -1903,7 +1891,7 @@
       },
       {
         "label": "Quaker",
-        "count": 258
+        "count": 257
       },
       {
         "label": "Salvation Army",
@@ -1911,7 +1899,7 @@
       },
       {
         "label": "Brethren",
-        "count": 60
+        "count": 61
       },
       {
         "label": "Moravian",
@@ -1929,7 +1917,7 @@
     "pentecostal": [
       {
         "label": "Pentecostal",
-        "count": 3447
+        "count": 3452
       },
       {
         "label": "Assemblies of God",
@@ -1937,15 +1925,15 @@
       },
       {
         "label": "Church of God",
-        "count": 300
+        "count": 298
       },
       {
         "label": "Apostolic",
-        "count": 229
+        "count": 227
       },
       {
         "label": "Church of God in Christ",
-        "count": 103
+        "count": 102
       },
       {
         "label": "Foursquare",
@@ -1963,15 +1951,15 @@
     "presbyterian": [
       {
         "label": "Presbyterian",
-        "count": 5974
+        "count": 5976
       },
       {
         "label": "United Church of Christ",
-        "count": 709
+        "count": 708
       },
       {
         "label": "Reformed",
-        "count": 382
+        "count": 379
       },
       {
         "label": "Congregational",
@@ -1989,11 +1977,11 @@
     "restorationist": [
       {
         "label": "Latter-day Saints",
-        "count": 4360
+        "count": 4361
       },
       {
         "label": "Jehovah's Witnesses",
-        "count": 1997
+        "count": 1998
       },
       {
         "label": "Seventh-day Adventist",
@@ -2028,21 +2016,21 @@
     {
       "code": "AK",
       "name": "Alaska",
-      "count": 451,
+      "count": 452,
       "lat": 64.0,
       "lon": -152.0
     },
     {
       "code": "AZ",
       "name": "Arizona",
-      "count": 1709,
+      "count": 1708,
       "lat": 34.17,
       "lon": -111.93
     },
     {
       "code": "AR",
       "name": "Arkansas",
-      "count": 5952,
+      "count": 5971,
       "lat": 34.75,
       "lon": -92.44
     },
@@ -2084,42 +2072,42 @@
     {
       "code": "FL",
       "name": "Florida",
-      "count": 8886,
+      "count": 8887,
       "lat": 28.63,
       "lon": -82.45
     },
     {
       "code": "GA",
       "name": "Georgia",
-      "count": 12304,
+      "count": 12320,
       "lat": 32.64,
       "lon": -83.44
     },
     {
       "code": "HI",
       "name": "Hawaii",
-      "count": 248,
+      "count": 267,
       "lat": 20.29,
       "lon": -156.37
     },
     {
       "code": "ID",
       "name": "Idaho",
-      "count": 955,
+      "count": 958,
       "lat": 44.35,
       "lon": -114.61
     },
     {
       "code": "IL",
       "name": "Illinois",
-      "count": 9131,
+      "count": 9112,
       "lat": 40.04,
       "lon": -89.2
     },
     {
       "code": "IN",
       "name": "Indiana",
-      "count": 4673,
+      "count": 4692,
       "lat": 39.89,
       "lon": -86.28
     },

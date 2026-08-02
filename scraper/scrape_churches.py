@@ -13,6 +13,7 @@ Usage:
 
 import argparse
 import json
+import os
 import sys
 import time
 import urllib.error
@@ -148,8 +149,21 @@ def write_state(state_code, churches, osm_timestamp):
         "fields": FIELDS,
         "churches": to_compact(churches),
     }
-    path.write_text(json.dumps(payload, separators=(",", ":"), ensure_ascii=False))
+    _write_atomic(path, json.dumps(payload, separators=(",", ":"), ensure_ascii=False))
     return path
+
+
+def _write_atomic(path, text):
+    """Write via a temporary file and rename, so the file is never half-written.
+
+    A megabyte of JSON is not one write syscall. A container restart or a kill
+    part-way through leaves a truncated file that parses as nothing, and this
+    one has already been interrupted mid-scrape once. os.replace is atomic
+    within a filesystem, so a reader sees either the old file or the new one.
+    """
+    temporary = path.with_name(path.name + ".tmp")
+    temporary.write_text(text)
+    os.replace(temporary, path)
 
 
 def family_counts(churches):
@@ -318,7 +332,8 @@ def write_index():
         "states": summaries,
     }
     DATA_DIR.mkdir(parents=True, exist_ok=True)
-    (DATA_DIR / "index.json").write_text(json.dumps(index, indent=2, ensure_ascii=False))
+    _write_atomic(DATA_DIR / "index.json",
+                  json.dumps(index, indent=2, ensure_ascii=False))
 
     print(f"\nTotal: {totals['churches']:,} churches across {len(summaries)} states")
     print(f"  with street address: {totals['with_address']:,}")

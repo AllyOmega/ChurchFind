@@ -15,30 +15,30 @@ list of churches you care about. The page detects which it has and says so.
 
 <!-- STATS:BEGIN -->
 
-**235,761 churches** across **50 states and DC**, from an OpenStreetMap snapshot taken **2026-08-02**.
+**235,819 churches** across **50 states and DC**, from an OpenStreetMap snapshot taken **2026-08-02**.
 
 | | Count | Share |
 |---|---:|---:|
-| Has a street address | 70,727 | 30% |
-| Has a website | 26,453 | 11% |
-| Has a phone number | 22,228 | 9% |
+| Has a street address | 70,756 | 30% |
+| Has a website | 26,445 | 11% |
+| Has a phone number | 22,213 | 9% |
 
 Denominational families, largest first:
 
 | Family | Churches | Share |
 |---|---:|---:|
-| Unspecified | 127,632 | 54.1% |
-| Baptist | 38,487 | 16.3% |
-| Methodist & Wesleyan | 15,587 | 6.6% |
-| Catholic | 13,954 | 5.9% |
+| Unspecified | 127,692 | 54.1% |
+| Baptist | 38,496 | 16.3% |
+| Methodist & Wesleyan | 15,579 | 6.6% |
+| Catholic | 13,956 | 5.9% |
 | Lutheran | 9,035 | 3.8% |
-| Restorationist | 8,688 | 3.7% |
-| Presbyterian & Reformed | 7,327 | 3.1% |
+| Restorationist | 8,690 | 3.7% |
+| Presbyterian & Reformed | 7,325 | 3.1% |
 | Pentecostal & Charismatic | 4,796 | 2.0% |
-| Other | 2,839 | 1.2% |
+| Other | 2,832 | 1.2% |
 | Anglican & Episcopal | 2,816 | 1.2% |
-| Non-denominational | 2,107 | 0.9% |
-| Orthodox | 1,705 | 0.7% |
+| Non-denominational | 2,104 | 0.9% |
+| Orthodox | 1,710 | 0.7% |
 | Anabaptist & Peace Churches | 788 | 0.3% |
 
 Ten largest state files:
@@ -46,15 +46,15 @@ Ten largest state files:
 | State | Churches |
 |---|---:|
 | Texas | 16,251 |
-| Georgia | 12,304 |
+| Georgia | 12,320 |
 | Alabama | 11,787 |
 | North Carolina | 11,689 |
 | California | 11,662 |
 | Tennessee | 10,340 |
 | Ohio | 9,794 |
 | Pennsylvania | 9,321 |
-| Illinois | 9,131 |
 | Virginia | 9,129 |
+| Illinois | 9,112 |
 
 <!-- STATS:END -->
 

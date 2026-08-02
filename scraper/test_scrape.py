@@ -177,3 +177,29 @@ def test_one_unfetchable_state_does_not_abandon_the_others(monkeypatch, data_dir
     # The state already on disk survived and the index still describes it.
     index = json.loads((root / "index.json").read_text())
     assert [s["code"] for s in index["states"]] == ["CO"]
+
+
+def test_a_state_file_is_never_left_half_written(data_dir, monkeypatch):
+    """A megabyte of JSON is not one write syscall, and this container has been
+    interrupted mid-scrape. A torn file parses as nothing and takes a whole
+    state offline, so the write goes through a temporary and a rename."""
+    root, states = data_dir
+    write_fake_state(states, "CO", 3)
+    original = json.loads((states / "CO.json").read_text())
+
+    real_replace = scrape_churches.os.replace
+
+    def die_before_rename(src, dst):
+        raise KeyboardInterrupt("killed between write and rename")
+
+    monkeypatch.setattr(scrape_churches.os, "replace", die_before_rename)
+    with pytest.raises(KeyboardInterrupt):
+        scrape_churches.write_state("CO", [], "2026-01-01T00:00:00Z")
+
+    # The old file is intact and still parses -- the interrupted write went to
+    # the temporary, which never became CO.json.
+    assert json.loads((states / "CO.json").read_text()) == original
+
+    monkeypatch.setattr(scrape_churches.os, "replace", real_replace)
+    scrape_churches.write_state("CO", [], "2026-01-01T00:00:00Z")
+    assert json.loads((states / "CO.json").read_text())["count"] == 0
