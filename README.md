@@ -4,8 +4,12 @@ A static site for finding a church near you anywhere in the United States, backe
 scraped snapshot of OpenStreetMap.
 
 Type a town or ZIP code, pick a denomination, drag the radius slider, and get a ranked
-list with addresses, phone numbers, websites, service times and a map. No build step, no
-server, no API keys — the whole thing is HTML, CSS, one script, and a folder of JSON.
+list with addresses, phone numbers, websites, service times and a map.
+
+It runs two ways. Open the folder with any static file server and it works off the
+bundled JSON — no build, no server, no API keys. Start the API server as well and the
+same page switches to SQL over the whole country and gains accounts, so you can keep a
+list of churches you care about. The page detects which it has and says so.
 
 <!-- STATS:BEGIN -->
 
@@ -54,8 +58,9 @@ Ten largest state files:
 
 ## Running it
 
-The site is entirely static, so any file server will do. It cannot be opened with
-`file://` — the JSON fetches need HTTP.
+### Static, no server
+
+Any file server will do. It cannot be opened with `file://` — the JSON fetches need HTTP.
 
 ```bash
 git clone https://github.com/AllyOmega/ChurchFind.git
@@ -64,13 +69,39 @@ python3 -m http.server 8000
 # open http://localhost:8000
 ```
 
-To deploy, point GitHub Pages at the repository root (Settings → Pages → Deploy from a
-branch → `main` / `/`). Any static host works the same way — there is nothing to build.
+To deploy this way, point GitHub Pages at the repository root (Settings → Pages → Deploy
+from a branch → `main` / `/`). Any static host works the same — there is nothing to build.
+Accounts are unavailable, and the page says so in a banner rather than leaving you to
+wonder where the sign-in button went.
+
+### With the API server
+
+```bash
+pip install fastapi "uvicorn[standard]" argon2-cffi
+python server/build_db.py                      # data/ -> SQLite, about a minute
+CHURCHFIND_INSECURE_COOKIES=1 \
+  uvicorn server.app:app --port 8000           # drop that variable behind HTTPS
+```
+
+The server hosts the site as well as the API, so there is still one thing to open. The
+database is a build artifact — it is rebuilt from `data/`, and is not in the repository.
+
+**`CHURCHFIND_INSECURE_COOKIES=1` is for local http only.** Session cookies are marked
+`Secure` by default, and a browser will not send a `Secure` cookie over plain http, so
+sign-in silently fails without it. Behind HTTPS, leave it unset. The name is deliberately
+unpleasant so it does not survive a copy-paste into production.
 
 ## How the site works
 
-The interesting constraint is size. The full dataset is tens of megabytes, which is far
-too much to hand a visitor who wants to know what is down the road. So it is split:
+Search goes through one interface with two backends behind it. With the API server
+running, a search is a SQL query over the whole country. Without it, the same search runs
+over per-state JSON files loaded into memory. The page picks by probing `/api/health` at
+boot; nothing else in the UI knows which it got, except that accounts only exist in the
+first case. Both paths are tested against each other and return identical counts.
+
+The rest of this section is about the static path, where the interesting constraint is
+size. The full dataset is tens of megabytes, far too much to hand a visitor who wants to
+know what is down the road. So it is split:
 
 - `data/index.json` is small and always loaded. It holds per-state counts, denomination
   totals and state centroids — enough to render the filter chips, the state grid and the
@@ -210,6 +241,160 @@ own label (`acim` renders as "Acim") and falls into the "Other" family, so an un
 denomination still displays correctly rather than disappearing. Add a row to
 `DENOMINATIONS` to promote one into a family.
 
+## Accounts and the database
+
+`server/build_db.py` loads `data/states/*.json` into SQLite. The church tables are
+rebuilt wholesale each time — they are a cache of the scrape, not a system of record —
+while the account tables are left alone, so importing a fresh snapshot never touches
+anyone's login or saved list.
+
+Two things make the query side worth having. `churches_geo` is an R\*Tree over the
+coordinates, so a radius search narrows to a bounding box before a single haversine runs;
+`churches_fts` is an FTS5 index over name, city and denomination. Across 235,783 rows on
+a laptop:
+
+| Query | Results | Time |
+|---|---:|---:|
+| Everything within 25 miles of Denver | 873 | 7 ms |
+| …narrowed to the Catholic family | 100 | 4 ms |
+| 6 miles around Kansas City, crossing the state line | 333 | 3 ms |
+| `grace` anywhere in the country | 3,433 | 8 ms |
+| Every church in Texas | 16,239 | 4 ms |
+
+Which is the real reason the server exists: the static build has to download a whole
+state to filter it, and cannot answer "grace, anywhere" at all.
+
+### What is stored
+
+| Table | Holds |
+|---|---|
+| `churches` + `churches_geo` + `churches_fts` | the scrape, read-only at runtime |
+| `users` | email, argon2id hash, display name, optional home location |
+| `sessions` | SHA-256 of the cookie token, CSRF digest, expiry, user agent |
+| `saved_churches` | user → church, with a private note |
+| `correction_reports` | queue for a human; the fix belongs upstream in OSM |
+| `auth_attempts` | throttle history, pruned after 24 hours |
+
+### The security decisions
+
+These are the parts worth arguing with, so here is the reasoning rather than a checklist.
+
+- **Passwords use argon2id** with the library's defaults, and `needs_rehash` on every
+  login means the cost can be raised later without forcing a reset.
+- **The session token is never stored.** The cookie holds 256 bits from `secrets`; the
+  database holds its SHA-256. Reading the `sessions` table gives an attacker nothing they
+  can put in a cookie. A slow KDF would be pointless here — the input is already random,
+  so there is nothing to guess.
+- **Two cookies, on purpose.** `cf_session` is `HttpOnly`, so no script can read it, and
+  it is the one that authenticates. `cf_csrf` is deliberately readable, because the page
+  has to echo it back in an `X-CSRF-Token` header on every state-changing request. A
+  cross-site form can make the browser send cookies but cannot read one to build the
+  header — that asymmetry is the whole mechanism. Both are `SameSite=Lax` and `Secure`.
+- **Login does not confirm whether an address exists.** Wrong password and unknown email
+  return the same status and the same sentence, and an unknown email still pays for a
+  hash so the timing matches. Registration cannot hide it — the account has to be unique
+  — but registration is not where enumeration is useful.
+- **Throttling is per-email and per-address**, so one account cannot be ground down and
+  one host cannot spray many accounts. A successful login clears the account's counter.
+- **Changing a password destroys every session**, which is the entire point of changing it
+  after a scare.
+- **Every query is parameterised.** The only strings interpolated into SQL are column
+  names and placeholder lists the code writes itself. User text also never reaches FTS5's
+  query syntax raw: punctuation is stripped and each term quoted, because `NEAR/2` and a
+  bare `*` are operators there, not searches.
+- **A tight CSP**, with no `unsafe-inline` — every script and style is a file. The only
+  cross-origin destinations allowed are OSM tiles and the geocoder.
+
+`server/test_api.py` covers this: 48 tests, including that the stored hash is not the
+cookie, that a session cookie without the CSRF header is refused, that two users cannot
+see each other's saved churches, that `'; DROP TABLE churches; --` and five other hostile
+strings leave the table standing, and that an expired cookie cannot be replayed.
+
+```bash
+cd server && python -m pytest test_api.py -q
+```
+
+### What is deliberately missing
+
+Worth knowing before you put this in front of anyone:
+
+- **No email verification and no password reset.** The server sends no email at all, so a
+  forgotten password is a lost account. This is the first thing to add.
+- **No admin interface.** `correction_reports` fills up and nothing reads it.
+- **The common-password list is a token gesture** — sixteen entries. A real deployment
+  should check Pwned Passwords by k-anonymity, or ship a local bloom filter.
+- **Throttling lives in the application**, so it counts per process and trusts
+  `request.client.host`. Behind a proxy that needs to become the forwarded address, and
+  it belongs at the edge as well.
+- **SQLite with one shared connection** is right for one process and a read-mostly
+  workload. Concurrent writers want Postgres.
+
+### API
+
+| | |
+|---|---|
+| `GET /api/health` | is the server up, how many churches |
+| `GET /api/meta` | families, the denominations inside each, states |
+| `GET /api/churches` | `lat` `lon` `radius` `state` `q` `family` `denomination` `has_website` `has_phone` `has_services` `wheelchair` `sort` `limit` `offset` |
+| `GET /api/churches/{id}` | one church, plus whether you saved it |
+| `POST /api/auth/register` · `login` · `logout` · `password` | accounts |
+| `GET /api/auth/me` | current user, or `null` |
+| `GET` `POST` `/api/saved`, `DELETE /api/saved/{id}` | saved churches |
+| `PUT /api/me/home` | home location |
+| `POST /api/reports` | suggest a correction |
+
+Interactive docs at `/api/docs`.
+
+## Filtering by denomination
+
+The filter is two levels, because one is not enough at either end. There are 11
+denominational families and 481 distinct denominations, and 54% of records have no
+denomination tagged at all.
+
+Picking a family — Baptist, Catholic, Orthodox — filters immediately and reveals a second
+control listing only the specific denominations inside the families you picked, with
+counts. Choose "Roman Catholic" and a Denver search goes from 100 Catholic churches to
+the 91 tagged specifically. Each choice becomes a removable pill, and families combine
+with each other and with everything else in the panel.
+
+A flat list of 481 would be unusable, and families alone cannot tell Southern Baptist
+from Free Will Baptist. The nesting comes from `normalize.py`, which maps roughly ninety
+raw OSM values onto families; anything unrecognised keeps its own label and lands in
+"Other" rather than disappearing. Both the API and the static build produce identical
+results — the two code paths are checked against each other.
+
+## What I would build next
+
+Ordered by what the data already supports.
+
+**Cheap, and the data is already there**
+- **Service-time search** — "somewhere with a Sunday evening service". `service_times` is
+  populated on a slice of records and OSM's `opening_hours` grammar is parseable.
+- **Stale-record flags.** OSM exposes a last-edited timestamp per feature. A church
+  untouched since 2013 deserves a quieter presentation than one edited last month.
+- **State and metro pages** — real URLs like `/tx/austin`, which is also the only way any
+  of this gets indexed by a search engine. Today everything is one page and a query string.
+- **Fuzzy-duplicate detection.** The scraper only merges exact name matches at the same
+  spot; "St Mary's" and "Saint Mary's" 40 m apart are still two records.
+
+**Now that accounts exist**
+- **Password reset and email verification**, as above — the gap that matters most.
+- **A moderation queue** for `correction_reports`, with an admin role.
+- **Notes and visit history** — the `note` column exists and only the API uses it.
+- **"New near home"** — a monthly digest when churches appear near a saved home location.
+  The scrape already runs monthly, so the diff is free.
+
+**Bigger**
+- **Search along a route**, for moving or travelling rather than standing still.
+- **Claimed listings.** Let a congregation verify itself and correct its own entry, with
+  the changes pushed back to OpenStreetMap so everyone downstream benefits.
+- **Accessibility beyond `wheelchair=yes`** — hearing loops, step-free access, parking.
+  These are real OSM tags that this scrape currently discards.
+
+Two I would push back on. **Public reviews of congregations** would need moderation far
+beyond what a side project can staff, and the failure mode is ugly. **Attendance or
+"popularity" figures** are not in the data and cannot be estimated from it honestly.
+
 ## Keeping it fresh
 
 `.github/workflows/refresh-data.yml` re-runs the scrape on the 1st of each month, validates
@@ -222,16 +407,24 @@ file — the site runs fine on whatever snapshot is committed.
 ```
 index.html                     the whole UI
 assets/css/styles.css          light and dark, one set of custom properties
-assets/js/data.js              state file loading, adjacency, geocoding, distance
+assets/js/data.js              one search interface over the API and the static files
+assets/js/account.js           auth calls, the sign-in dialog, saved churches
 assets/js/app.js               search, filters, list rendering, map
 assets/vendor/leaflet/         vendored Leaflet 1.9.4 (BSD-2-Clause)
-data/index.json                counts and centroids, always loaded
+data/index.json                counts, denominations and centroids, always loaded
 data/states/XX.json            one file per state, loaded on demand
 scraper/scrape_churches.py     the Overpass scrape
-scraper/normalize.py           OSM tags -> flat records, denomination mapping
+scraper/normalize.py           OSM tags -> flat records, denomination and state mapping
 scraper/states.py              state codes and centroids
 scraper/validate.py            consistency checks over data/
 scraper/update_readme.py       regenerates the stats block in this file
+server/schema.sql              the database, churches and accounts
+server/db.py                   connections, pragmas, haversine as a SQL function
+server/build_db.py             data/ -> SQLite
+server/queries.py              church search: R*Tree radius, FTS5 names
+server/auth.py                 argon2id, sessions, CSRF, throttling
+server/app.py                  FastAPI routes and the static host
+server/test_api.py             48 tests, weighted towards the security-critical parts
 ```
 
 ## Licence

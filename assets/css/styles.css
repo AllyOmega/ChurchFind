@@ -377,3 +377,92 @@ input[type="range"] { width: 100%; accent-color: var(--indigo); }
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+/* ------------------------------------------------- accounts & the auth dialog */
+
+.account-area { display: flex; align-items: center; gap: .75rem; font-size: .9rem; }
+.account-who { color: var(--ink-soft); max-width: 22ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.btn-small { padding: .4rem .75rem; font-size: .85rem; background: var(--indigo); color: #fff; }
+.btn-small:hover { filter: brightness(1.08); }
+@media (prefers-color-scheme: dark) { .btn-small { color: #10131a; } }
+
+/* Shown only when the API server is absent, so nobody wonders where the
+   account controls went. */
+.mode-note {
+  margin: 0;
+  padding: .6rem clamp(1rem, 4vw, 3rem);
+  background: color-mix(in srgb, var(--gold-soft) 30%, var(--paper));
+  border-bottom: 1px solid var(--rule);
+  color: var(--ink-soft);
+  font-size: .85rem;
+}
+
+.auth-dialog {
+  width: min(92vw, 400px);
+  padding: 1.5rem;
+  color: var(--ink);
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .28);
+}
+.auth-dialog::backdrop { background: rgba(20, 22, 28, .55); }
+
+.auth-close-form { display: flex; justify-content: flex-end; margin: -.5rem -.5rem 0 0; }
+.auth-close {
+  background: none; border: 0; cursor: pointer;
+  font-size: 1.5rem; line-height: 1; color: var(--ink-faint);
+}
+.auth-close:hover { color: var(--ink); }
+
+.auth-tabs { display: flex; gap: .25rem; margin-bottom: 1rem; border-bottom: 1px solid var(--rule); }
+.auth-tab {
+  flex: 1; padding: .55rem .5rem;
+  font: inherit; font-size: .92rem;
+  background: none; border: 0; border-bottom: 2px solid transparent;
+  color: var(--ink-soft); cursor: pointer;
+}
+.auth-tab.is-on { color: var(--indigo); border-bottom-color: var(--indigo); font-weight: 600; }
+
+.auth-intro { margin: 0 0 1rem; font-size: .88rem; color: var(--ink-soft); }
+.auth-form { display: flex; flex-direction: column; gap: .35rem; }
+.auth-form label { font-size: .85rem; font-weight: 600; color: var(--ink-soft); margin-top: .5rem; }
+.auth-optional { font-weight: 400; color: var(--ink-faint); }
+.auth-form input {
+  padding: .6rem .7rem; font: inherit; font-size: .95rem;
+  color: var(--ink); background: var(--paper);
+  border: 1px solid var(--rule); border-radius: 8px;
+}
+.auth-form input:focus-visible { outline: 2px solid var(--indigo); outline-offset: 1px; }
+.auth-hint { margin: .35rem 0 0; font-size: .8rem; color: var(--ink-faint); }
+.auth-error { margin: .5rem 0 0; font-size: .85rem; color: var(--danger); min-height: 1.1rem; }
+.auth-submit { margin-top: .75rem; width: 100%; }
+.auth-name-row { display: contents; }
+
+/* The save star reads as on/off, so it needs a state that is not just colour. */
+.action-save.is-saved {
+  background: color-mix(in srgb, var(--gold) 16%, transparent);
+  border-color: var(--gold);
+  color: var(--gold);
+  font-weight: 600;
+}
+
+.note {
+  margin: .35rem 0 0; padding-left: .6rem;
+  border-left: 2px solid var(--gold-soft);
+  font-size: .84rem; color: var(--ink-soft); font-style: italic;
+}
+
+/* ------------------------------------------------- specific-denomination picker */
+
+#denomination-select {
+  width: 100%; padding: .45rem .5rem;
+  font: inherit; font-size: .85rem;
+  color: var(--ink); background: var(--card);
+  border: 1px solid var(--rule); border-radius: 7px;
+}
+#denomination-select:focus-visible { outline: 2px solid var(--indigo); outline-offset: 1px; }
+.chips-chosen { margin-top: .5rem; }
+.chips-chosen .chip { white-space: normal; text-align: left; }
+.chip-x { font-size: 1.05em; line-height: 1; opacity: .8; }

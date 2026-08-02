@@ -18,10 +18,14 @@
   </a>
   <nav class="masthead-nav">
     <a href="#browse">Browse by state</a>
+    <a href="#" id="saved-link" hidden>Saved</a>
     <a href="#about">About the data</a>
     <a href="https://github.com/AllyOmega/ChurchFind" rel="noopener">GitHub</a>
   </nav>
+  <div class="account-area" id="account-area"></div>
 </header>
+
+<p class="mode-note" id="mode-note" hidden></p>
 
 <section class="hero">
   <div class="hero-inner">
@@ -69,8 +73,16 @@
     </div>
 
     <div class="filter-block">
-      <span class="filter-label">Denomination</span>
+      <span class="filter-label">Denomination family</span>
       <div class="chips" id="family-chips"></div>
+    </div>
+
+    <div class="filter-block" id="denomination-block" hidden>
+      <label for="denomination-select">Specific denomination</label>
+      <select id="denomination-select">
+        <option value="">Add a denomination…</option>
+      </select>
+      <div class="chips chips-chosen" id="denomination-chosen"></div>
     </div>
 
     <div class="filter-block">
@@ -156,6 +168,7 @@
 
 <script src="assets/vendor/leaflet/leaflet.js"></script>
 <script src="assets/js/data.js"></script>
+<script src="assets/js/account.js"></script>
 <script src="assets/js/app.js"></script>
 </body>
 </html>

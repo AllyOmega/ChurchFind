@@ -27,13 +27,21 @@ jobs:
         with:
           python-version: '3.11'
 
+      # Run from scraper/ so the sibling imports resolve; the path is relative
+      # to that, not to the repository root.
       - name: Scrape OpenStreetMap
-        run: python scraper/scrape_churches.py --force
+        run: python scrape_churches.py --force
         working-directory: scraper
 
       - name: Validate the generated data
         run: python validate.py
         working-directory: scraper
+
+      - name: Check the refreshed data still loads into SQLite
+        run: |
+          pip install -r server/requirements.txt
+          python server/build_db.py
+          cd server && python -m pytest test_api.py -q
 
       - name: Refresh the README stats block
         run: python update_readme.py
