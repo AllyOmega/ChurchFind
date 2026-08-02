@@ -36,7 +36,7 @@
    "ceremonial": -0.8,
    "confidence": 0.068,
    "matched": [
-    "informal"
+    "informal service"
    ],
    "source": "wikipedia",
    "theology": -0.2
@@ -103,14 +103,13 @@
    "theology": 1.0
   },
   "r383495": {
-   "ceremonial": -0.133,
-   "confidence": 0.152,
+   "ceremonial": 0.4,
+   "confidence": 0.084,
    "matched": [
-    "confession",
-    "informal"
+    "confession"
    ],
    "source": "wikipedia",
-   "theology": 0.3
+   "theology": 0.7
   },
   "r6112760": {
    "ceremonial": 0.62,
@@ -538,19 +537,18 @@
    "theology": 0.281
   },
   "w342277775": {
-   "ceremonial": 0.502,
+   "ceremonial": 0.645,
    "confidence": 0.45,
    "matched": [
     "anglo-catholic",
     "benediction",
     "book of common prayer",
     "catholic tradition",
-    "informal",
     "procession",
     "vestment"
    ],
    "source": "wikipedia",
-   "theology": 0.633
+   "theology": 0.724
   },
   "w370278549": {
    "ceremonial": 0.7,
@@ -591,15 +589,6 @@
    ],
    "source": "wikipedia",
    "theology": 0.1
-  },
-  "w439092463": {
-   "ceremonial": -0.8,
-   "confidence": 0.068,
-   "matched": [
-    "casual"
-   ],
-   "source": "wikipedia",
-   "theology": -0.2
   },
   "w444202400": {
    "ceremonial": -0.1,
@@ -668,11 +657,10 @@
    "theology": -0.4
   },
   "w589705045": {
-   "ceremonial": 0.528,
+   "ceremonial": 0.671,
    "confidence": 0.45,
    "matched": [
     "book of common prayer",
-    "casual",
     "chrism",
     "daily mass",
     "evensong",
@@ -682,7 +670,7 @@
     "traditional language"
    ],
    "source": "wikipedia",
-   "theology": 0.41
+   "theology": 0.475
   },
   "w66811710": {
    "ceremonial": 0.6,

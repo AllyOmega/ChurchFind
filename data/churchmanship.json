@@ -149,6 +149,3709 @@
     "the gospel"
    ],
    "theology": -0.6
+  },
+  "n1829178765": {
+   "ceremonial": 0.455,
+   "confidence": 0.268,
+   "matched": [
+    "bcp",
+    "confession",
+    "processional"
+   ],
+   "theology": 0.348
+  },
+  "n2371498266": {
+   "ceremonial": -0.209,
+   "confidence": 0.179,
+   "matched": [
+    "book of common prayer",
+    "come as you are"
+   ],
+   "theology": -0.064
+  },
+  "n2575037491": {
+   "ceremonial": -0.4,
+   "confidence": 0.098,
+   "matched": [
+    "the gospel"
+   ],
+   "theology": -0.6
+  },
+  "n2804161582": {
+   "ceremonial": -0.4,
+   "confidence": 0.098,
+   "matched": [
+    "the gospel"
+   ],
+   "theology": -0.6
+  },
+  "n3145855239": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "theology": 0.1
+  },
+  "n3481682403": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "theology": 0.1
+  },
+  "n354384083": {
+   "ceremonial": 0.0,
+   "confidence": 0.163,
+   "matched": [
+    "book of common prayer",
+    "spirit-filled"
+   ],
+   "theology": -0.05
+  },
+  "n356550344": {
+   "ceremonial": 0.4,
+   "confidence": 0.122,
+   "matched": [
+    "confession"
+   ],
+   "theology": 0.7
+  },
+  "n356551016": {
+   "ceremonial": -0.5,
+   "confidence": 0.081,
+   "matched": [
+    "spirit filled"
+   ],
+   "theology": -0.2
+  },
+  "n356559740": {
+   "ceremonial": -0.5,
+   "confidence": 0.081,
+   "matched": [
+    "renewal"
+   ],
+   "theology": -0.2
+  },
+  "n356720626": {
+   "ceremonial": 0.505,
+   "confidence": 0.65,
+   "matched": [
+    "acolyte",
+    "book of common prayer",
+    "casual",
+    "high church",
+    "incense",
+    "sung eucharist",
+    "the gospel"
+   ],
+   "theology": 0.231
+  },
+  "n356827771": {
+   "ceremonial": -0.65,
+   "confidence": 0.195,
+   "matched": [
+    "come as you are",
+    "small group"
+   ],
+   "theology": -0.3
+  },
+  "n356878903": {
+   "ceremonial": -0.209,
+   "confidence": 0.179,
+   "matched": [
+    "book of common prayer",
+    "casual"
+   ],
+   "theology": -0.064
+  },
+  "n3570352894": {
+   "ceremonial": -0.4,
+   "confidence": 0.098,
+   "matched": [
+    "the gospel"
+   ],
+   "theology": -0.6
+  },
+  "n357310466": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "theology": 0.1
+  },
+  "n357381424": {
+   "ceremonial": 0.0,
+   "confidence": 0.163,
+   "matched": [
+    "book of common prayer",
+    "renewal"
+   ],
+   "theology": -0.05
+  },
+  "n357777562": {
+   "ceremonial": -0.4,
+   "confidence": 0.098,
+   "matched": [
+    "the gospel"
+   ],
+   "theology": -0.6
+  },
+  "n357983921": {
+   "ceremonial": 0.609,
+   "confidence": 0.179,
+   "matched": [
+    "acolyte",
+    "bcp"
+   ],
+   "theology": 0.209
+  },
+  "n358240309": {
+   "ceremonial": 0.613,
+   "confidence": 0.244,
+   "matched": [
+    "acolyte",
+    "compline",
+    "procession"
+   ],
+   "theology": 0.22
+  },
+  "n358241374": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "theology": 0.1
+  },
+  "n358264019": {
+   "ceremonial": -0.5,
+   "confidence": 0.203,
+   "matched": [
+    "evangelical"
+   ],
+   "theology": -0.9
+  },
+  "n358279140": {
+   "ceremonial": 0.8,
+   "confidence": 0.219,
+   "matched": [
+    "choral eucharist",
+    "choral evensong"
+   ],
+   "theology": 0.211
+  },
+  "n358282529": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "theology": 0.1
+  },
+  "n358387492": {
+   "ceremonial": 0.44,
+   "confidence": 0.203,
+   "matched": [
+    "bcp",
+    "confession"
+   ],
+   "theology": 0.46
+  },
+  "n358734072": {
+   "ceremonial": 0.7,
+   "confidence": 0.098,
+   "matched": [
+    "acolyte"
+   ],
+   "theology": 0.3
+  },
+  "n358751785": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "theology": 0.1
+  },
+  "n358788582": {
+   "ceremonial": 0.62,
+   "confidence": 0.163,
+   "matched": [
+    "acolyte",
+    "procession"
+   ],
+   "theology": 0.18
+  },
+  "n358959382": {
+   "ceremonial": -0.026,
+   "confidence": 0.561,
+   "matched": [
+    "choral eucharist",
+    "praise and worship",
+    "small groups",
+    "stations of the cross",
+    "the gospel"
+   ],
+   "theology": -0.043
+  },
+  "n358967357": {
+   "ceremonial": 0.6,
+   "confidence": 0.081,
+   "matched": [
+    "compline"
+   ],
+   "theology": 0.3
+  },
+  "n359287076": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "theology": 0.1
+  },
+  "n480003064": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "theology": 0.1
+  },
+  "n5915052227": {
+   "ceremonial": -0.172,
+   "confidence": 0.406,
+   "matched": [
+    "acolyte",
+    "procession",
+    "the gospel",
+    "worship team"
+   ],
+   "theology": -0.216
+  },
+  "n6431868238": {
+   "ceremonial": -0.8,
+   "confidence": 0.098,
+   "matched": [
+    "come as you are"
+   ],
+   "theology": -0.2
+  },
+  "n8272409328": {
+   "ceremonial": 0.2,
+   "confidence": 0.195,
+   "matched": [
+    "choral evensong",
+    "the gospel"
+   ],
+   "theology": -0.25
+  },
+  "n8331601093": {
+   "ceremonial": 0.044,
+   "confidence": 0.219,
+   "matched": [
+    "confession",
+    "the gospel"
+   ],
+   "theology": 0.122
+  },
+  "n8555913130": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "theology": 0.1
+  },
+  "n9417389782": {
+   "ceremonial": 0.7,
+   "confidence": 0.098,
+   "matched": [
+    "acolyte"
+   ],
+   "theology": 0.3
+  },
+  "n9837556867": {
+   "ceremonial": 0.55,
+   "confidence": 0.163,
+   "matched": [
+    "book of common prayer",
+    "traditional language"
+   ],
+   "theology": 0.1
+  },
+  "r11145617": {
+   "ceremonial": 0.223,
+   "confidence": 0.358,
+   "matched": [
+    "acolyte",
+    "book of common prayer",
+    "casual",
+    "compline"
+   ],
+   "theology": 0.118
+  },
+  "r12172606": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "theology": 0.1
+  },
+  "r12455460": {
+   "ceremonial": 0.8,
+   "confidence": 0.098,
+   "matched": [
+    "choral evensong"
+   ],
+   "theology": 0.1
+  },
+  "r13578499": {
+   "ceremonial": 0.2,
+   "confidence": 0.195,
+   "matched": [
+    "evensong",
+    "the gospel"
+   ],
+   "theology": -0.25
+  },
+  "r13630403": {
+   "ceremonial": -0.045,
+   "confidence": 0.179,
+   "matched": [
+    "book of common prayer",
+    "small group"
+   ],
+   "theology": -0.173
+  },
+  "r14429710": {
+   "ceremonial": 0.15,
+   "confidence": 0.195,
+   "matched": [
+    "evensong",
+    "small group"
+   ],
+   "theology": -0.15
+  },
+  "r16466558": {
+   "ceremonial": 0.68,
+   "confidence": 0.203,
+   "matched": [
+    "book of common prayer",
+    "sung eucharist"
+   ],
+   "theology": 0.22
+  },
+  "r17233691": {
+   "ceremonial": 0.7,
+   "confidence": 0.195,
+   "matched": [
+    "acolyte",
+    "vestment"
+   ],
+   "theology": 0.3
+  },
+  "r17471684": {
+   "ceremonial": 0.44,
+   "confidence": 0.203,
+   "matched": [
+    "book of common prayer",
+    "the mass"
+   ],
+   "theology": 0.46
+  },
+  "r19448176": {
+   "ceremonial": 0.8,
+   "confidence": 0.098,
+   "matched": [
+    "evensong"
+   ],
+   "theology": 0.1
+  },
+  "r19450521": {
+   "ceremonial": 0.751,
+   "confidence": 0.65,
+   "matched": [
+    "acolyte",
+    "benediction",
+    "blessed sacrament",
+    "evensong",
+    "high mass",
+    "incense",
+    "low mass",
+    "rosary",
+    "sanctus bell"
+   ],
+   "theology": 0.724
+  },
+  "r20694235": {
+   "ceremonial": 0.719,
+   "confidence": 0.65,
+   "matched": [
+    "anglo-catholic",
+    "book of common prayer",
+    "catholic tradition",
+    "high mass",
+    "incense",
+    "low mass"
+   ],
+   "theology": 0.785
+  },
+  "r21046165": {
+   "ceremonial": 0.664,
+   "confidence": 0.179,
+   "matched": [
+    "book of common prayer",
+    "choral evensong"
+   ],
+   "theology": 0.1
+  },
+  "r21161189": {
+   "ceremonial": 0.7,
+   "confidence": 0.163,
+   "matched": [
+    "adoration"
+   ],
+   "theology": 0.9
+  },
+  "r2682714": {
+   "ceremonial": -0.062,
+   "confidence": 0.423,
+   "matched": [
+    "acolyte",
+    "choral evensong",
+    "renewal",
+    "worship team"
+   ],
+   "theology": -0.085
+  },
+  "r3573490": {
+   "ceremonial": 0.8,
+   "confidence": 0.122,
+   "matched": [
+    "choral eucharist"
+   ],
+   "theology": 0.3
+  },
+  "r3624833": {
+   "ceremonial": 0.8,
+   "confidence": 0.098,
+   "matched": [
+    "choral evensong"
+   ],
+   "theology": 0.1
+  },
+  "r4281023": {
+   "ceremonial": -0.5,
+   "confidence": 0.098,
+   "matched": [
+    "small groups"
+   ],
+   "theology": -0.4
+  },
+  "r5491645": {
+   "ceremonial": 0.428,
+   "confidence": 0.544,
+   "matched": [
+    "anglo-catholic",
+    "catholic faith and practice",
+    "the gospel"
+   ],
+   "theology": 0.676
+  },
+  "r5723961": {
+   "ceremonial": -0.5,
+   "confidence": 0.081,
+   "matched": [
+    "renewal"
+   ],
+   "theology": -0.2
+  },
+  "r6343224": {
+   "ceremonial": -0.8,
+   "confidence": 0.098,
+   "matched": [
+    "informal"
+   ],
+   "theology": -0.2
+  },
+  "r6682118": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "theology": 0.1
+  },
+  "r7626467": {
+   "ceremonial": 0.7,
+   "confidence": 0.098,
+   "matched": [
+    "acolyte"
+   ],
+   "theology": 0.3
+  },
+  "r9683984": {
+   "ceremonial": -0.4,
+   "confidence": 0.098,
+   "matched": [
+    "the gospel"
+   ],
+   "theology": -0.6
+  },
+  "w1000645990": {
+   "ceremonial": -0.468,
+   "confidence": 0.301,
+   "matched": [
+    "evangelical",
+    "the gospel"
+   ],
+   "theology": -0.803
+  },
+  "w1008266357": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "theology": 0.1
+  },
+  "w1011341052": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "theology": 0.1
+  },
+  "w1022116893": {
+   "ceremonial": -0.4,
+   "confidence": 0.227,
+   "matched": [
+    "bcp",
+    "contemporary worship"
+   ],
+   "theology": -0.221
+  },
+  "w1024648450": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "theology": 0.1
+  },
+  "w1042525158": {
+   "ceremonial": 0.6,
+   "confidence": 0.122,
+   "matched": [
+    "stations of the cross"
+   ],
+   "theology": 0.7
+  },
+  "w1043554408": {
+   "ceremonial": 0.833,
+   "confidence": 0.244,
+   "matched": [
+    "bcp",
+    "incense"
+   ],
+   "theology": 0.367
+  },
+  "w1049770156": {
+   "ceremonial": 1.0,
+   "confidence": 0.203,
+   "matched": [
+    "solemn mass"
+   ],
+   "theology": 0.9
+  },
+  "w1049771334": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "theology": 0.1
+  },
+  "w1049774586": {
+   "ceremonial": 0.8,
+   "confidence": 0.098,
+   "matched": [
+    "evensong"
+   ],
+   "theology": 0.1
+  },
+  "w108059185": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "theology": 0.1
+  },
+  "w1087104402": {
+   "ceremonial": 0.1,
+   "confidence": 0.179,
+   "matched": [
+    "renewal",
+    "requiem"
+   ],
+   "theology": 0.236
+  },
+  "w1100964533": {
+   "ceremonial": 0.8,
+   "confidence": 0.122,
+   "matched": [
+    "choral eucharist"
+   ],
+   "theology": 0.3
+  },
+  "w1123218260": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "1928"
+   ],
+   "theology": 0.1
+  },
+  "w1126769177": {
+   "ceremonial": 0.662,
+   "confidence": 0.528,
+   "matched": [
+    "book of common prayer",
+    "compline",
+    "confession",
+    "incense",
+    "traditional language"
+   ],
+   "theology": 0.392
+  },
+  "w1133535745": {
+   "ceremonial": -0.5,
+   "confidence": 0.081,
+   "matched": [
+    "renewal"
+   ],
+   "theology": -0.2
+  },
+  "w114191479": {
+   "ceremonial": 0.347,
+   "confidence": 0.276,
+   "matched": [
+    "acolyte",
+    "renewal",
+    "vestment"
+   ],
+   "theology": 0.153
+  },
+  "w114919326": {
+   "ceremonial": -0.8,
+   "confidence": 0.098,
+   "matched": [
+    "informal"
+   ],
+   "theology": -0.2
+  },
+  "w1152789330": {
+   "ceremonial": 0.5,
+   "confidence": 0.065,
+   "matched": [
+    "procession"
+   ],
+   "theology": 0.0
+  },
+  "w1183599111": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "theology": 0.1
+  },
+  "w1187509601": {
+   "ceremonial": 0.709,
+   "confidence": 0.179,
+   "matched": [
+    "compline",
+    "evensong"
+   ],
+   "theology": 0.191
+  },
+  "w1188488393": {
+   "ceremonial": -0.664,
+   "confidence": 0.179,
+   "matched": [
+    "come as you are",
+    "spirit-filled"
+   ],
+   "theology": -0.2
+  },
+  "w1190006830": {
+   "ceremonial": 0.664,
+   "confidence": 0.179,
+   "matched": [
+    "book of common prayer",
+    "evensong"
+   ],
+   "theology": 0.1
+  },
+  "w1190057508": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "theology": 0.1
+  },
+  "w1192727704": {
+   "ceremonial": -0.027,
+   "confidence": 0.358,
+   "matched": [
+    "acolyte",
+    "book of common prayer",
+    "come as you are",
+    "spirit-filled"
+   ],
+   "theology": 0.005
+  },
+  "w1206021265": {
+   "ceremonial": 0.234,
+   "confidence": 0.382,
+   "matched": [
+    "book of common prayer",
+    "compline",
+    "confession",
+    "small group"
+   ],
+   "theology": 0.206
+  },
+  "w1209228949": {
+   "ceremonial": 0.4,
+   "confidence": 0.122,
+   "matched": [
+    "confession"
+   ],
+   "theology": 0.7
+  },
+  "w1210248602": {
+   "ceremonial": -0.164,
+   "confidence": 0.179,
+   "matched": [
+    "come as you are",
+    "compline"
+   ],
+   "theology": 0.027
+  },
+  "w1214663335": {
+   "ceremonial": 0.009,
+   "confidence": 0.179,
+   "matched": [
+    "book of common prayer",
+    "the gospel"
+   ],
+   "theology": -0.282
+  },
+  "w1219867762": {
+   "ceremonial": 0.4,
+   "confidence": 0.122,
+   "matched": [
+    "the mass"
+   ],
+   "theology": 0.7
+  },
+  "w122480595": {
+   "ceremonial": 0.6,
+   "confidence": 0.081,
+   "matched": [
+    "compline"
+   ],
+   "theology": 0.3
+  },
+  "w1228760361": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "theology": 0.1
+  },
+  "w1229194535": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "1928"
+   ],
+   "theology": 0.1
+  },
+  "w1239465201": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "theology": 0.1
+  },
+  "w1250541771": {
+   "ceremonial": -0.8,
+   "confidence": 0.098,
+   "matched": [
+    "casual"
+   ],
+   "theology": -0.2
+  },
+  "w1256392210": {
+   "ceremonial": -0.4,
+   "confidence": 0.098,
+   "matched": [
+    "the gospel"
+   ],
+   "theology": -0.6
+  },
+  "w1267197300": {
+   "ceremonial": 0.249,
+   "confidence": 0.463,
+   "matched": [
+    "bcp",
+    "daily mass",
+    "rosary",
+    "the gospel"
+   ],
+   "theology": 0.391
+  },
+  "w1272433260": {
+   "ceremonial": 0.7,
+   "confidence": 0.195,
+   "matched": [
+    "acolyte",
+    "vestment"
+   ],
+   "theology": 0.3
+  },
+  "w1272434865": {
+   "ceremonial": 0.0,
+   "confidence": 0.163,
+   "matched": [
+    "book of common prayer",
+    "renewal"
+   ],
+   "theology": -0.05
+  },
+  "w1272618372": {
+   "ceremonial": 0.55,
+   "confidence": 0.163,
+   "matched": [
+    "book of common prayer",
+    "traditional language"
+   ],
+   "theology": 0.1
+  },
+  "w1272622276": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "theology": 0.1
+  },
+  "w1272623051": {
+   "ceremonial": 0.6,
+   "confidence": 0.081,
+   "matched": [
+    "compline"
+   ],
+   "theology": 0.3
+  },
+  "w1272624508": {
+   "ceremonial": 0.306,
+   "confidence": 0.65,
+   "matched": [
+    "acolyte",
+    "book of common prayer",
+    "come as you are",
+    "plainsong",
+    "the gospel",
+    "the mass",
+    "vestment"
+   ],
+   "theology": 0.189
+  },
+  "w1272885610": {
+   "ceremonial": 0.6,
+   "confidence": 0.081,
+   "matched": [
+    "traditional language"
+   ],
+   "theology": 0.1
+  },
+  "w1272892363": {
+   "ceremonial": 0.234,
+   "confidence": 0.382,
+   "matched": [
+    "book of common prayer",
+    "confession",
+    "small group",
+    "traditional language"
+   ],
+   "theology": 0.164
+  },
+  "w1272905826": {
+   "ceremonial": -0.027,
+   "confidence": 0.358,
+   "matched": [
+    "acolyte",
+    "book of common prayer",
+    "come as you are",
+    "spirit-filled"
+   ],
+   "theology": 0.005
+  },
+  "w1273138115": {
+   "ceremonial": 0.0,
+   "confidence": 0.163,
+   "matched": [
+    "book of common prayer",
+    "spirit-filled"
+   ],
+   "theology": -0.05
+  },
+  "w127595982": {
+   "ceremonial": -0.4,
+   "confidence": 0.098,
+   "matched": [
+    "the gospel"
+   ],
+   "theology": -0.6
+  },
+  "w1278327546": {
+   "ceremonial": 0.004,
+   "confidence": 0.398,
+   "matched": [
+    "book of common prayer",
+    "confession",
+    "small groups",
+    "the gospel"
+   ],
+   "theology": -0.01
+  },
+  "w1278328733": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "theology": 0.1
+  },
+  "w1291826578": {
+   "ceremonial": 0.318,
+   "confidence": 0.276,
+   "matched": [
+    "choral evensong",
+    "compline",
+    "the gospel"
+   ],
+   "theology": -0.088
+  },
+  "w1313551466": {
+   "ceremonial": 0.3,
+   "confidence": 0.341,
+   "matched": [
+    "acolyte",
+    "book of common prayer",
+    "processional",
+    "the gospel"
+   ],
+   "theology": -0.062
+  },
+  "w131497582": {
+   "ceremonial": 0.233,
+   "confidence": 0.244,
+   "matched": [
+    "compline",
+    "renewal",
+    "traditional language"
+   ],
+   "theology": 0.067
+  },
+  "w1331072129": {
+   "ceremonial": 0.56,
+   "confidence": 0.203,
+   "matched": [
+    "book of common prayer",
+    "stations of the cross"
+   ],
+   "theology": 0.46
+  },
+  "w1334638563": {
+   "ceremonial": 0.6,
+   "confidence": 0.081,
+   "matched": [
+    "traditional language"
+   ],
+   "theology": 0.1
+  },
+  "w1353320811": {
+   "ceremonial": -0.164,
+   "confidence": 0.179,
+   "matched": [
+    "come as you are",
+    "compline"
+   ],
+   "theology": 0.027
+  },
+  "w1361002096": {
+   "ceremonial": 0.8,
+   "confidence": 0.098,
+   "matched": [
+    "evensong"
+   ],
+   "theology": 0.1
+  },
+  "w1381838786": {
+   "ceremonial": -0.171,
+   "confidence": 0.276,
+   "matched": [
+    "book of common prayer",
+    "gospel-centered",
+    "small groups"
+   ],
+   "theology": -0.324
+  },
+  "w141129259": {
+   "ceremonial": 0.755,
+   "confidence": 0.544,
+   "matched": [
+    "compline",
+    "evensong",
+    "high mass",
+    "low mass"
+   ],
+   "theology": 0.637
+  },
+  "w141964581": {
+   "ceremonial": -0.8,
+   "confidence": 0.098,
+   "matched": [
+    "casual"
+   ],
+   "theology": -0.2
+  },
+  "w1432281695": {
+   "ceremonial": 0.636,
+   "confidence": 0.268,
+   "matched": [
+    "book of common prayer",
+    "choral eucharist",
+    "procession"
+   ],
+   "theology": 0.167
+  },
+  "w1443522123": {
+   "ceremonial": 0.037,
+   "confidence": 0.544,
+   "matched": [
+    "anglo-catholic",
+    "evangelical",
+    "small groups"
+   ],
+   "theology": 0.04
+  },
+  "w1448504779": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "theology": 0.1
+  },
+  "w146365415": {
+   "ceremonial": -0.4,
+   "confidence": 0.227,
+   "matched": [
+    "book of common prayer",
+    "contemporary worship"
+   ],
+   "theology": -0.221
+  },
+  "w1470069148": {
+   "ceremonial": -0.132,
+   "confidence": 0.463,
+   "matched": [
+    "book of common prayer",
+    "compline",
+    "evangelical",
+    "small group"
+   ],
+   "theology": -0.409
+  },
+  "w148037386": {
+   "ceremonial": 0.7,
+   "confidence": 0.098,
+   "matched": [
+    "acolyte"
+   ],
+   "theology": 0.3
+  },
+  "w1491042323": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "theology": 0.1
+  },
+  "w158248772": {
+   "ceremonial": 0.8,
+   "confidence": 0.122,
+   "matched": [
+    "choral eucharist"
+   ],
+   "theology": 0.3
+  },
+  "w160947235": {
+   "ceremonial": 0.486,
+   "confidence": 0.284,
+   "matched": [
+    "book of common prayer",
+    "confession",
+    "traditional language"
+   ],
+   "theology": 0.357
+  },
+  "w161405782": {
+   "ceremonial": 0.8,
+   "confidence": 0.098,
+   "matched": [
+    "evensong"
+   ],
+   "theology": 0.1
+  },
+  "w166323448": {
+   "ceremonial": 0.253,
+   "confidence": 0.276,
+   "matched": [
+    "acolyte",
+    "book of common prayer",
+    "the gospel"
+   ],
+   "theology": -0.076
+  },
+  "w173699967": {
+   "ceremonial": -0.164,
+   "confidence": 0.179,
+   "matched": [
+    "casual",
+    "traditional language"
+   ],
+   "theology": -0.064
+  },
+  "w177187138": {
+   "ceremonial": 0.672,
+   "confidence": 0.65,
+   "matched": [
+    "anglo-catholic",
+    "benediction",
+    "choral evensong",
+    "low mass",
+    "requiem",
+    "rosary",
+    "solemn mass",
+    "the mass"
+   ],
+   "theology": 0.804
+  },
+  "w178198643": {
+   "ceremonial": 0.6,
+   "confidence": 0.081,
+   "matched": [
+    "compline"
+   ],
+   "theology": 0.3
+  },
+  "w184027366": {
+   "ceremonial": 0.6,
+   "confidence": 0.081,
+   "matched": [
+    "compline"
+   ],
+   "theology": 0.3
+  },
+  "w187530865": {
+   "ceremonial": 0.58,
+   "confidence": 0.65,
+   "matched": [
+    "acolyte",
+    "adoration",
+    "choral evensong",
+    "compline",
+    "incense",
+    "renewal",
+    "requiem",
+    "rosary",
+    "society of mary",
+    "the society",
+    "traditional language"
+   ],
+   "theology": 0.614
+  },
+  "w187564921": {
+   "ceremonial": 0.632,
+   "confidence": 0.301,
+   "matched": [
+    "acolyte",
+    "stations of the cross",
+    "traditional language"
+   ],
+   "theology": 0.408
+  },
+  "w195507333": {
+   "ceremonial": 0.533,
+   "confidence": 0.219,
+   "matched": [
+    "acolyte",
+    "confession"
+   ],
+   "theology": 0.522
+  },
+  "w196428867": {
+   "ceremonial": 0.55,
+   "confidence": 0.163,
+   "matched": [
+    "book of common prayer",
+    "compline"
+   ],
+   "theology": 0.2
+  },
+  "w196449089": {
+   "ceremonial": -0.8,
+   "confidence": 0.098,
+   "matched": [
+    "casual"
+   ],
+   "theology": -0.2
+  },
+  "w202499583": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "theology": 0.1
+  },
+  "w202892128": {
+   "ceremonial": 0.8,
+   "confidence": 0.203,
+   "matched": [
+    "benediction"
+   ],
+   "theology": 0.9
+  },
+  "w203025753": {
+   "ceremonial": 0.15,
+   "confidence": 0.195,
+   "matched": [
+    "evensong",
+    "small groups"
+   ],
+   "theology": -0.15
+  },
+  "w203395218": {
+   "ceremonial": 0.367,
+   "confidence": 0.423,
+   "matched": [
+    "39 articles",
+    "book of common prayer",
+    "confession",
+    "evensong"
+   ],
+   "theology": 0.042
+  },
+  "w206146960": {
+   "ceremonial": 0.7,
+   "confidence": 0.244,
+   "matched": [
+    "anglo-catholic"
+   ],
+   "theology": 1.0
+  },
+  "w208613499": {
+   "ceremonial": 0.756,
+   "confidence": 0.366,
+   "matched": [
+    "bcp",
+    "incense",
+    "stations of the cross"
+   ],
+   "theology": 0.478
+  },
+  "w213729044": {
+   "ceremonial": 0.6,
+   "confidence": 0.179,
+   "matched": [
+    "requiem",
+    "traditional language"
+   ],
+   "theology": 0.373
+  },
+  "w214145806": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "theology": 0.1
+  },
+  "w214326244": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "theology": 0.1
+  },
+  "w214736987": {
+   "ceremonial": -0.8,
+   "confidence": 0.098,
+   "matched": [
+    "informal"
+   ],
+   "theology": -0.2
+  },
+  "w215906131": {
+   "ceremonial": 0.8,
+   "confidence": 0.098,
+   "matched": [
+    "evensong"
+   ],
+   "theology": 0.1
+  },
+  "w219358881": {
+   "ceremonial": -0.5,
+   "confidence": 0.098,
+   "matched": [
+    "small groups"
+   ],
+   "theology": -0.4
+  },
+  "w222294774": {
+   "ceremonial": 0.55,
+   "confidence": 0.163,
+   "matched": [
+    "book of common prayer",
+    "compline"
+   ],
+   "theology": 0.2
+  },
+  "w226014413": {
+   "ceremonial": 0.441,
+   "confidence": 0.439,
+   "matched": [
+    "book of common prayer",
+    "incense",
+    "informal",
+    "vestment"
+   ],
+   "theology": 0.226
+  },
+  "w226938749": {
+   "ceremonial": 0.301,
+   "confidence": 0.585,
+   "matched": [
+    "catholic tradition",
+    "rosary",
+    "the gospel",
+    "the mass"
+   ],
+   "theology": 0.608
+  },
+  "w229630705": {
+   "ceremonial": 0.75,
+   "confidence": 0.195,
+   "matched": [
+    "acolyte",
+    "choral evensong"
+   ],
+   "theology": 0.2
+  },
+  "w230612048": {
+   "ceremonial": -0.312,
+   "confidence": 0.276,
+   "matched": [
+    "book of common prayer",
+    "come as you are",
+    "small group"
+   ],
+   "theology": -0.182
+  },
+  "w231789318": {
+   "ceremonial": -0.8,
+   "confidence": 0.098,
+   "matched": [
+    "come as you are"
+   ],
+   "theology": -0.2
+  },
+  "w232827604": {
+   "ceremonial": 0.2,
+   "confidence": 0.195,
+   "matched": [
+    "evensong",
+    "the gospel"
+   ],
+   "theology": -0.25
+  },
+  "w233557583": {
+   "ceremonial": 0.7,
+   "confidence": 0.098,
+   "matched": [
+    "acolyte"
+   ],
+   "theology": 0.3
+  },
+  "w233807429": {
+   "ceremonial": -0.45,
+   "confidence": 0.195,
+   "matched": [
+    "home groups",
+    "the gospel"
+   ],
+   "theology": -0.5
+  },
+  "w240010717": {
+   "ceremonial": -0.9,
+   "confidence": 0.146,
+   "matched": [
+    "worship team"
+   ],
+   "theology": -0.4
+  },
+  "w241844932": {
+   "ceremonial": 0.486,
+   "confidence": 0.341,
+   "matched": [
+    "acolyte",
+    "confession",
+    "the mass"
+   ],
+   "theology": 0.586
+  },
+  "w241854295": {
+   "ceremonial": -0.5,
+   "confidence": 0.098,
+   "matched": [
+    "small groups"
+   ],
+   "theology": -0.4
+  },
+  "w242884035": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "theology": 0.1
+  },
+  "w242892683": {
+   "ceremonial": 0.72,
+   "confidence": 0.203,
+   "matched": [
+    "choral eucharist",
+    "compline"
+   ],
+   "theology": 0.3
+  },
+  "w249485149": {
+   "ceremonial": -0.6,
+   "confidence": 0.195,
+   "matched": [
+    "come as you are",
+    "the gospel"
+   ],
+   "theology": -0.4
+  },
+  "w249666372": {
+   "ceremonial": 0.7,
+   "confidence": 0.163,
+   "matched": [
+    "adoration"
+   ],
+   "theology": 0.9
+  },
+  "w250474274": {
+   "ceremonial": 0.85,
+   "confidence": 0.244,
+   "matched": [
+    "choral eucharist",
+    "gregorian chant"
+   ],
+   "theology": 0.4
+  },
+  "w260352657": {
+   "ceremonial": -0.9,
+   "confidence": 0.146,
+   "matched": [
+    "contemporary worship"
+   ],
+   "theology": -0.4
+  },
+  "w263343373": {
+   "ceremonial": 0.223,
+   "confidence": 0.358,
+   "matched": [
+    "acolyte",
+    "book of common prayer",
+    "informal",
+    "traditional language"
+   ],
+   "theology": 0.073
+  },
+  "w263867420": {
+   "ceremonial": 0.044,
+   "confidence": 0.26,
+   "matched": [
+    "book of common prayer",
+    "casual",
+    "compline"
+   ],
+   "theology": 0.05
+  },
+  "w264356934": {
+   "ceremonial": 0.569,
+   "confidence": 0.65,
+   "matched": [
+    "adoration",
+    "anglo-catholic",
+    "catholic tradition",
+    "high mass",
+    "low mass",
+    "sacrament of reconciliation",
+    "the gospel"
+   ],
+   "theology": 0.764
+  },
+  "w264671930": {
+   "ceremonial": 0.55,
+   "confidence": 0.163,
+   "matched": [
+    "book of common prayer",
+    "compline"
+   ],
+   "theology": 0.2
+  },
+  "w266170537": {
+   "ceremonial": 0.685,
+   "confidence": 0.65,
+   "matched": [
+    "angelus",
+    "anglo-catholic",
+    "confession",
+    "daily mass",
+    "evensong",
+    "incense",
+    "our lady of",
+    "requiem",
+    "solemn mass",
+    "walsingham"
+   ],
+   "source": "website",
+   "theology": 0.786
+  },
+  "w266894275": {
+   "ceremonial": 0.1,
+   "confidence": 0.195,
+   "matched": [
+    "acolyte",
+    "small groups"
+   ],
+   "source": "website",
+   "theology": -0.05
+  },
+  "w266894428": {
+   "ceremonial": 0.681,
+   "confidence": 0.65,
+   "matched": [
+    "anglo-catholic",
+    "low mass",
+    "requiem",
+    "solemn mass",
+    "the mass",
+    "vestment"
+   ],
+   "source": "website",
+   "theology": 0.788
+  },
+  "w266926166": {
+   "ceremonial": -0.5,
+   "confidence": 0.098,
+   "matched": [
+    "small groups"
+   ],
+   "source": "website",
+   "theology": -0.4
+  },
+  "w270355304": {
+   "ceremonial": 0.6,
+   "confidence": 0.366,
+   "matched": [
+    "anglo-catholic",
+    "the mass"
+   ],
+   "source": "website",
+   "theology": 0.9
+  },
+  "w270948862": {
+   "ceremonial": 0.703,
+   "confidence": 0.65,
+   "matched": [
+    "acolyte",
+    "anglo-catholic",
+    "book of common prayer",
+    "catholic tradition",
+    "compline",
+    "incense",
+    "low mass",
+    "solemn mass",
+    "traditional language",
+    "vestment"
+   ],
+   "source": "website",
+   "theology": 0.651
+  },
+  "w271912608": {
+   "ceremonial": 0.55,
+   "confidence": 0.163,
+   "matched": [
+    "book of common prayer",
+    "compline"
+   ],
+   "source": "website",
+   "theology": 0.2
+  },
+  "w277904752": {
+   "ceremonial": 0.811,
+   "confidence": 0.219,
+   "matched": [
+    "chasuble",
+    "vestment"
+   ],
+   "source": "website",
+   "theology": 0.467
+  },
+  "w278160736": {
+   "ceremonial": 0.764,
+   "confidence": 0.65,
+   "matched": [
+    "anglo-catholic",
+    "confession",
+    "high church",
+    "incense",
+    "vestment"
+   ],
+   "source": "website",
+   "theology": 0.677
+  },
+  "w278346592": {
+   "ceremonial": 0.543,
+   "confidence": 0.65,
+   "matched": [
+    "acolyte",
+    "choral evensong",
+    "confession",
+    "procession",
+    "requiem",
+    "rosary",
+    "said mass",
+    "traditional language"
+   ],
+   "source": "website",
+   "theology": 0.528
+  },
+  "w280175471": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w284332673": {
+   "ceremonial": -0.8,
+   "confidence": 0.098,
+   "matched": [
+    "casual setting"
+   ],
+   "source": "website",
+   "theology": -0.2
+  },
+  "w297277827": {
+   "ceremonial": 0.5,
+   "confidence": 0.065,
+   "matched": [
+    "procession"
+   ],
+   "source": "website",
+   "theology": 0.0
+  },
+  "w298501506": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w298693770": {
+   "ceremonial": 0.7,
+   "confidence": 0.098,
+   "matched": [
+    "acolyte"
+   ],
+   "source": "website",
+   "theology": 0.3
+  },
+  "w298702172": {
+   "ceremonial": 0.8,
+   "confidence": 0.122,
+   "matched": [
+    "choral eucharist"
+   ],
+   "source": "website",
+   "theology": 0.3
+  },
+  "w299029612": {
+   "ceremonial": 0.414,
+   "confidence": 0.601,
+   "matched": [
+    "choral evensong",
+    "compline",
+    "incense",
+    "renewal",
+    "small group",
+    "traditional language"
+   ],
+   "source": "website",
+   "theology": 0.114
+  },
+  "w300574844": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w301488456": {
+   "ceremonial": -0.55,
+   "confidence": 0.195,
+   "matched": [
+    "church planting",
+    "small group"
+   ],
+   "source": "website",
+   "theology": -0.45
+  },
+  "w302144591": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w305313237": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w306199224": {
+   "ceremonial": 0.4,
+   "confidence": 0.122,
+   "matched": [
+    "the mass"
+   ],
+   "source": "website",
+   "theology": 0.7
+  },
+  "w309600689": {
+   "ceremonial": 0.794,
+   "confidence": 0.528,
+   "matched": [
+    "choral eucharist",
+    "compline",
+    "evensong",
+    "incense",
+    "procession"
+   ],
+   "source": "website",
+   "theology": 0.288
+  },
+  "w311043890": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w311145527": {
+   "ceremonial": 0.747,
+   "confidence": 0.52,
+   "matched": [
+    "acolyte",
+    "book of common prayer",
+    "incense",
+    "traditional language",
+    "vestment"
+   ],
+   "source": "website",
+   "theology": 0.3
+  },
+  "w312993675": {
+   "ceremonial": 0.702,
+   "confidence": 0.65,
+   "matched": [
+    "anglican missal",
+    "book of common prayer",
+    "evensong",
+    "incense",
+    "low mass",
+    "sung eucharist",
+    "the mass"
+   ],
+   "source": "website",
+   "theology": 0.529
+  },
+  "w321867612": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w322318394": {
+   "ceremonial": 0.6,
+   "confidence": 0.098,
+   "matched": [
+    "requiem"
+   ],
+   "source": "website",
+   "theology": 0.6
+  },
+  "w32324360": {
+   "ceremonial": 0.6,
+   "confidence": 0.081,
+   "matched": [
+    "compline"
+   ],
+   "source": "website",
+   "theology": 0.3
+  },
+  "w323916700": {
+   "ceremonial": 0.555,
+   "confidence": 0.504,
+   "matched": [
+    "acolyte",
+    "book of common prayer",
+    "spirit-filled",
+    "thurifer",
+    "traditional language"
+   ],
+   "source": "website",
+   "theology": 0.219
+  },
+  "w332757057": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w333906056": {
+   "ceremonial": 0.679,
+   "confidence": 0.65,
+   "matched": [
+    "angelus",
+    "anglo-catholic",
+    "blessed sacrament",
+    "evensong",
+    "marian"
+   ],
+   "source": "website",
+   "theology": 0.838
+  },
+  "w334179780": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w335512391": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w337257760": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w342277775": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w342830672": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w344797625": {
+   "ceremonial": -0.224,
+   "confidence": 0.406,
+   "matched": [
+    "book of common prayer",
+    "contemporary worship",
+    "small group",
+    "traditional language"
+   ],
+   "source": "website",
+   "theology": -0.2
+  },
+  "w34580513": {
+   "ceremonial": 0.6,
+   "confidence": 0.081,
+   "matched": [
+    "compline"
+   ],
+   "source": "website",
+   "theology": 0.3
+  },
+  "w346037104": {
+   "ceremonial": 0.7,
+   "confidence": 0.098,
+   "matched": [
+    "acolyte"
+   ],
+   "source": "website",
+   "theology": 0.3
+  },
+  "w348833481": {
+   "ceremonial": 0.848,
+   "confidence": 0.341,
+   "matched": [
+    "choral evensong",
+    "incense",
+    "traditional language"
+   ],
+   "source": "website",
+   "theology": 0.29
+  },
+  "w354108948": {
+   "ceremonial": -0.121,
+   "confidence": 0.349,
+   "matched": [
+    "book of common prayer",
+    "confession",
+    "contemporary worship"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w356939128": {
+   "ceremonial": 0.5,
+   "confidence": 0.203,
+   "matched": [
+    "catholic tradition"
+   ],
+   "source": "website",
+   "theology": 0.9
+  },
+  "w357004151": {
+   "ceremonial": 0.714,
+   "confidence": 0.301,
+   "matched": [
+    "acolyte",
+    "choral eucharist",
+    "traditional language"
+   ],
+   "source": "website",
+   "theology": 0.246
+  },
+  "w362266104": {
+   "ceremonial": -0.5,
+   "confidence": 0.098,
+   "matched": [
+    "small groups"
+   ],
+   "source": "website",
+   "theology": -0.4
+  },
+  "w366894706": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w36805969": {
+   "ceremonial": 0.6,
+   "confidence": 0.081,
+   "matched": [
+    "compline"
+   ],
+   "source": "website",
+   "theology": 0.3
+  },
+  "w368406923": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w368695944": {
+   "ceremonial": 0.6,
+   "confidence": 0.081,
+   "matched": [
+    "traditional language"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w370079012": {
+   "ceremonial": 0.1,
+   "confidence": 0.195,
+   "matched": [
+    "acolyte",
+    "small groups"
+   ],
+   "source": "website",
+   "theology": -0.05
+  },
+  "w372281812": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w373554247": {
+   "ceremonial": 0.633,
+   "confidence": 0.244,
+   "matched": [
+    "blessed sacrament",
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.633
+  },
+  "w381796452": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w382075764": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w382146100": {
+   "ceremonial": 0.5,
+   "confidence": 0.065,
+   "matched": [
+    "processional"
+   ],
+   "source": "website",
+   "theology": 0.0
+  },
+  "w382783311": {
+   "ceremonial": 0.664,
+   "confidence": 0.447,
+   "matched": [
+    "compline",
+    "high church",
+    "rosary"
+   ],
+   "source": "website",
+   "theology": 0.655
+  },
+  "w383199995": {
+   "ceremonial": -0.5,
+   "confidence": 0.098,
+   "matched": [
+    "small groups"
+   ],
+   "source": "website",
+   "theology": -0.4
+  },
+  "w385611224": {
+   "ceremonial": 0.218,
+   "confidence": 0.276,
+   "matched": [
+    "acolyte",
+    "book of common prayer",
+    "small groups"
+   ],
+   "source": "website",
+   "theology": -0.006
+  },
+  "w388814483": {
+   "ceremonial": -0.9,
+   "confidence": 0.146,
+   "matched": [
+    "worship team"
+   ],
+   "source": "website",
+   "theology": -0.4
+  },
+  "w389229816": {
+   "ceremonial": 0.173,
+   "confidence": 0.423,
+   "matched": [
+    "adoration",
+    "book of common prayer",
+    "sermon series",
+    "small groups"
+   ],
+   "source": "website",
+   "theology": 0.196
+  },
+  "w39242714": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w394266452": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w397729027": {
+   "ceremonial": 0.6,
+   "confidence": 0.081,
+   "matched": [
+    "compline"
+   ],
+   "source": "website",
+   "theology": 0.3
+  },
+  "w404167829": {
+   "ceremonial": -0.178,
+   "confidence": 0.219,
+   "matched": [
+    "praise and worship",
+    "requiem"
+   ],
+   "source": "website",
+   "theology": 0.044
+  },
+  "w40719799": {
+   "ceremonial": -0.4,
+   "confidence": 0.227,
+   "matched": [
+    "book of common prayer",
+    "worship band"
+   ],
+   "source": "website",
+   "theology": -0.221
+  },
+  "w414236913": {
+   "ceremonial": 0.6,
+   "confidence": 0.081,
+   "matched": [
+    "compline"
+   ],
+   "source": "website",
+   "theology": 0.3
+  },
+  "w417310157": {
+   "ceremonial": 0.0,
+   "confidence": 0.179,
+   "matched": [
+    "compline",
+    "small group"
+   ],
+   "source": "website",
+   "theology": -0.082
+  },
+  "w422262367": {
+   "ceremonial": -0.5,
+   "confidence": 0.098,
+   "matched": [
+    "life groups"
+   ],
+   "source": "website",
+   "theology": -0.4
+  },
+  "w422313569": {
+   "ceremonial": -0.426,
+   "confidence": 0.309,
+   "matched": [
+    "book of common prayer",
+    "renewal",
+    "worship band"
+   ],
+   "source": "website",
+   "theology": -0.216
+  },
+  "w424083255": {
+   "ceremonial": 0.16,
+   "confidence": 0.203,
+   "matched": [
+    "renewal",
+    "stations of the cross"
+   ],
+   "source": "website",
+   "theology": 0.34
+  },
+  "w42504912": {
+   "ceremonial": 0.55,
+   "confidence": 0.163,
+   "matched": [
+    "book of common prayer",
+    "compline"
+   ],
+   "source": "website",
+   "theology": 0.2
+  },
+  "w430658177": {
+   "ceremonial": 0.4,
+   "confidence": 0.423,
+   "matched": [
+    "acolyte",
+    "book of common prayer",
+    "procession",
+    "spirit filled",
+    "vestment"
+   ],
+   "source": "website",
+   "theology": 0.119
+  },
+  "w435227292": {
+   "ceremonial": 0.638,
+   "confidence": 0.301,
+   "matched": [
+    "book of common prayer",
+    "evensong",
+    "stations of the cross"
+   ],
+   "source": "website",
+   "theology": 0.343
+  },
+  "w437235888": {
+   "ceremonial": -0.045,
+   "confidence": 0.179,
+   "matched": [
+    "book of common prayer",
+    "small group"
+   ],
+   "source": "website",
+   "theology": -0.173
+  },
+  "w444605693": {
+   "ceremonial": 0.7,
+   "confidence": 0.098,
+   "matched": [
+    "acolyte"
+   ],
+   "source": "website",
+   "theology": 0.3
+  },
+  "w444829135": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w445542138": {
+   "ceremonial": 0.7,
+   "confidence": 0.098,
+   "matched": [
+    "acolyte"
+   ],
+   "source": "website",
+   "theology": 0.3
+  },
+  "w445866461": {
+   "ceremonial": 0.606,
+   "confidence": 0.26,
+   "matched": [
+    "1928 prayer book",
+    "traditional language",
+    "vestment"
+   ],
+   "source": "website",
+   "theology": 0.175
+  },
+  "w44873387": {
+   "ceremonial": 0.083,
+   "confidence": 0.488,
+   "matched": [
+    "book of common prayer",
+    "catholic tradition",
+    "evangelical"
+   ],
+   "source": "website",
+   "theology": 0.017
+  },
+  "w448894221": {
+   "ceremonial": 0.046,
+   "confidence": 0.528,
+   "matched": [
+    "book of common prayer",
+    "reformed episcopal",
+    "the mass"
+   ],
+   "source": "website",
+   "theology": -0.346
+  },
+  "w45207675": {
+   "ceremonial": -0.5,
+   "confidence": 0.179,
+   "matched": [
+    "small group",
+    "spirit-filled"
+   ],
+   "source": "website",
+   "theology": -0.309
+  },
+  "w455581284": {
+   "ceremonial": 0.8,
+   "confidence": 0.122,
+   "matched": [
+    "choral eucharist"
+   ],
+   "source": "website",
+   "theology": 0.3
+  },
+  "w45595769": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w456629156": {
+   "ceremonial": 0.611,
+   "confidence": 0.65,
+   "matched": [
+    "anglo-catholic",
+    "benediction",
+    "blessed sacrament",
+    "book of common prayer",
+    "catholic tradition",
+    "choral evensong",
+    "high mass",
+    "low mass",
+    "procession",
+    "renewal",
+    "the mass"
+   ],
+   "source": "website",
+   "theology": 0.711
+  },
+  "w456629167": {
+   "ceremonial": 0.6,
+   "confidence": 0.081,
+   "matched": [
+    "traditional language"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w45850899": {
+   "ceremonial": 0.17,
+   "confidence": 0.642,
+   "matched": [
+    "acolyte",
+    "bcp",
+    "confession",
+    "genuflect",
+    "praise and worship",
+    "small groups"
+   ],
+   "source": "website",
+   "theology": 0.187
+  },
+  "w461412552": {
+   "ceremonial": 0.473,
+   "confidence": 0.447,
+   "matched": [
+    "book of common prayer",
+    "incense",
+    "renewal",
+    "the mass"
+   ],
+   "source": "website",
+   "theology": 0.355
+  },
+  "w465111873": {
+   "ceremonial": 0.584,
+   "confidence": 0.301,
+   "matched": [
+    "compline",
+    "confession",
+    "evensong"
+   ],
+   "source": "website",
+   "theology": 0.397
+  },
+  "w468423727": {
+   "ceremonial": -0.9,
+   "confidence": 0.146,
+   "matched": [
+    "worship team"
+   ],
+   "source": "website",
+   "theology": -0.4
+  },
+  "w469776084": {
+   "ceremonial": -0.5,
+   "confidence": 0.098,
+   "matched": [
+    "small group"
+   ],
+   "source": "website",
+   "theology": -0.4
+  },
+  "w469845141": {
+   "ceremonial": 0.566,
+   "confidence": 0.382,
+   "matched": [
+    "book of common prayer",
+    "confession",
+    "evensong",
+    "traditional language"
+   ],
+   "source": "website",
+   "theology": 0.291
+  },
+  "w470788393": {
+   "ceremonial": 0.412,
+   "confidence": 0.423,
+   "matched": [
+    "bcp",
+    "casual setting",
+    "compline",
+    "incense"
+   ],
+   "source": "website",
+   "theology": 0.223
+  },
+  "w471875495": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w473004404": {
+   "ceremonial": 0.454,
+   "confidence": 0.479,
+   "matched": [
+    "acolyte",
+    "compline",
+    "renewal",
+    "stations of the cross",
+    "vestment"
+   ],
+   "source": "website",
+   "theology": 0.317
+  },
+  "w476063685": {
+   "ceremonial": -0.4,
+   "confidence": 0.227,
+   "matched": [
+    "book of common prayer",
+    "worship band"
+   ],
+   "source": "website",
+   "theology": -0.221
+  },
+  "w48077340": {
+   "ceremonial": 0.8,
+   "confidence": 0.219,
+   "matched": [
+    "choral eucharist",
+    "choral evensong"
+   ],
+   "source": "website",
+   "theology": 0.211
+  },
+  "w481714598": {
+   "ceremonial": -0.26,
+   "confidence": 0.244,
+   "matched": [
+    "acolyte",
+    "worship team"
+   ],
+   "source": "website",
+   "theology": -0.12
+  },
+  "w487850719": {
+   "ceremonial": 0.609,
+   "confidence": 0.179,
+   "matched": [
+    "acolyte",
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.209
+  },
+  "w488270722": {
+   "ceremonial": -0.5,
+   "confidence": 0.098,
+   "matched": [
+    "small group"
+   ],
+   "source": "website",
+   "theology": -0.4
+  },
+  "w495282055": {
+   "ceremonial": 0.244,
+   "confidence": 0.406,
+   "matched": [
+    "acolyte",
+    "thurifer",
+    "worship team"
+   ],
+   "source": "website",
+   "theology": 0.128
+  },
+  "w497151843": {
+   "ceremonial": -0.186,
+   "confidence": 0.471,
+   "matched": [
+    "book of common prayer",
+    "casual service",
+    "compline",
+    "procession",
+    "worship team"
+   ],
+   "source": "website",
+   "theology": -0.097
+  },
+  "w498399834": {
+   "ceremonial": 0.632,
+   "confidence": 0.358,
+   "matched": [
+    "acolyte",
+    "book of common prayer",
+    "traditional language",
+    "vestment"
+   ],
+   "source": "website",
+   "theology": 0.209
+  },
+  "w500197811": {
+   "ceremonial": 0.6,
+   "confidence": 0.081,
+   "matched": [
+    "compline"
+   ],
+   "source": "website",
+   "theology": 0.3
+  },
+  "w503426718": {
+   "ceremonial": 0.08,
+   "confidence": 0.203,
+   "matched": [
+    "sermon series",
+    "the mass"
+   ],
+   "source": "website",
+   "theology": 0.26
+  },
+  "w531078918": {
+   "ceremonial": -0.5,
+   "confidence": 0.098,
+   "matched": [
+    "small group"
+   ],
+   "source": "website",
+   "theology": -0.4
+  },
+  "w532041385": {
+   "ceremonial": 0.56,
+   "confidence": 0.203,
+   "matched": [
+    "book of common prayer",
+    "stations of the cross"
+   ],
+   "source": "website",
+   "theology": 0.46
+  },
+  "w532112337": {
+   "ceremonial": 0.44,
+   "confidence": 0.203,
+   "matched": [
+    "book of common prayer",
+    "confession"
+   ],
+   "source": "website",
+   "theology": 0.46
+  },
+  "w533070472": {
+   "ceremonial": 0.7,
+   "confidence": 0.098,
+   "matched": [
+    "acolyte"
+   ],
+   "source": "website",
+   "theology": 0.3
+  },
+  "w53436767": {
+   "ceremonial": 0.55,
+   "confidence": 0.163,
+   "matched": [
+    "book of common prayer",
+    "compline"
+   ],
+   "source": "website",
+   "theology": 0.2
+  },
+  "w538851781": {
+   "ceremonial": -0.5,
+   "confidence": 0.098,
+   "matched": [
+    "small groups"
+   ],
+   "source": "website",
+   "theology": -0.4
+  },
+  "w540394729": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "bcp"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w541799770": {
+   "ceremonial": 0.52,
+   "confidence": 0.366,
+   "matched": [
+    "book of common prayer",
+    "confession",
+    "crucifer",
+    "procession"
+   ],
+   "source": "website",
+   "theology": 0.336
+  },
+  "w54677516": {
+   "ceremonial": -0.5,
+   "confidence": 0.098,
+   "matched": [
+    "small groups"
+   ],
+   "source": "website",
+   "theology": -0.4
+  },
+  "w54789287": {
+   "ceremonial": 0.44,
+   "confidence": 0.203,
+   "matched": [
+    "book of common prayer",
+    "confession"
+   ],
+   "source": "website",
+   "theology": 0.46
+  },
+  "w548668625": {
+   "ceremonial": 0.7,
+   "confidence": 0.098,
+   "matched": [
+    "acolyte"
+   ],
+   "source": "website",
+   "theology": 0.3
+  },
+  "w549632252": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w55332523": {
+   "ceremonial": 0.7,
+   "confidence": 0.098,
+   "matched": [
+    "acolyte"
+   ],
+   "source": "website",
+   "theology": 0.3
+  },
+  "w558884239": {
+   "ceremonial": 0.6,
+   "confidence": 0.081,
+   "matched": [
+    "compline"
+   ],
+   "source": "website",
+   "theology": 0.3
+  },
+  "w579653468": {
+   "ceremonial": 0.55,
+   "confidence": 0.163,
+   "matched": [
+    "book of common prayer",
+    "traditional language"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w586380404": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w589705045": {
+   "ceremonial": 0.609,
+   "confidence": 0.382,
+   "matched": [
+    "choral evensong",
+    "stations of the cross",
+    "sung mass"
+   ],
+   "source": "website",
+   "theology": 0.589
+  },
+  "w590864738": {
+   "ceremonial": 0.0,
+   "confidence": 0.163,
+   "matched": [
+    "book of common prayer",
+    "renewal"
+   ],
+   "source": "website",
+   "theology": -0.05
+  },
+  "w595216274": {
+   "ceremonial": 0.606,
+   "confidence": 0.26,
+   "matched": [
+    "acolyte",
+    "book of common prayer",
+    "traditional language"
+   ],
+   "source": "website",
+   "theology": 0.175
+  },
+  "w595952116": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w610281582": {
+   "ceremonial": -0.5,
+   "confidence": 0.098,
+   "matched": [
+    "small groups"
+   ],
+   "source": "website",
+   "theology": -0.4
+  },
+  "w611230836": {
+   "ceremonial": 0.58,
+   "confidence": 0.244,
+   "matched": [
+    "acolyte",
+    "book of common prayer",
+    "procession"
+   ],
+   "source": "website",
+   "theology": 0.153
+  },
+  "w613566956": {
+   "ceremonial": 1.0,
+   "confidence": 0.163,
+   "matched": [
+    "incense"
+   ],
+   "source": "website",
+   "theology": 0.5
+  },
+  "w620135606": {
+   "ceremonial": 0.885,
+   "confidence": 0.382,
+   "matched": [
+    "choral eucharist",
+    "evensong",
+    "incense"
+   ],
+   "source": "website",
+   "theology": 0.334
+  },
+  "w626515696": {
+   "ceremonial": 0.53,
+   "confidence": 0.65,
+   "matched": [
+    "benediction",
+    "book of common prayer",
+    "confession",
+    "incense",
+    "informal service",
+    "vestment"
+   ],
+   "source": "website",
+   "theology": 0.481
+  },
+  "w626678389": {
+   "ceremonial": 0.633,
+   "confidence": 0.244,
+   "matched": [
+    "adoration",
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.633
+  },
+  "w628932190": {
+   "ceremonial": -0.5,
+   "confidence": 0.081,
+   "matched": [
+    "renewal"
+   ],
+   "source": "website",
+   "theology": -0.2
+  },
+  "w638040479": {
+   "ceremonial": 0.833,
+   "confidence": 0.244,
+   "matched": [
+    "bcp",
+    "incense"
+   ],
+   "source": "website",
+   "theology": 0.367
+  },
+  "w641983402": {
+   "ceremonial": -0.5,
+   "confidence": 0.098,
+   "matched": [
+    "small group"
+   ],
+   "source": "website",
+   "theology": -0.4
+  },
+  "w644696049": {
+   "ceremonial": -0.506,
+   "confidence": 0.276,
+   "matched": [
+    "church planting",
+    "sermon series",
+    "small groups"
+   ],
+   "source": "website",
+   "theology": -0.435
+  },
+  "w654831745": {
+   "ceremonial": -0.5,
+   "confidence": 0.098,
+   "matched": [
+    "small groups"
+   ],
+   "source": "website",
+   "theology": -0.4
+  },
+  "w660301708": {
+   "ceremonial": -0.526,
+   "confidence": 0.382,
+   "matched": [
+    "church planting",
+    "evangelical",
+    "spirit-filled"
+   ],
+   "source": "website",
+   "theology": -0.649
+  },
+  "w66346983": {
+   "ceremonial": 0.8,
+   "confidence": 0.122,
+   "matched": [
+    "choral eucharist"
+   ],
+   "source": "website",
+   "theology": 0.3
+  },
+  "w66693316": {
+   "ceremonial": 0.5,
+   "confidence": 0.203,
+   "matched": [
+    "catholic tradition"
+   ],
+   "source": "website",
+   "theology": 0.9
+  },
+  "w66793285": {
+   "ceremonial": 0.632,
+   "confidence": 0.65,
+   "matched": [
+    "anglo-catholic",
+    "blessed sacrament",
+    "book of common prayer",
+    "catholic tradition",
+    "incense",
+    "said mass",
+    "the mass"
+   ],
+   "source": "website",
+   "theology": 0.771
+  },
+  "w66811710": {
+   "ceremonial": 0.848,
+   "confidence": 0.341,
+   "matched": [
+    "compline",
+    "evensong",
+    "incense"
+   ],
+   "source": "website",
+   "theology": 0.338
+  },
+  "w669785869": {
+   "ceremonial": 0.045,
+   "confidence": 0.382,
+   "matched": [
+    "book of common prayer",
+    "evangelical",
+    "evensong"
+   ],
+   "source": "website",
+   "theology": -0.432
+  },
+  "w675682944": {
+   "ceremonial": 0.103,
+   "confidence": 0.301,
+   "matched": [
+    "1928 prayer book",
+    "church planting",
+    "the mass"
+   ],
+   "source": "website",
+   "theology": 0.149
+  },
+  "w679143151": {
+   "ceremonial": -0.2,
+   "confidence": 0.325,
+   "matched": [
+    "reformed episcopal"
+   ],
+   "source": "website",
+   "theology": -0.85
+  },
+  "w682989860": {
+   "ceremonial": 0.7,
+   "confidence": 0.098,
+   "matched": [
+    "acolyte"
+   ],
+   "source": "website",
+   "theology": 0.3
+  },
+  "w688521230": {
+   "ceremonial": 0.6,
+   "confidence": 0.122,
+   "matched": [
+    "stations of the cross"
+   ],
+   "source": "website",
+   "theology": 0.7
+  },
+  "w68935841": {
+   "ceremonial": 0.709,
+   "confidence": 0.179,
+   "matched": [
+    "compline",
+    "evensong"
+   ],
+   "source": "website",
+   "theology": 0.191
+  },
+  "w69118027": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w69347459": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w699308516": {
+   "ceremonial": 0.44,
+   "confidence": 0.203,
+   "matched": [
+    "book of common prayer",
+    "the mass"
+   ],
+   "source": "website",
+   "theology": 0.46
+  },
+  "w703782433": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w707114323": {
+   "ceremonial": 0.7,
+   "confidence": 0.098,
+   "matched": [
+    "acolyte"
+   ],
+   "source": "website",
+   "theology": 0.3
+  },
+  "w708188304": {
+   "ceremonial": 0.6,
+   "confidence": 0.081,
+   "matched": [
+    "compline"
+   ],
+   "source": "website",
+   "theology": 0.3
+  },
+  "w708687155": {
+   "ceremonial": 0.156,
+   "confidence": 0.26,
+   "matched": [
+    "book of common prayer",
+    "compline",
+    "small groups"
+   ],
+   "source": "website",
+   "theology": -0.025
+  },
+  "w711058041": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w715962266": {
+   "ceremonial": 0.223,
+   "confidence": 0.569,
+   "matched": [
+    "acolyte",
+    "book of common prayer",
+    "compline",
+    "procession",
+    "vestment",
+    "worship team"
+   ],
+   "source": "website",
+   "theology": 0.057
+  },
+  "w719600768": {
+   "ceremonial": 0.62,
+   "confidence": 0.163,
+   "matched": [
+    "acolyte",
+    "procession"
+   ],
+   "source": "website",
+   "theology": 0.18
+  },
+  "w724027697": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w732789631": {
+   "ceremonial": -0.06,
+   "confidence": 0.406,
+   "matched": [
+    "book of common prayer",
+    "reformed episcopal"
+   ],
+   "source": "website",
+   "theology": -0.66
+  },
+  "w733127321": {
+   "ceremonial": 0.786,
+   "confidence": 0.569,
+   "matched": [
+    "adoration",
+    "anglo-catholic",
+    "incense"
+   ],
+   "source": "website",
+   "theology": 0.829
+  },
+  "w738709485": {
+   "ceremonial": 0.55,
+   "confidence": 0.163,
+   "matched": [
+    "book of common prayer",
+    "compline"
+   ],
+   "source": "website",
+   "theology": 0.2
+  },
+  "w760072057": {
+   "ceremonial": 0.6,
+   "confidence": 0.081,
+   "matched": [
+    "compline"
+   ],
+   "source": "website",
+   "theology": 0.3
+  },
+  "w762101907": {
+   "ceremonial": 0.7,
+   "confidence": 0.098,
+   "matched": [
+    "acolyte"
+   ],
+   "source": "website",
+   "theology": 0.3
+  },
+  "w764447166": {
+   "ceremonial": 0.58,
+   "confidence": 0.244,
+   "matched": [
+    "acolyte",
+    "book of common prayer",
+    "procession"
+   ],
+   "source": "website",
+   "theology": 0.153
+  },
+  "w769394823": {
+   "ceremonial": 0.614,
+   "confidence": 0.341,
+   "matched": [
+    "acolyte",
+    "book of common prayer",
+    "processional",
+    "vestment"
+   ],
+   "source": "website",
+   "theology": 0.195
+  },
+  "w769424727": {
+   "ceremonial": 0.8,
+   "confidence": 0.203,
+   "matched": [
+    "angelus"
+   ],
+   "source": "website",
+   "theology": 0.9
+  },
+  "w771194325": {
+   "ceremonial": -0.362,
+   "confidence": 0.423,
+   "matched": [
+    "acolyte",
+    "contemporary worship",
+    "renewal",
+    "small group"
+   ],
+   "source": "website",
+   "theology": -0.2
+  },
+  "w777203064": {
+   "ceremonial": 0.5,
+   "confidence": 0.244,
+   "matched": [
+    "confession",
+    "stations of the cross"
+   ],
+   "source": "website",
+   "theology": 0.7
+  },
+  "w777266779": {
+   "ceremonial": 0.662,
+   "confidence": 0.601,
+   "matched": [
+    "acolyte",
+    "choral eucharist",
+    "procession",
+    "requiem",
+    "stations of the cross",
+    "vestment"
+   ],
+   "source": "website",
+   "theology": 0.397
+  },
+  "w789155626": {
+   "ceremonial": 0.44,
+   "confidence": 0.203,
+   "matched": [
+    "book of common prayer",
+    "confession"
+   ],
+   "source": "website",
+   "theology": 0.46
+  },
+  "w795245502": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w801817126": {
+   "ceremonial": -0.164,
+   "confidence": 0.179,
+   "matched": [
+    "informal setting",
+    "traditional language"
+   ],
+   "source": "website",
+   "theology": -0.064
+  },
+  "w804494204": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w805816584": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w807381097": {
+   "ceremonial": 0.6,
+   "confidence": 0.098,
+   "matched": [
+    "requiem"
+   ],
+   "source": "website",
+   "theology": 0.6
+  },
+  "w810832126": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w823797275": {
+   "ceremonial": -0.09,
+   "confidence": 0.406,
+   "matched": [
+    "book of common prayer",
+    "come to faith",
+    "confession",
+    "renewal"
+   ],
+   "source": "website",
+   "theology": -0.02
+  },
+  "w834724053": {
+   "ceremonial": 0.5,
+   "confidence": 0.065,
+   "matched": [
+    "procession"
+   ],
+   "source": "website",
+   "theology": 0.0
+  },
+  "w837999582": {
+   "ceremonial": 0.108,
+   "confidence": 0.423,
+   "matched": [
+    "acolyte",
+    "book of common prayer",
+    "vestment",
+    "worship team"
+   ],
+   "source": "website",
+   "theology": 0.019
+  },
+  "w84515804": {
+   "ceremonial": 0.746,
+   "confidence": 0.301,
+   "matched": [
+    "choral eucharist",
+    "choral evensong",
+    "traditional language"
+   ],
+   "source": "website",
+   "theology": 0.181
+  },
+  "w847389570": {
+   "ceremonial": 0.238,
+   "confidence": 0.325,
+   "matched": [
+    "book of common prayer",
+    "confession",
+    "thirty-nine articles"
+   ],
+   "source": "website",
+   "theology": 0.025
+  },
+  "w856447686": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w862358102": {
+   "ceremonial": 0.6,
+   "confidence": 0.081,
+   "matched": [
+    "compline"
+   ],
+   "source": "website",
+   "theology": 0.3
+  },
+  "w865158565": {
+   "ceremonial": 0.611,
+   "confidence": 0.284,
+   "matched": [
+    "processional",
+    "stations of the cross",
+    "vestment"
+   ],
+   "source": "website",
+   "theology": 0.403
+  },
+  "w875353312": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w885756300": {
+   "ceremonial": 0.2,
+   "confidence": 0.26,
+   "matched": [
+    "acolyte",
+    "processional",
+    "small groups"
+   ],
+   "source": "website",
+   "theology": -0.037
+  },
+  "w912635051": {
+   "ceremonial": -0.43,
+   "confidence": 0.325,
+   "matched": [
+    "book of common prayer",
+    "contemporary worship",
+    "small groups"
+   ],
+   "source": "website",
+   "theology": -0.275
+  },
+  "w912756328": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w914871324": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w923253166": {
+   "ceremonial": 0.609,
+   "confidence": 0.179,
+   "matched": [
+    "acolyte",
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.209
+  },
+  "w937351689": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w941206525": {
+   "ceremonial": 0.609,
+   "confidence": 0.179,
+   "matched": [
+    "book of common prayer",
+    "crucifer"
+   ],
+   "source": "website",
+   "theology": 0.209
+  },
+  "w947097151": {
+   "ceremonial": 0.31,
+   "confidence": 0.325,
+   "matched": [
+    "book of common prayer",
+    "processional",
+    "spirit-filled",
+    "vestment"
+   ],
+   "source": "website",
+   "theology": 0.065
+  },
+  "w947775084": {
+   "ceremonial": -0.5,
+   "confidence": 0.098,
+   "matched": [
+    "small groups"
+   ],
+   "source": "website",
+   "theology": -0.4
+  },
+  "w948795215": {
+   "ceremonial": 0.6,
+   "confidence": 0.081,
+   "matched": [
+    "traditional language"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w950222995": {
+   "ceremonial": 0.727,
+   "confidence": 0.447,
+   "matched": [
+    "book of common prayer",
+    "high mass",
+    "said mass"
+   ],
+   "source": "website",
+   "theology": 0.718
+  },
+  "w956428333": {
+   "ceremonial": -0.137,
+   "confidence": 0.309,
+   "matched": [
+    "book of common prayer",
+    "compline",
+    "contemporary worship"
+   ],
+   "source": "website",
+   "theology": -0.084
+  },
+  "w958741830": {
+   "ceremonial": 0.633,
+   "confidence": 0.244,
+   "matched": [
+    "adoration",
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.633
+  },
+  "w963327346": {
+   "ceremonial": 0.455,
+   "confidence": 0.268,
+   "matched": [
+    "book of common prayer",
+    "confession",
+    "processional"
+   ],
+   "source": "website",
+   "theology": 0.348
+  },
+  "w969331806": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w972048956": {
+   "ceremonial": 0.5,
+   "confidence": 0.081,
+   "matched": [
+    "book of common prayer"
+   ],
+   "source": "website",
+   "theology": 0.1
+  },
+  "w977438343": {
+   "ceremonial": 0.5,
+   "confidence": 0.065,
+   "matched": [
+    "procession"
+   ],
+   "source": "website",
+   "theology": 0.0
+  },
+  "w987358398": {
+   "ceremonial": 0.741,
+   "confidence": 0.65,
+   "matched": [
+    "acolyte",
+    "benediction",
+    "book of common prayer",
+    "chasuble",
+    "confession",
+    "genuflect",
+    "incense",
+    "processional"
+   ],
+   "source": "website",
+   "theology": 0.559
+  },
+  "w988904675": {
+   "ceremonial": -0.5,
+   "confidence": 0.098,
+   "matched": [
+    "small groups"
+   ],
+   "source": "website",
+   "theology": -0.4
+  },
+  "w995438040": {
+   "ceremonial": 0.7,
+   "confidence": 0.098,
+   "matched": [
+    "acolyte"
+   ],
+   "source": "website",
+   "theology": 0.3
+  },
+  "w996192301": {
+   "ceremonial": -0.5,
+   "confidence": 0.081,
+   "matched": [
+    "renewal"
+   ],
+   "source": "website",
+   "theology": -0.2
+  },
+  "w999917943": {
+   "ceremonial": 0.46,
+   "confidence": 0.406,
+   "matched": [
+    "bcp",
+    "confession",
+    "the mass",
+    "traditional language"
+   ],
+   "source": "website",
+   "theology": 0.46
   }
  }
 }

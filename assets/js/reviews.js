@@ -352,7 +352,7 @@
       data.votes
         ? strength + ', from ' + data.votes + (data.votes === 1 ? ' submission' : ' submissions') +
           (data.source === 'community' ? '' : ' and ' + scrapedSourceName(data))
-        : strength + ', from ' + scrapedSourceName(data) + ' only' }));
+        : strength + ', from ' + scrapedSourceName(data) + ', with no submissions yet' }));
     return node;
   }
 
@@ -421,8 +421,8 @@
       }
     } else {
       host.appendChild(el('p', { class: 'cm-none', text:
-        'No estimate yet. Nothing was found on a website for this parish, so ' +
-        'the first person to answer sets it.' }));
+        'No estimate yet. Nothing was found on a website or in a Wikipedia ' +
+        'article for this parish, so the first person to answer sets it.' }));
     }
 
     if (!ChurchAccount.user()) {

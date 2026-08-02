@@ -113,7 +113,15 @@ LEXICON = [
     (r"gospel[- ]cent(?:re|er)ed", -0.6, -0.4, 1.2),
     (r"\baltar call\b|\bcome to (?:christ|faith)\b", -0.7, -0.7, 1.5),
     (r"\bchurch plant(?:ing)?\b",              -0.5, -0.6, 1.2),
-    (r"\binformal\b|\bcasual\b|\bcome as you are\b", -0.2, -0.8, 1.2),
+    # "Come as you are" is a welcome mat, not a churchmanship claim: 33 parish
+    # websites used it against zero Wikipedia articles, and the most ceremonially
+    # elaborate Anglo-Catholic shrine in a diocese will still say it on the
+    # homepage. "Informal" and "casual" have to be attached to the worship to
+    # count -- otherwise they were matching casual dress and informal coffee.
+    # These three alone were the entire evidence for 22 of 410 website scores and
+    # biased the whole source 0.17 low on ceremonial against Wikipedia.
+    (r"(?:informal|casual)\s+(?:service|worship|liturgy|eucharist|mass|setting)"
+     r"|worship is (?:informal|casual)", -0.2, -0.8, 1.2),
     (r"\bsermon series\b",                     -0.4, -0.4, 1.0),
     (r"reformed episcopal",                    -0.9, -0.3, 2.0),
     (r"\bcharismatic\b|spirit[- ]filled|\brenewal\b", -0.2, -0.5, 1.0),
@@ -252,8 +260,20 @@ def merge_sources(scores):
     best = max(s["confidence"] for s in scores)
     cap = max(SOURCE_CAPS.get(s.get("source", "website"), MAX_SCRAPED_CONFIDENCE)
               for s in scores)
-    # Agreement adds up to a third again; disagreement takes away up to half.
-    confidence = best * (1.0 + 0.33 * (1 - spread) - 0.5 * spread)
+    # Disagreement lowers confidence; agreement does not raise it.
+    #
+    # The asymmetry is deliberate and was earned the hard way. On the 27 parishes
+    # where both a website and a Wikipedia article scored, the two sources
+    # correlate at only +0.17 on ceremonial and +0.23 on theology. At that
+    # strength, two sources landing near each other is not much evidence that
+    # either is right -- it is as easily coincidence, since most readings cluster
+    # near the middle anyway. Rewarding that would be manufacturing certainty out
+    # of noise, which is the one thing this whole feature is built not to do.
+    #
+    # Disagreement is different: it is a positive signal that something is wrong
+    # -- a parish that changed, or a source describing a building rather than a
+    # congregation -- and hedging on it costs nothing but a wider error bar.
+    confidence = best * (1.0 - 0.5 * spread)
 
     matched = []
     for s in scores:

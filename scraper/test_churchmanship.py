@@ -121,12 +121,17 @@ def test_source_is_recorded_on_the_result():
 
 # -- merging sources ----------------------------------------------------------
 
-def test_merging_agreeing_sources_raises_confidence():
+def test_agreement_does_not_raise_confidence():
+    """Measured on the 27 parishes with both sources, they correlate at only
+    +0.17 on ceremonial and +0.23 on theology. At that strength two sources
+    landing near each other is as easily coincidence as corroboration -- most
+    readings cluster near the middle anyway -- so agreement must not be rewarded.
+    Doing so would manufacture certainty out of noise."""
     text = "Anglo-Catholic parish with solemn mass and incense."
     site = cm.score(text, source="website")
     wiki = cm.score(text, source="wikipedia")
     merged = cm.merge_sources([site, wiki])
-    assert merged["confidence"] > site["confidence"]
+    assert merged["confidence"] == site["confidence"]
     assert merged["source"] == "website+wikipedia"
 
 
@@ -185,3 +190,22 @@ def test_disagreeing_votes_lower_confidence():
     agree = cm.blend(scraped, [(0.5, 0.5)] * 4)
     conflict = cm.blend(scraped, [(1.0, 1.0), (-1.0, -1.0), (1.0, -1.0), (-1.0, 1.0)])
     assert conflict["confidence"] < agree["confidence"]
+
+
+def test_a_welcome_mat_is_not_a_churchmanship_claim():
+    """"Come as you are" appeared on 33 parish websites and zero Wikipedia
+    articles. The most ceremonially elaborate shrine in a diocese still says it
+    on the homepage -- it is hospitality copy, and treating it as evidence biased
+    the whole website source 0.17 low on ceremonial against Wikipedia."""
+    assert cm.score("Come as you are — all are welcome at our table.") is None
+    assert cm.score("Casual dress is fine. Parking is behind the church.") is None
+    assert cm.score("Join us for an informal coffee after the service.") is None
+
+
+def test_informality_still_counts_when_it_describes_the_worship():
+    for text in ("Our 9am is an informal service in the parish hall.",
+                 "Worship is casual and contemporary.",
+                 "A casual worship setting with a band."):
+        result = cm.score(text)
+        assert result is not None, text
+        assert result["ceremonial"] < 0, text

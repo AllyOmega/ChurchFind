@@ -793,7 +793,7 @@
         ceremonial: church.cm_ceremonial, theology: church.cm_theology,
         ceremonialLabel: '', theologyLabel: '',
         confidence: church.cm_confidence, votes: church.cm_votes || 0,
-        source: church.cm_source
+        source: church.cm_source, scrapedSource: church.cm_scraped_source
       }, true);
       if (inline) meta.push(inline);
     }

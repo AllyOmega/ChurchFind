@@ -157,7 +157,8 @@ def search(connection, params):
     base = base.replace("FROM churches c",
                         "FROM churches c LEFT JOIN churchmanship m ON m.church_id = c.id", 1)
     columns += (", m.ceremonial AS cm_ceremonial, m.theology AS cm_theology, "
-                "m.confidence AS cm_confidence, m.votes AS cm_votes, m.source AS cm_source")
+                "m.confidence AS cm_confidence, m.votes AS cm_votes, m.source AS cm_source, "
+                "m.scraped_source AS cm_scraped_source")
     rows = connection.execute(
         f"SELECT {columns}, {distance_select} {base}{where} "
         f"ORDER BY {SORTS[sort]} LIMIT ? OFFSET ?",
@@ -172,7 +173,7 @@ def get_church(connection, church_id):
     row = connection.execute(
         f"SELECT {columns}, m.ceremonial AS cm_ceremonial, m.theology AS cm_theology, "
         f"m.confidence AS cm_confidence, m.votes AS cm_votes, m.source AS cm_source, "
-        f"m.evidence AS cm_evidence "
+        f"m.scraped_source AS cm_scraped_source, m.evidence AS cm_evidence "
         f"FROM churches c LEFT JOIN churchmanship m ON m.church_id = c.id "
         f"WHERE c.id = ?", (church_id,)
     ).fetchone()

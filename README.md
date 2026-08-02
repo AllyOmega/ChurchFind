@@ -15,30 +15,30 @@ list of churches you care about. The page detects which it has and says so.
 
 <!-- STATS:BEGIN -->
 
-**235,819 churches** across **50 states and DC**, from an OpenStreetMap snapshot taken **2026-08-02**.
+**235,667 churches** across **50 states and DC**, from an OpenStreetMap snapshot taken **2026-08-02**.
 
 | | Count | Share |
 |---|---:|---:|
-| Has a street address | 70,756 | 30% |
-| Has a website | 26,445 | 11% |
-| Has a phone number | 22,213 | 9% |
+| Has a street address | 70,229 | 30% |
+| Has a website | 26,157 | 11% |
+| Has a phone number | 21,902 | 9% |
 
 Denominational families, largest first:
 
 | Family | Churches | Share |
 |---|---:|---:|
-| Unspecified | 127,692 | 54.1% |
-| Baptist | 38,496 | 16.3% |
-| Methodist & Wesleyan | 15,579 | 6.6% |
-| Catholic | 13,956 | 5.9% |
-| Lutheran | 9,035 | 3.8% |
-| Restorationist | 8,690 | 3.7% |
+| Unspecified | 127,756 | 54.2% |
+| Baptist | 38,465 | 16.3% |
+| Methodist & Wesleyan | 15,572 | 6.6% |
+| Catholic | 13,837 | 5.9% |
+| Lutheran | 9,028 | 3.8% |
+| Restorationist | 8,672 | 3.7% |
 | Presbyterian & Reformed | 7,325 | 3.1% |
-| Pentecostal & Charismatic | 4,796 | 2.0% |
-| Other | 2,832 | 1.2% |
-| Anglican & Episcopal | 2,816 | 1.2% |
-| Non-denominational | 2,104 | 0.9% |
-| Orthodox | 1,710 | 0.7% |
+| Pentecostal & Charismatic | 4,787 | 2.0% |
+| Other | 2,828 | 1.2% |
+| Anglican & Episcopal | 2,812 | 1.2% |
+| Non-denominational | 2,089 | 0.9% |
+| Orthodox | 1,708 | 0.7% |
 | Anabaptist & Peace Churches | 788 | 0.3% |
 
 Ten largest state files:
@@ -48,10 +48,10 @@ Ten largest state files:
 | Texas | 16,251 |
 | Georgia | 12,320 |
 | Alabama | 11,787 |
-| North Carolina | 11,689 |
+| North Carolina | 11,705 |
 | California | 11,662 |
-| Tennessee | 10,340 |
-| Ohio | 9,794 |
+| Tennessee | 10,313 |
+| Ohio | 9,793 |
 | Pennsylvania | 9,321 |
 | Virginia | 9,129 |
 | Illinois | 9,112 |
@@ -80,7 +80,7 @@ Pages copies the tree verbatim instead of running it through Jekyll. Any other s
 host works the same; there is nothing to build.
 
 What you get is the static half: search, both denomination filters, service times,
-radius, the map, and browse-by-state, over all 235,761 churches. What you do not get is
+radius, the map, and browse-by-state, over all 235,667 churches. What you do not get is
 anything that needs the API — accounts, saved churches, correction reports, reviews and
 churchmanship voting all require the server. The page detects this at boot and says so
 in a banner rather than leaving you to wonder where the sign-in button went.
@@ -262,7 +262,7 @@ anyone's login or saved list.
 
 Two things make the query side worth having. `churches_geo` is an R\*Tree over the
 coordinates, so a radius search narrows to a bounding box before a single haversine runs;
-`churches_fts` is an FTS5 index over name, city and denomination. Across 235,761 rows on
+`churches_fts` is an FTS5 index over name, city and denomination. Across 235,667 rows on
 a laptop:
 
 | Query | Results | Time |
@@ -552,15 +552,50 @@ right direction: the missing 6% were noise. The readings that remain are checkab
 ceremonial and +0.76 theology, which is exactly where anyone who knows it would
 put it.
 
+Having two sources then falsified a fourth pattern. Parish websites were reading
+0.17 lower on ceremonial than Wikipedia for the *same parishes*, and the cause was
+hospitality copy: **"come as you are" appeared on 33 parish websites and zero
+Wikipedia articles**, and the most ceremonially elaborate shrine in a diocese
+still says it on the homepage. With "casual" and "informal" it was the entire
+evidence for 22 of 410 website scores. Those words now have to be attached to the
+worship — "an informal service", not "casual dress" or "informal coffee".
+
+### How much the two sources actually agree
+
+Not much, and this is the most important caveat on the whole feature.
+
+On the 27 parishes where both a website and a Wikipedia article produced a score,
+the two correlate at **+0.17 on ceremonial and +0.23 on theology**. The median
+distance between them is small and 81% land within a quarter of the axis of each
+other, but that is mostly because readings cluster near the middle — at r = 0.17
+two sources landing close together is as easily coincidence as corroboration.
+
+Fixing the welcome-copy bug did not move this. The gap closed from 0.166 to
+0.155 and the correlation did not budge, which falsified the obvious explanation
+and left the honest one: a parish website describes worship now and an
+encyclopedia article describes a building's history, and those are not the same
+question. Twenty-seven is also a small sample.
+
+The consequence is in the code. **Agreement between sources earns no confidence
+bonus** — rewarding it at this correlation would be manufacturing certainty out
+of noise, which is the one thing the feature is built not to do. Disagreement
+still costs, because that is a positive signal something is wrong and hedging on
+it only widens an error bar. The asymmetry is deliberate.
+
+It is also the strongest argument for the voting: the scraped prior is noisier
+than any single number suggests, and three people who have actually been to a
+parish outweigh all of it.
+
 Everything downstream is built around that weakness:
 
 - **A scraped score never exceeds its source's cap** — 0.65 for a website, 0.45
   for Wikipedia. Evidence, not testimony.
-- **Two sources that agree count for more, two that disagree for less.** A
-  website calling a parish Anglo-Catholic while its article describes a plain
-  preaching box is a parish that changed or a source that is wrong; either way
-  the meter hedges. Merging can never exceed the better source's cap, so adding
-  a weak source can sharpen a reading but not manufacture certainty.
+- **Two sources that disagree count for less; two that agree count for no more.**
+  A website calling a parish Anglo-Catholic while its article describes a plain
+  preaching box is a parish that changed or a source that is wrong, and the meter
+  hedges. Agreement earns nothing, for a measured reason — see below. Merging can
+  never exceed the better source's cap either, so adding a weak source can sharpen
+  a reading but not manufacture certainty.
 - **No match means no score.** A parish with nothing to go on shows as unknown,
   not as a confident "middle" — zero and no-data are different answers, and
   conflating them invents a claim.
@@ -656,9 +691,9 @@ scraper/service_times.py       OSM opening_hours -> searchable (day, time) pairs
 scraper/churchmanship.py       the two-axis Anglican scorer, source merge, vote blend
 scraper/fetch_sites.py         robots-respecting fetch of Anglican parish websites
 scraper/fetch_wikipedia.py     Wikipedia extracts, joined exactly via OSM wiki tags
-scraper/test_churchmanship.py  19 tests over the scorer, several from measurements
+scraper/test_churchmanship.py  21 tests over the scorer, several from measurements
 scraper/validate.py            consistency checks over data/
-scraper/test_scrape.py         5 tests over index bookkeeping
+scraper/test_scrape.py         8 tests over index bookkeeping and resilience
 scraper/update_readme.py       regenerates the stats block in this file
 server/schema.sql              the database, churches and accounts
 server/db.py                   connections, pragmas, haversine as a SQL function
@@ -667,7 +702,7 @@ server/queries.py              church search: R*Tree radius, FTS5 names
 server/auth.py                 argon2id, sessions, CSRF, throttling
 server/moderation.py           review moderation with Claude, fail-closed
 server/app.py                  FastAPI routes and the static host
-server/test_api.py             77 tests over the API, weighted to the security-critical parts
+server/test_api.py             78 tests over the API, weighted to the security-critical parts
 server/test_moderation.py      24 tests over moderation, with the Claude call stubbed
 data/churchmanship.json        churchmanship from parish websites
 data/churchmanship-wikipedia.json  churchmanship from Wikipedia, merged at build time
