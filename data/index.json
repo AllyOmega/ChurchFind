@@ -1,46 +1,46 @@
 {
-  "generated_at": "2026-08-02T07:32:12Z",
-  "osm_snapshot": "2026-08-02T07:07:06Z",
+  "generated_at": "2026-08-02T14:36:59Z",
+  "osm_snapshot": "2026-08-02",
   "source": "OpenStreetMap via Overpass API",
   "license": "ODbL 1.0",
   "totals": {
-    "churches": 235784,
-    "with_website": 26452,
-    "with_phone": 22180,
-    "with_address": 70740
+    "churches": 235780,
+    "with_address": 70721,
+    "with_website": 26455,
+    "with_phone": 22225
   },
   "families": {
     "baptist": {
       "label": "Baptist",
-      "count": 38480
+      "count": 38476
     },
     "methodist": {
       "label": "Methodist & Wesleyan",
-      "count": 15591
+      "count": 15599
     },
     "catholic": {
       "label": "Catholic",
-      "count": 13945
+      "count": 13956
     },
     "lutheran": {
       "label": "Lutheran",
-      "count": 9037
+      "count": 9042
     },
     "restorationist": {
       "label": "Restorationist",
-      "count": 8693
+      "count": 8689
     },
     "presbyterian": {
       "label": "Presbyterian & Reformed",
-      "count": 7335
+      "count": 7326
     },
     "pentecostal": {
       "label": "Pentecostal & Charismatic",
-      "count": 4798
+      "count": 4795
     },
     "anglican": {
       "label": "Anglican & Episcopal",
-      "count": 2815
+      "count": 2814
     },
     "nondenominational": {
       "label": "Non-denominational",
@@ -48,7 +48,7 @@
     },
     "orthodox": {
       "label": "Orthodox",
-      "count": 1711
+      "count": 1705
     },
     "peace": {
       "label": "Anabaptist & Peace Churches",
@@ -56,18 +56,18 @@
     },
     "unknown": {
       "label": "Unspecified",
-      "count": 127658
+      "count": 127647
     },
     "other": {
       "label": "Other",
-      "count": 2823
+      "count": 2833
     }
   },
   "denominations": {
     "anglican": [
       {
         "label": "Episcopal",
-        "count": 2305
+        "count": 2304
       },
       {
         "label": "Anglican",
@@ -77,11 +77,11 @@
     "baptist": [
       {
         "label": "Baptist",
-        "count": 37897
+        "count": 37894
       },
       {
         "label": "Southern Baptist",
-        "count": 457
+        "count": 456
       },
       {
         "label": "Missionary Baptist",
@@ -107,11 +107,11 @@
     "catholic": [
       {
         "label": "Roman Catholic",
-        "count": 7761
+        "count": 7770
       },
       {
         "label": "Catholic",
-        "count": 6017
+        "count": 6019
       },
       {
         "label": "Ukrainian Greek Catholic",
@@ -137,11 +137,11 @@
     "lutheran": [
       {
         "label": "Lutheran",
-        "count": 8700
+        "count": 8706
       },
       {
         "label": "Evangelical Lutheran",
-        "count": 336
+        "count": 335
       },
       {
         "label": "Lutheran (Missouri Synod)",
@@ -151,19 +151,19 @@
     "methodist": [
       {
         "label": "Methodist",
-        "count": 11699
+        "count": 11697
       },
       {
         "label": "United Methodist",
-        "count": 2385
+        "count": 2393
       },
       {
         "label": "African Methodist Episcopal",
-        "count": 496
+        "count": 495
       },
       {
         "label": "Church of the Nazarene",
-        "count": 440
+        "count": 441
       },
       {
         "label": "AME Zion",
@@ -171,7 +171,7 @@
       },
       {
         "label": "Wesleyan",
-        "count": 157
+        "count": 159
       },
       {
         "label": "Free Methodist",
@@ -181,11 +181,11 @@
     "nondenominational": [
       {
         "label": "Non-denominational",
-        "count": 1360
+        "count": 1357
       },
       {
         "label": "Evangelical",
-        "count": 728
+        "count": 731
       },
       {
         "label": "Interdenominational",
@@ -199,15 +199,15 @@
     "orthodox": [
       {
         "label": "Orthodox",
-        "count": 867
+        "count": 859
       },
       {
         "label": "Greek Orthodox",
-        "count": 512
+        "count": 513
       },
       {
         "label": "Russian Orthodox",
-        "count": 92
+        "count": 93
       },
       {
         "label": "Coptic Orthodox",
@@ -241,11 +241,11 @@
     "other": [
       {
         "label": "Protestant",
-        "count": 916
+        "count": 931
       },
       {
         "label": "Christ Scientist",
-        "count": 233
+        "count": 234
       },
       {
         "label": "Latter Day Saints",
@@ -253,7 +253,7 @@
       },
       {
         "label": "Presbyterian Church Usa",
-        "count": 124
+        "count": 116
       },
       {
         "label": "Christian And Missionary Alliance",
@@ -281,7 +281,7 @@
       },
       {
         "label": "Presbyterian Church In America",
-        "count": 24
+        "count": 25
       },
       {
         "label": "Community Of Christ",
@@ -296,15 +296,15 @@
         "count": 22
       },
       {
+        "label": "New Apostolic",
+        "count": 21
+      },
+      {
         "label": "Orthodox Presbyterian Church",
         "count": 21
       },
       {
         "label": "Church Of The Nazarene",
-        "count": 20
-      },
-      {
-        "label": "New Apostolic",
         "count": 20
       },
       {
@@ -340,6 +340,10 @@
         "count": 14
       },
       {
+        "label": "Albanian Orthodox",
+        "count": 13
+      },
+      {
         "label": "Calvary Chapel",
         "count": 13
       },
@@ -350,10 +354,6 @@
       {
         "label": "Independent",
         "count": 13
-      },
-      {
-        "label": "Albanian Orthodox",
-        "count": 12
       },
       {
         "label": "Apostolic Assembly Of The Faith In Christ Jesus",
@@ -384,15 +384,15 @@
         "count": 10
       },
       {
-        "label": "Lutheran Church Missouri Synod",
-        "count": 10
-      },
-      {
         "label": "Alliance",
         "count": 9
       },
       {
         "label": "Church Of God Of Prophecy",
+        "count": 9
+      },
+      {
+        "label": "Lutheran Church Missouri Synod",
         "count": 9
       },
       {
@@ -408,15 +408,15 @@
         "count": 8
       },
       {
-        "label": "Neo Pentecostal",
-        "count": 8
-      },
-      {
         "label": "Bulgarian Orthodox",
         "count": 7
       },
       {
         "label": "Christian Science",
+        "count": 7
+      },
+      {
+        "label": "Neo Pentecostal",
         "count": 7
       },
       {
@@ -620,6 +620,10 @@
         "count": 3
       },
       {
+        "label": "The Church Of Jesus Christ Of Latter Day Saints",
+        "count": 3
+      },
+      {
         "label": "United Brethren In Christ",
         "count": 3
       },
@@ -712,10 +716,6 @@
         "count": 2
       },
       {
-        "label": "Malankara Orthodox",
-        "count": 2
-      },
-      {
         "label": "Masonic",
         "count": 2
       },
@@ -777,10 +777,6 @@
       },
       {
         "label": "Sovereign Grace Ministries",
-        "count": 2
-      },
-      {
-        "label": "The Church Of Jesus Christ Of Latter Day Saints",
         "count": 2
       },
       {
@@ -996,6 +992,10 @@
         "count": 1
       },
       {
+        "label": "Christian Congregation In The United States",
+        "count": 1
+      },
+      {
         "label": "Christian Fellowship Ministry",
         "count": 1
       },
@@ -1073,6 +1073,10 @@
       },
       {
         "label": "Church Of The Apostles",
+        "count": 1
+      },
+      {
+        "label": "Church Of The Apostolic Authority",
         "count": 1
       },
       {
@@ -1484,6 +1488,10 @@
         "count": 1
       },
       {
+        "label": "Malankara Orthodox",
+        "count": 1
+      },
+      {
         "label": "Malankara Orthodox Syrian",
         "count": 1
       },
@@ -1625,10 +1633,6 @@
       },
       {
         "label": "Polish National",
-        "count": 1
-      },
-      {
-        "label": "Presbyterian (pcusa)",
         "count": 1
       },
       {
@@ -1899,7 +1903,7 @@
       },
       {
         "label": "Quaker",
-        "count": 258
+        "count": 259
       },
       {
         "label": "Salvation Army",
@@ -1907,7 +1911,7 @@
       },
       {
         "label": "Brethren",
-        "count": 61
+        "count": 60
       },
       {
         "label": "Moravian",
@@ -1925,7 +1929,7 @@
     "pentecostal": [
       {
         "label": "Pentecostal",
-        "count": 3452
+        "count": 3446
       },
       {
         "label": "Assemblies of God",
@@ -1933,15 +1937,15 @@
       },
       {
         "label": "Church of God",
-        "count": 298
+        "count": 299
       },
       {
         "label": "Apostolic",
-        "count": 228
+        "count": 229
       },
       {
         "label": "Church of God in Christ",
-        "count": 102
+        "count": 103
       },
       {
         "label": "Foursquare",
@@ -1959,15 +1963,15 @@
     "presbyterian": [
       {
         "label": "Presbyterian",
-        "count": 5977
+        "count": 5971
       },
       {
         "label": "United Church of Christ",
-        "count": 709
+        "count": 710
       },
       {
         "label": "Reformed",
-        "count": 387
+        "count": 383
       },
       {
         "label": "Congregational",
@@ -1985,19 +1989,19 @@
     "restorationist": [
       {
         "label": "Latter-day Saints",
-        "count": 4360
+        "count": 4359
       },
       {
         "label": "Jehovah's Witnesses",
-        "count": 2000
+        "count": 1998
       },
       {
         "label": "Seventh-day Adventist",
-        "count": 1182
+        "count": 1180
       },
       {
         "label": "Church of Christ",
-        "count": 788
+        "count": 789
       },
       {
         "label": "Christian Church",
@@ -2018,358 +2022,358 @@
       "code": "AL",
       "name": "Alabama",
       "count": 11787,
-      "lat": 32.8,
-      "lon": -86.79
+      "lat": 32.95575,
+      "lon": -86.77471
     },
     {
       "code": "AK",
       "name": "Alaska",
-      "count": 450,
-      "lat": 64.0,
-      "lon": -152.0
+      "count": 451,
+      "lat": 61.03122,
+      "lon": -149.47713
     },
     {
       "code": "AZ",
       "name": "Arizona",
-      "count": 1724,
-      "lat": 34.17,
-      "lon": -111.93
+      "count": 1709,
+      "lat": 33.41504,
+      "lon": -111.77155
     },
     {
       "code": "AR",
       "name": "Arkansas",
-      "count": 5971,
-      "lat": 34.75,
-      "lon": -92.44
+      "count": 5952,
+      "lat": 34.89279,
+      "lon": -92.41118
     },
     {
       "code": "CA",
       "name": "California",
-      "count": 11661,
-      "lat": 37.18,
-      "lon": -119.47
+      "count": 11662,
+      "lat": 35.71913,
+      "lon": -119.57519
     },
     {
       "code": "CO",
       "name": "Colorado",
       "count": 1990,
-      "lat": 38.998,
-      "lon": -105.55
+      "lat": 39.35296,
+      "lon": -105.28787
     },
     {
       "code": "CT",
       "name": "Connecticut",
-      "count": 1767,
-      "lat": 41.62,
-      "lon": -72.73
+      "count": 1773,
+      "lat": 41.49707,
+      "lon": -72.83009
     },
     {
       "code": "DE",
       "name": "Delaware",
       "count": 279,
-      "lat": 38.99,
-      "lon": -75.51
+      "lat": 39.31372,
+      "lon": -75.54398
     },
     {
       "code": "DC",
       "name": "District of Columbia",
       "count": 544,
-      "lat": 38.91,
-      "lon": -77.02
+      "lat": 38.91123,
+      "lon": -77.00431
     },
     {
       "code": "FL",
       "name": "Florida",
       "count": 8886,
-      "lat": 28.63,
-      "lon": -82.45
+      "lat": 28.83102,
+      "lon": -82.29294
     },
     {
       "code": "GA",
       "name": "Georgia",
-      "count": 12320,
-      "lat": 32.64,
-      "lon": -83.44
+      "count": 12304,
+      "lat": 32.964,
+      "lon": -83.63911
     },
     {
       "code": "HI",
       "name": "Hawaii",
-      "count": 267,
-      "lat": 20.29,
-      "lon": -156.37
+      "count": 248,
+      "lat": 20.9668,
+      "lon": -157.29962
     },
     {
       "code": "ID",
       "name": "Idaho",
-      "count": 957,
-      "lat": 44.35,
-      "lon": -114.61
+      "count": 955,
+      "lat": 44.21542,
+      "lon": -114.85014
     },
     {
       "code": "IL",
       "name": "Illinois",
-      "count": 9111,
-      "lat": 40.04,
-      "lon": -89.2
+      "count": 9131,
+      "lat": 40.66573,
+      "lon": -88.66241
     },
     {
       "code": "IN",
       "name": "Indiana",
-      "count": 4692,
-      "lat": 39.89,
-      "lon": -86.28
+      "count": 4673,
+      "lat": 40.11711,
+      "lon": -86.30301
     },
     {
       "code": "IA",
       "name": "Iowa",
-      "count": 5150,
-      "lat": 42.08,
-      "lon": -93.5
+      "count": 5155,
+      "lat": 41.97038,
+      "lon": -93.2481
     },
     {
       "code": "KS",
       "name": "Kansas",
-      "count": 2450,
-      "lat": 38.49,
-      "lon": -98.38
+      "count": 2465,
+      "lat": 38.52991,
+      "lon": -96.59671
     },
     {
       "code": "KY",
       "name": "Kentucky",
       "count": 5444,
-      "lat": 37.53,
-      "lon": -85.3
+      "lat": 37.62139,
+      "lon": -85.22033
     },
     {
       "code": "LA",
       "name": "Louisiana",
       "count": 5629,
-      "lat": 31.07,
-      "lon": -91.99
+      "lat": 31.16404,
+      "lon": -91.82692
     },
     {
       "code": "ME",
       "name": "Maine",
       "count": 1137,
-      "lat": 45.37,
-      "lon": -69.24
+      "lat": 44.43912,
+      "lon": -69.5204
     },
     {
       "code": "MD",
       "name": "Maryland",
-      "count": 4193,
-      "lat": 39.06,
-      "lon": -76.8
+      "count": 4188,
+      "lat": 39.13594,
+      "lon": -76.72641
     },
     {
       "code": "MA",
       "name": "Massachusetts",
-      "count": 2372,
-      "lat": 42.26,
-      "lon": -71.81
+      "count": 2370,
+      "lat": 42.28996,
+      "lon": -71.49779
     },
     {
       "code": "MI",
       "name": "Michigan",
       "count": 6706,
-      "lat": 44.35,
-      "lon": -85.41
+      "lat": 43.22379,
+      "lon": -84.55885
     },
     {
       "code": "MN",
       "name": "Minnesota",
       "count": 2106,
-      "lat": 46.28,
-      "lon": -94.31
+      "lat": 45.37886,
+      "lon": -93.80569
     },
     {
       "code": "MS",
       "name": "Mississippi",
       "count": 8124,
-      "lat": 32.74,
-      "lon": -89.67
+      "lat": 32.87455,
+      "lon": -89.63051
     },
     {
       "code": "MO",
       "name": "Missouri",
-      "count": 5849,
-      "lat": 38.36,
-      "lon": -92.48
+      "count": 5889,
+      "lat": 38.33615,
+      "lon": -92.36333
     },
     {
       "code": "MT",
       "name": "Montana",
-      "count": 1563,
-      "lat": 47.05,
-      "lon": -109.63
+      "count": 1567,
+      "lat": 47.02105,
+      "lon": -110.48844
     },
     {
       "code": "NE",
       "name": "Nebraska",
-      "count": 2894,
-      "lat": 41.53,
-      "lon": -99.8
+      "count": 2895,
+      "lat": 41.22526,
+      "lon": -98.15195
     },
     {
       "code": "NV",
       "name": "Nevada",
       "count": 511,
-      "lat": 39.36,
-      "lon": -116.63
+      "lat": 37.13755,
+      "lon": -116.05546
     },
     {
       "code": "NH",
       "name": "New Hampshire",
       "count": 799,
-      "lat": 43.68,
-      "lon": -71.58
+      "lat": 43.25814,
+      "lon": -71.52697
     },
     {
       "code": "NJ",
       "name": "New Jersey",
       "count": 3304,
-      "lat": 40.19,
-      "lon": -74.67
+      "lat": 40.44694,
+      "lon": -74.44391
     },
     {
       "code": "NM",
       "name": "New Mexico",
       "count": 1536,
-      "lat": 34.41,
-      "lon": -106.11
+      "lat": 34.55677,
+      "lon": -106.15848
     },
     {
       "code": "NY",
       "name": "New York",
       "count": 7565,
-      "lat": 42.95,
-      "lon": -75.53
+      "lat": 41.80986,
+      "lon": -74.90761
     },
     {
       "code": "NC",
       "name": "North Carolina",
       "count": 11675,
-      "lat": 35.56,
-      "lon": -79.39
+      "lat": 35.58556,
+      "lon": -79.71469
     },
     {
       "code": "ND",
       "name": "North Dakota",
       "count": 657,
-      "lat": 47.45,
-      "lon": -100.47
+      "lat": 47.39438,
+      "lon": -99.92064
     },
     {
       "code": "OH",
       "name": "Ohio",
       "count": 9809,
-      "lat": 40.29,
-      "lon": -82.79
+      "lat": 40.33957,
+      "lon": -82.79204
     },
     {
       "code": "OK",
       "name": "Oklahoma",
       "count": 4637,
-      "lat": 35.59,
-      "lon": -97.49
+      "lat": 35.53614,
+      "lon": -96.84401
     },
     {
       "code": "OR",
       "name": "Oregon",
       "count": 2022,
-      "lat": 43.94,
-      "lon": -120.56
+      "lat": 44.74307,
+      "lon": -122.52834
     },
     {
       "code": "PA",
       "name": "Pennsylvania",
       "count": 9370,
-      "lat": 40.87,
-      "lon": -77.8
+      "lat": 40.50961,
+      "lon": -77.25415
     },
     {
       "code": "RI",
       "name": "Rhode Island",
       "count": 532,
-      "lat": 41.68,
-      "lon": -71.56
+      "lat": 41.73751,
+      "lon": -71.4479
     },
     {
       "code": "SC",
       "name": "South Carolina",
       "count": 7776,
-      "lat": 33.91,
-      "lon": -80.9
+      "lat": 34.10765,
+      "lon": -81.0708
     },
     {
       "code": "SD",
       "name": "South Dakota",
       "count": 935,
-      "lat": 44.44,
-      "lon": -100.23
+      "lat": 44.21244,
+      "lon": -98.96288
     },
     {
       "code": "TN",
       "name": "Tennessee",
       "count": 10340,
-      "lat": 35.86,
-      "lon": -86.35
+      "lat": 35.79505,
+      "lon": -86.36562
     },
     {
       "code": "TX",
       "name": "Texas",
       "count": 16251,
-      "lat": 31.49,
-      "lon": -99.34
+      "lat": 31.43821,
+      "lon": -97.22196
     },
     {
       "code": "UT",
       "name": "Utah",
       "count": 2142,
-      "lat": 39.33,
-      "lon": -111.68
+      "lat": 40.37638,
+      "lon": -111.88019
     },
     {
       "code": "VT",
       "name": "Vermont",
       "count": 559,
-      "lat": 44.07,
-      "lon": -72.67
+      "lat": 44.04723,
+      "lon": -72.75549
     },
     {
       "code": "VA",
       "name": "Virginia",
       "count": 9124,
-      "lat": 37.52,
-      "lon": -78.85
+      "lat": 37.5121,
+      "lon": -78.55484
     },
     {
       "code": "WA",
       "name": "Washington",
       "count": 3535,
-      "lat": 47.38,
-      "lon": -120.45
+      "lat": 47.28255,
+      "lon": -121.49432
     },
     {
       "code": "WV",
       "name": "West Virginia",
       "count": 4123,
-      "lat": 38.64,
-      "lon": -80.62
+      "lat": 38.72695,
+      "lon": -80.79355
     },
     {
       "code": "WI",
       "name": "Wisconsin",
       "count": 2245,
-      "lat": 44.62,
-      "lon": -89.99
+      "lat": 43.8781,
+      "lon": -89.37213
     },
     {
       "code": "WY",
       "name": "Wyoming",
       "count": 314,
-      "lat": 42.99,
-      "lon": -107.55
+      "lat": 42.70765,
+      "lon": -106.85632
     }
   ]
 }
