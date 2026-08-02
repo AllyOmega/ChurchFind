@@ -1,0 +1,425 @@
+{
+  "generated_at": "2026-08-02T07:10:29Z",
+  "osm_snapshot": "2026-08-02T07:07:06Z",
+  "source": "OpenStreetMap via Overpass API",
+  "license": "ODbL 1.0",
+  "totals": {
+    "churches": 235784,
+    "with_website": 26452,
+    "with_phone": 22180,
+    "with_address": 70740
+  },
+  "families": {
+    "baptist": {
+      "label": "Baptist",
+      "count": 38480
+    },
+    "methodist": {
+      "label": "Methodist & Wesleyan",
+      "count": 15591
+    },
+    "catholic": {
+      "label": "Catholic",
+      "count": 13945
+    },
+    "lutheran": {
+      "label": "Lutheran",
+      "count": 9037
+    },
+    "restorationist": {
+      "label": "Restorationist",
+      "count": 8693
+    },
+    "presbyterian": {
+      "label": "Presbyterian & Reformed",
+      "count": 7335
+    },
+    "pentecostal": {
+      "label": "Pentecostal & Charismatic",
+      "count": 4798
+    },
+    "anglican": {
+      "label": "Anglican & Episcopal",
+      "count": 2815
+    },
+    "nondenominational": {
+      "label": "Non-denominational",
+      "count": 2105
+    },
+    "orthodox": {
+      "label": "Orthodox",
+      "count": 1711
+    },
+    "peace": {
+      "label": "Anabaptist & Peace Churches",
+      "count": 793
+    },
+    "unknown": {
+      "label": "Unspecified",
+      "count": 127658
+    },
+    "other": {
+      "label": "Other",
+      "count": 2823
+    }
+  },
+  "states": [
+    {
+      "code": "AL",
+      "name": "Alabama",
+      "count": 11787,
+      "lat": 32.8,
+      "lon": -86.79
+    },
+    {
+      "code": "AK",
+      "name": "Alaska",
+      "count": 450,
+      "lat": 64.0,
+      "lon": -152.0
+    },
+    {
+      "code": "AZ",
+      "name": "Arizona",
+      "count": 1724,
+      "lat": 34.17,
+      "lon": -111.93
+    },
+    {
+      "code": "AR",
+      "name": "Arkansas",
+      "count": 5971,
+      "lat": 34.75,
+      "lon": -92.44
+    },
+    {
+      "code": "CA",
+      "name": "California",
+      "count": 11661,
+      "lat": 37.18,
+      "lon": -119.47
+    },
+    {
+      "code": "CO",
+      "name": "Colorado",
+      "count": 1990,
+      "lat": 38.998,
+      "lon": -105.55
+    },
+    {
+      "code": "CT",
+      "name": "Connecticut",
+      "count": 1767,
+      "lat": 41.62,
+      "lon": -72.73
+    },
+    {
+      "code": "DE",
+      "name": "Delaware",
+      "count": 279,
+      "lat": 38.99,
+      "lon": -75.51
+    },
+    {
+      "code": "DC",
+      "name": "District of Columbia",
+      "count": 544,
+      "lat": 38.91,
+      "lon": -77.02
+    },
+    {
+      "code": "FL",
+      "name": "Florida",
+      "count": 8886,
+      "lat": 28.63,
+      "lon": -82.45
+    },
+    {
+      "code": "GA",
+      "name": "Georgia",
+      "count": 12320,
+      "lat": 32.64,
+      "lon": -83.44
+    },
+    {
+      "code": "HI",
+      "name": "Hawaii",
+      "count": 267,
+      "lat": 20.29,
+      "lon": -156.37
+    },
+    {
+      "code": "ID",
+      "name": "Idaho",
+      "count": 957,
+      "lat": 44.35,
+      "lon": -114.61
+    },
+    {
+      "code": "IL",
+      "name": "Illinois",
+      "count": 9111,
+      "lat": 40.04,
+      "lon": -89.2
+    },
+    {
+      "code": "IN",
+      "name": "Indiana",
+      "count": 4692,
+      "lat": 39.89,
+      "lon": -86.28
+    },
+    {
+      "code": "IA",
+      "name": "Iowa",
+      "count": 5150,
+      "lat": 42.08,
+      "lon": -93.5
+    },
+    {
+      "code": "KS",
+      "name": "Kansas",
+      "count": 2450,
+      "lat": 38.49,
+      "lon": -98.38
+    },
+    {
+      "code": "KY",
+      "name": "Kentucky",
+      "count": 5444,
+      "lat": 37.53,
+      "lon": -85.3
+    },
+    {
+      "code": "LA",
+      "name": "Louisiana",
+      "count": 5629,
+      "lat": 31.07,
+      "lon": -91.99
+    },
+    {
+      "code": "ME",
+      "name": "Maine",
+      "count": 1137,
+      "lat": 45.37,
+      "lon": -69.24
+    },
+    {
+      "code": "MD",
+      "name": "Maryland",
+      "count": 4193,
+      "lat": 39.06,
+      "lon": -76.8
+    },
+    {
+      "code": "MA",
+      "name": "Massachusetts",
+      "count": 2372,
+      "lat": 42.26,
+      "lon": -71.81
+    },
+    {
+      "code": "MI",
+      "name": "Michigan",
+      "count": 6706,
+      "lat": 44.35,
+      "lon": -85.41
+    },
+    {
+      "code": "MN",
+      "name": "Minnesota",
+      "count": 2106,
+      "lat": 46.28,
+      "lon": -94.31
+    },
+    {
+      "code": "MS",
+      "name": "Mississippi",
+      "count": 8124,
+      "lat": 32.74,
+      "lon": -89.67
+    },
+    {
+      "code": "MO",
+      "name": "Missouri",
+      "count": 5849,
+      "lat": 38.36,
+      "lon": -92.48
+    },
+    {
+      "code": "MT",
+      "name": "Montana",
+      "count": 1563,
+      "lat": 47.05,
+      "lon": -109.63
+    },
+    {
+      "code": "NE",
+      "name": "Nebraska",
+      "count": 2894,
+      "lat": 41.53,
+      "lon": -99.8
+    },
+    {
+      "code": "NV",
+      "name": "Nevada",
+      "count": 511,
+      "lat": 39.36,
+      "lon": -116.63
+    },
+    {
+      "code": "NH",
+      "name": "New Hampshire",
+      "count": 799,
+      "lat": 43.68,
+      "lon": -71.58
+    },
+    {
+      "code": "NJ",
+      "name": "New Jersey",
+      "count": 3304,
+      "lat": 40.19,
+      "lon": -74.67
+    },
+    {
+      "code": "NM",
+      "name": "New Mexico",
+      "count": 1536,
+      "lat": 34.41,
+      "lon": -106.11
+    },
+    {
+      "code": "NY",
+      "name": "New York",
+      "count": 7565,
+      "lat": 42.95,
+      "lon": -75.53
+    },
+    {
+      "code": "NC",
+      "name": "North Carolina",
+      "count": 11675,
+      "lat": 35.56,
+      "lon": -79.39
+    },
+    {
+      "code": "ND",
+      "name": "North Dakota",
+      "count": 657,
+      "lat": 47.45,
+      "lon": -100.47
+    },
+    {
+      "code": "OH",
+      "name": "Ohio",
+      "count": 9809,
+      "lat": 40.29,
+      "lon": -82.79
+    },
+    {
+      "code": "OK",
+      "name": "Oklahoma",
+      "count": 4637,
+      "lat": 35.59,
+      "lon": -97.49
+    },
+    {
+      "code": "OR",
+      "name": "Oregon",
+      "count": 2022,
+      "lat": 43.94,
+      "lon": -120.56
+    },
+    {
+      "code": "PA",
+      "name": "Pennsylvania",
+      "count": 9370,
+      "lat": 40.87,
+      "lon": -77.8
+    },
+    {
+      "code": "RI",
+      "name": "Rhode Island",
+      "count": 532,
+      "lat": 41.68,
+      "lon": -71.56
+    },
+    {
+      "code": "SC",
+      "name": "South Carolina",
+      "count": 7776,
+      "lat": 33.91,
+      "lon": -80.9
+    },
+    {
+      "code": "SD",
+      "name": "South Dakota",
+      "count": 935,
+      "lat": 44.44,
+      "lon": -100.23
+    },
+    {
+      "code": "TN",
+      "name": "Tennessee",
+      "count": 10340,
+      "lat": 35.86,
+      "lon": -86.35
+    },
+    {
+      "code": "TX",
+      "name": "Texas",
+      "count": 16251,
+      "lat": 31.49,
+      "lon": -99.34
+    },
+    {
+      "code": "UT",
+      "name": "Utah",
+      "count": 2142,
+      "lat": 39.33,
+      "lon": -111.68
+    },
+    {
+      "code": "VT",
+      "name": "Vermont",
+      "count": 559,
+      "lat": 44.07,
+      "lon": -72.67
+    },
+    {
+      "code": "VA",
+      "name": "Virginia",
+      "count": 9124,
+      "lat": 37.52,
+      "lon": -78.85
+    },
+    {
+      "code": "WA",
+      "name": "Washington",
+      "count": 3535,
+      "lat": 47.38,
+      "lon": -120.45
+    },
+    {
+      "code": "WV",
+      "name": "West Virginia",
+      "count": 4123,
+      "lat": 38.64,
+      "lon": -80.62
+    },
+    {
+      "code": "WI",
+      "name": "Wisconsin",
+      "count": 2245,
+      "lat": 44.62,
+      "lon": -89.99
+    },
+    {
+      "code": "WY",
+      "name": "Wyoming",
+      "count": 314,
+      "lat": 42.99,
+      "lon": -107.55
+    }
+  ]
+}
