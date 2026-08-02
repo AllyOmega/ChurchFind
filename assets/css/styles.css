@@ -229,8 +229,8 @@ input[type="range"] { width: 100%; accent-color: var(--indigo); }
   transition: border-color .15s, transform .15s;
 }
 .church-card:hover { border-left-color: var(--gold); transform: translateX(2px); }
-.church-card:focus-visible { outline: 2px solid var(--indigo); outline-offset: 2px; }
 .church-card.is-active { border-left-color: var(--indigo); box-shadow: var(--shadow); }
+.church-card:focus-within { border-left-color: var(--indigo); }
 
 .card-head { display: flex; align-items: baseline; justify-content: space-between; gap: .75rem; }
 .church-name { font-size: 1.02rem; font-weight: 620; }
@@ -280,13 +280,17 @@ input[type="range"] { width: 100%; accent-color: var(--indigo); }
 .services, .access { margin: .3rem 0 0; font-size: .84rem; color: var(--ink-soft); }
 
 .actions { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .65rem; }
+/* Shared by the <a> actions and the "Show on map" <button>, so it has to reset
+   the button's inherited font and background. */
 .action {
-  font-size: .8rem; text-decoration: none;
+  font: inherit; font-size: .8rem; text-decoration: none;
   padding: .25rem .6rem;
-  color: var(--indigo);
+  color: var(--indigo); background: transparent;
   border: 1px solid var(--rule); border-radius: 999px;
+  cursor: pointer;
 }
 .action:hover { border-color: var(--indigo); background: color-mix(in srgb, var(--indigo) 8%, transparent); }
+.action:focus-visible { outline: 2px solid var(--indigo); outline-offset: 1px; }
 
 .load-more { display: block; width: 100%; margin-top: 1rem; }
 

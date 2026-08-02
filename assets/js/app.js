@@ -80,7 +80,7 @@
   }
 
   function formatDistance(miles) {
-    if (miles < 0.1) return 'here';
+    if (miles < 0.1) return '< 0.1 mi';
     if (miles < 10) return miles.toFixed(1) + ' mi';
     return Math.round(miles) + ' mi';
   }
@@ -345,6 +345,9 @@
     if (dom.layout.hidden) {
       dom.layout.hidden = false;
       ensureMap();
+      // Leaflet measures its container on creation. The layout has only just
+      // been un-hidden, so give it a frame and re-measure.
+      if (map) requestAnimationFrame(function () { map.invalidateSize(); });
     }
     dom.layout.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
@@ -465,6 +468,19 @@
       class: 'action', href: directionsUrl(church), rel: 'noopener', target: '_blank', text: 'Directions'
     }));
 
+    // Clicking anywhere on the card also does this, but a mouse-only affordance
+    // is no affordance at all -- keyboard and screen-reader users need a real
+    // control, and it cannot be the card itself because the card holds links.
+    if (!mapUnavailable) {
+      var locate = el('button', {
+        type: 'button', class: 'action',
+        'aria-label': 'Show ' + church.name + ' on the map',
+        text: 'Show on map'
+      });
+      locate.addEventListener('click', function () { focusChurch(church.id); });
+      actions.push(locate);
+    }
+
     var meta = [];
     if (church.services) meta.push(el('p', { class: 'services', text: 'Services: ' + church.services }));
     else if (church.hours) meta.push(el('p', { class: 'services', text: 'Open: ' + church.hours }));
@@ -472,7 +488,7 @@
 
     var address = addressLine(church);
 
-    var card = el('li', { class: 'church-card', 'data-id': church.id, tabindex: '0' }, [
+    var card = el('li', { class: 'church-card', 'data-id': church.id }, [
       el('div', { class: 'card-head' }, [
         el('h3', { class: 'church-name', text: church.name }),
         state.mode === 'near'
@@ -485,15 +501,10 @@
       el('div', { class: 'actions' }, actions)
     ]));
 
+    // Mouse convenience on top of the button above: click the card anywhere.
     card.addEventListener('click', function (event) {
-      if (event.target.closest('a')) return;   // let link clicks through untouched
+      if (event.target.closest('a, button')) return;   // let real controls handle themselves
       focusChurch(church.id);
-    });
-    card.addEventListener('keydown', function (event) {
-      if (event.key === 'Enter' || event.key === ' ') {
-        event.preventDefault();
-        focusChurch(church.id);
-      }
     });
 
     return card;
