@@ -322,6 +322,30 @@
     });
   }
 
+  /* The same bands as LABELS in scraper/churchmanship.py. The API sends labels
+     with its readings; the static build has only the numbers, so the wording has
+     to exist on this side too. Keep the two in step -- a parish should not be
+     "High church" on one backend and "Middle" on the other. */
+  var AXIS_LABELS = {
+    ceremonial: [
+      [-0.55, 'Very low church'], [-0.2, 'Low church'], [0.2, 'Middle'],
+      [0.55, 'High church'], [1.01, 'Very high church']
+    ],
+    theology: [
+      [-0.55, 'Strongly evangelical'], [-0.2, 'Evangelical'], [0.2, 'Central'],
+      [0.55, 'Catholic-leaning'], [1.01, 'Anglo-Catholic']
+    ]
+  };
+
+  function label(axis, value) {
+    if (value === null || value === undefined) return 'Unknown';
+    var bands = AXIS_LABELS[axis] || [];
+    for (var i = 0; i < bands.length; i++) {
+      if (value < bands[i][0]) return bands[i][1];
+    }
+    return 'Unknown';
+  }
+
   /* The inline meter on a search-result card. Deliberately shows nothing at all
      when there is no estimate -- an empty meter reads as "middle", which is a
      claim we have not earned. */
@@ -487,5 +511,5 @@
     }, 0);
   }
 
-  global.ChurchManship = { open: open, meter: meter };
+  global.ChurchManship = { open: open, meter: meter, label: label };
 })(window);

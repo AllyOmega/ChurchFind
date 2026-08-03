@@ -116,6 +116,14 @@
     </div><!-- /.filters-body -->
   </aside>
 
+  <!-- Sits inside the layout grid so it can take the whole width when open,
+       with the results and map hidden behind it. A real URL (?church=<id>)
+       backs it, so it can be linked to, bookmarked and reached with Back. -->
+  <section class="detail" id="church-detail" aria-labelledby="detail-name" hidden>
+    <button type="button" class="link-btn detail-back" id="detail-back">← Back to results</button>
+    <div id="detail-body"></div>
+  </section>
+
   <!-- The map comes before the results in source order so that a one-column
        phone layout gets it without any CSS reordering: the list runs to
        hundreds of cards, and a map after it sits a dozen screens down where

@@ -167,19 +167,54 @@
 
   /* -------------------------------------------------- static-mode pool loading */
 
+  // Churchmanship for the no-server build. The API gets these from a LEFT JOIN;
+  // without one the state files carry no scores at all, so the whole feature was
+  // invisible on the deployed site. 446 readings is a small file, fetched once
+  // and merged onto churches as they load, so both backends hand the UI the same
+  // cm_* fields and nothing downstream has to know which mode it is in.
+  var CHURCHMANSHIP_URL = 'data/churchmanship-merged.json';
+  var churchmanship = null;          // id -> reading, once loaded
+  var churchmanshipLoad = null;
+
+  function loadChurchmanship() {
+    if (churchmanshipLoad) return churchmanshipLoad;
+    churchmanshipLoad = fetch(CHURCHMANSHIP_URL)
+      .then(function (response) { return response.ok ? response.json() : { scores: {} }; })
+      // A missing or broken file means no readings, never a broken search.
+      .catch(function () { return { scores: {} }; })
+      .then(function (payload) { churchmanship = payload.scores || {}; return churchmanship; });
+    return churchmanshipLoad;
+  }
+
+  function attachChurchmanship(church) {
+    var reading = churchmanship && churchmanship[church.id];
+    if (!reading) return church;
+    church.cm_ceremonial = reading.ceremonial;
+    church.cm_theology = reading.theology;
+    church.cm_confidence = reading.confidence;
+    church.cm_scraped_source = reading.source;
+    church.cm_evidence = (reading.evidence || []).join(',');
+    church.cm_votes = 0;             // votes need accounts, which need the server
+    church.cm_source = 'estimated';
+    return church;
+  }
+
   function expand(payload) {
     var fields = payload.fields;
     return payload.churches.map(function (row) {
       var church = {};
       for (var i = 0; i < fields.length; i++) church[fields[i]] = row[i];
-      return church;
+      return attachChurchmanship(church);
     });
   }
 
   function loadState(code) {
     code = String(code).toUpperCase();
     if (!stateCache[code]) {
-      stateCache[code] = fetch(STATE_URL + code + '.json')
+      // The readings have to be in hand before expand() runs, or the first
+      // state loaded would come back without them.
+      stateCache[code] = loadChurchmanship()
+        .then(function () { return fetch(STATE_URL + code + '.json'); })
         .then(function (response) {
           if (!response.ok) throw new Error('No data file for ' + code + '.');
           return response.json();
@@ -235,6 +270,32 @@
 
   function search(params) {
     return mode === 'api' ? searchApi(params) : Promise.resolve(searchStatic(params));
+  }
+
+  /* One church by id, for the detail view and for deep links.
+   *
+   * Static mode needs the state code as well: an OSM id says nothing about
+   * where it is, and the data is split into one file per state, so without it
+   * there is no way to know which of 51 files to open. The API has an index and
+   * does not care -- it ignores the second argument.
+   */
+  function getChurch(id, stateCode) {
+    if (mode === 'api') {
+      return fetch(API + '/churches/' + encodeURIComponent(id)).then(function (response) {
+        if (response.status === 404) return null;
+        if (!response.ok) throw new Error('Could not load that church.');
+        return response.json();
+      });
+    }
+    var known = poolIds[id] && pool.filter(function (c) { return c.id === id; })[0];
+    if (known) return Promise.resolve(known);
+    if (!stateCode) return Promise.resolve(null);
+    return loadState(stateCode).then(function (churches) {
+      for (var i = 0; i < churches.length; i++) {
+        if (churches[i].id === id) return churches[i];
+      }
+      return null;
+    });
   }
 
   function searchApi(params) {
@@ -462,6 +523,7 @@
     prepare: prepare,
     expandRegion: expandRegion,
     search: search,
+    getChurch: getChurch,
     haversine: haversine,
     geocode: geocode,
     reverseGeocode: reverseGeocode,

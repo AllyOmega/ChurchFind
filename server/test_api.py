@@ -6,6 +6,7 @@ not need the 59 MB build and does not touch a real one.
     cd server && python -m pytest test_api.py -q
 """
 
+import json
 import os
 import sys
 import tempfile
@@ -773,3 +774,64 @@ def test_out_of_range_votes_rejected(client, anglican_church, payload):
     payload = dict(payload, church_id=anglican_church)
     assert client.post("/api/churchmanship", json=payload,
                        headers={"X-CSRF-Token": csrf(client)}).status_code == 422
+
+
+# ------------------------------------------------- the static build's churchmanship
+
+def test_static_churchmanship_is_the_same_merge_the_database_gets():
+    """The deployed site is the static build, and it reads its churchmanship from
+    data/churchmanship-merged.json rather than from a LEFT JOIN. Both come from
+    the same two score files, and both must come from the same merge -- otherwise
+    a parish reads one way with a server running and another way without, which
+    is exactly how the feature came to be invisible on the live site.
+
+    This recomputes the merge from the source files and compares, rather than
+    reading the database: the test fixture holds five synthetic churches and no
+    readings at all, so a database comparison would pass by having nothing to say.
+    """
+    import build_db
+    import churchmanship
+
+    path = build_db.STATIC_CHURCHMANSHIP_PATH
+    if not path.exists():
+        pytest.skip("run server/build_db.py to generate the static readings")
+
+    per_source = {}
+    for source_path, source in ((build_db.CHURCHMANSHIP_PATH, "website"),
+                                (build_db.CHURCHMANSHIP_WIKI_PATH, "wikipedia")):
+        if not source_path.exists():
+            continue
+        for church_id, score in json.loads(source_path.read_text())["scores"].items():
+            score.setdefault("source", source)
+            per_source.setdefault(church_id, []).append(score)
+
+    published = json.loads(path.read_text())["scores"]
+    assert published, "the static build would show no churchmanship at all"
+
+    for church_id, found in per_source.items():
+        expected = churchmanship.merge_sources(found)
+        if not expected:
+            assert church_id not in published
+            continue
+        actual = published[church_id]
+        assert actual["ceremonial"] == pytest.approx(expected["ceremonial"])
+        assert actual["theology"] == pytest.approx(expected["theology"])
+        assert actual["confidence"] == pytest.approx(expected["confidence"])
+        assert actual["source"] == expected["source"]
+
+    assert set(published) == {k for k, v in per_source.items()
+                              if churchmanship.merge_sources(v)}
+
+
+def test_every_static_reading_carries_its_provenance():
+    """A number with no source is the failure mode this feature exists to avoid."""
+    import build_db
+
+    path = build_db.STATIC_CHURCHMANSHIP_PATH
+    if not path.exists():
+        pytest.skip("run server/build_db.py to generate the static readings")
+
+    for church_id, reading in json.loads(path.read_text())["scores"].items():
+        assert reading["source"], f"{church_id} has a reading with no source"
+        assert reading["confidence"] > 0, f"{church_id} has a reading with no confidence"
+        assert reading["evidence"], f"{church_id} has a reading with no evidence"

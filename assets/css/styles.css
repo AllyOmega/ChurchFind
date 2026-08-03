@@ -163,6 +163,47 @@ code {
 /* Set when Leaflet or the tile host can't be reached -- results take the space. */
 .layout.no-map { grid-template-columns: 250px minmax(0, 1fr); }
 
+/* One church, on its own. The results and map are hidden while it is open, so
+   it takes every column that is not the sidebar. */
+.detail { grid-column: 2 / -1; grid-row: 1; }
+.layout.showing-detail.no-map .detail { grid-column: 2 / -1; }
+
+.detail-back {
+  display: inline-block; margin-bottom: 1rem;
+  font-size: .95rem; padding: .35rem 0;
+}
+.detail-name { font-size: clamp(1.4rem, 3.5vw, 2rem); line-height: 1.2; margin-bottom: .5rem; }
+.detail-address { margin: .6rem 0 1rem; }
+.detail .actions { margin-bottom: 1.5rem; }
+
+.detail-facts { display: grid; gap: 0; margin: 0 0 1.75rem; }
+.detail-row {
+  display: grid; grid-template-columns: 190px minmax(0, 1fr);
+  gap: 1rem; padding: .7rem 0; border-top: 1px solid var(--rule);
+}
+.detail-row dt { color: var(--ink-soft); font-size: .9rem; }
+.detail-row dd { margin: 0; overflow-wrap: anywhere; }
+@media (max-width: 560px) {
+  .detail-row { grid-template-columns: minmax(0, 1fr); gap: .15rem; }
+}
+
+.detail-cm {
+  border: 1px solid var(--rule); border-radius: var(--radius);
+  padding: 1rem 1.1rem; margin-bottom: 1.5rem;
+}
+.detail-cm h3 { font-size: 1rem; margin-bottom: .75rem; }
+.detail-cm .btn { margin-top: .85rem; }
+.detail-cm .small { font-size: .85rem; margin-top: .75rem; }
+
+.detail-extra { display: flex; flex-wrap: wrap; gap: .6rem; margin-bottom: 1.5rem; }
+.detail-source { font-size: .85rem; color: var(--ink-soft); }
+
+/* The card is a link now, so it has to look and focus like one. */
+.church-card { cursor: pointer; }
+.church-card:focus-visible {
+  outline: 2px solid var(--gold); outline-offset: 2px;
+}
+
 @media (max-width: 1100px) {
   .layout { grid-template-columns: 220px minmax(0, 1fr); }
   .layout.no-map { grid-template-columns: 220px minmax(0, 1fr); }
@@ -175,6 +216,7 @@ code {
      leaves the sidebar floating against a full-height track. */
   .layout.no-map .filters,
   .layout.no-map .results { grid-row: 1; }
+  .detail { grid-column: 2; grid-row: 1 / span 2; }
 }
 @media (max-width: 720px) {
   /* `.layout.no-map` has to be named here too. It is the more specific
@@ -183,7 +225,7 @@ code {
      showing a 220px sidebar beside a 122px results column, scrolling sideways. */
   .layout, .layout.no-map { grid-template-columns: minmax(0, 1fr); }
   /* One column: source order is already right, so clear the placement above. */
-  .filters, .results, .map-pane { grid-column: auto; grid-row: auto; }
+  .filters, .results, .map-pane, .detail { grid-column: auto; grid-row: auto; }
 }
 
 /* ------------------------------------------------------------------- filters */

@@ -113,6 +113,8 @@
     dom = {
       form: $('search-form'), input: $('location-input'), geolocate: $('geolocate-btn'),
       status: $('search-status'), layout: $('results-layout'), list: $('church-list'),
+      detail: $('church-detail'), detailBody: $('detail-body'), detailBack: $('detail-back'),
+      results: document.querySelector('.results'), mapPane: document.querySelector('.map-pane'),
       count: $('results-count'), loadMore: $('load-more'), sort: $('sort-select'),
       radius: $('radius-input'), radiusOut: $('radius-output'), nameFilter: $('name-filter'),
       chips: $('family-chips'), denomBlock: $('denomination-block'),
@@ -191,7 +193,22 @@
 
     dom.loadMore.addEventListener('click', loadMore);
     dom.reset.addEventListener('click', resetFilters);
+    dom.detailBack.addEventListener('click', function () { closeDetail(); });
     setUpFilterCollapse();
+
+    // Back and Forward move between the results and a church, because both are
+    // real URLs. `push: false` stops the handler pushing the state it is
+    // reacting to and stacking duplicates.
+    window.addEventListener('popstate', function (event) {
+      var id = (event.state && event.state.church) ||
+               new URLSearchParams(window.location.search).get('church');
+      if (!id) { closeDetail('none'); return; }
+      var code = (event.state && event.state.state) ||
+                 new URLSearchParams(window.location.search).get('state');
+      ChurchData.getChurch(id, code).then(function (church) {
+        if (church) openChurch(church, 'none'); else closeDetail('none');
+      }).catch(function () { closeDetail('none'); });
+    });
     dom.denomSelect.addEventListener('change', function () {
       addDenomination(dom.denomSelect.value);
       dom.denomSelect.value = '';
@@ -463,7 +480,9 @@
 
     setStatus('Loading churches in ' + entry.name + '…');
 
-    ChurchData.prepare(entry.code).then(function () {
+    // Returned so a deep link can wait for the list before opening a church on
+    // top of it -- otherwise Back lands on an empty page.
+    return ChurchData.prepare(entry.code).then(function () {
       if (token !== searchToken) return null;
       return runSearch(token, true).then(function () {
         setStatus('Showing churches in ' + entry.name + '.', 'ok');
@@ -511,6 +530,10 @@
 
   function rerun() {
     updateFilterToggleText();
+    // Changing a filter is a request to see the search, not the church that
+    // happens to be open. 'replace' rather than 'push' because closing as a
+    // side effect of a filter change is not a navigation worth a Back stop.
+    closeDetail('replace');
     if (state.mode === null) return;
     runSearch(++searchToken, true).catch(function (error) {
       setStatus(error.message, 'error');
@@ -872,10 +895,225 @@
 
     card.addEventListener('click', function (event) {
       if (event.target.closest('a, button')) return;   // real controls handle themselves
-      focusChurch(church.id);
+      openChurch(church);
+    });
+    // The card is not a button -- it contains links -- so keyboard users need
+    // this said explicitly rather than inferred from the click handler.
+    card.tabIndex = 0;
+    card.setAttribute('role', 'link');
+    card.addEventListener('keydown', function (event) {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      if (event.target.closest('a, button')) return;
+      event.preventDefault();
+      openChurch(church);
     });
 
     return card;
+  }
+
+  /* ------------------------------------------------------------ church detail */
+
+  /* A card is a summary. Tapping one used to move a map pin, which on a phone
+     happened off-screen and looked like nothing at all -- so a tap appeared to
+     do nothing, and everything the scrape knows about a church had no place to
+     be shown. This is that place: one church, everything known about it, at its
+     own URL so it can be linked to and reached with the Back button. */
+
+  var detailChurch = null;
+
+  /* `history` is one of 'push' (a tap, which should be undoable with Back),
+     'replace' (a cold deep link -- the URL is already this church, and the
+     search that ran underneath rewrote it), or 'none' (reacting to popstate,
+     where pushing would stack a duplicate entry). */
+  function openChurch(church, historyMode) {
+    detailChurch = church;
+    renderDetail(church);
+    dom.detail.hidden = false;
+    dom.results.hidden = true;
+    dom.mapPane.hidden = true;
+    document.querySelector('.layout').classList.add('showing-detail');
+
+    if (historyMode !== 'none') {
+      var query = new URLSearchParams(window.location.search);
+      query.set('church', church.id);
+      if (church.state) query.set('state', church.state);
+      var entry = { church: church.id, state: church.state };
+      if (historyMode === 'replace') history.replaceState(entry, '', '?' + query.toString());
+      else history.pushState(entry, '', '?' + query.toString());
+    }
+    document.title = church.name + ' — ChurchFind';
+    dom.detail.scrollIntoView({ block: 'start' });
+    dom.detailBack.focus();
+  }
+
+  function closeDetail(historyMode) {
+    var wasOpen = !dom.detail.hidden;
+    detailChurch = null;
+    dom.detail.hidden = true;
+    dom.results.hidden = false;
+    dom.mapPane.hidden = mapUnavailable;
+    document.querySelector('.layout').classList.remove('showing-detail');
+    document.title = 'ChurchFind — find a church near you';
+
+    if (wasOpen && historyMode !== 'none') {
+      var query = new URLSearchParams(window.location.search);
+      query.delete('church');
+      var search = query.toString();
+      var url = search ? '?' + search : window.location.pathname;
+      // 'replace' when the detail was closed as a side effect of something else
+      // (a filter change): the URL must stop naming a church nobody is looking
+      // at, but that is not a navigation worth a Back stop of its own.
+      if (historyMode === 'replace') history.replaceState({}, '', url);
+      else history.pushState({}, '', url);
+    }
+    // Leaflet lays out against a hidden container as zero-sized, so it has to be
+    // told the pane is back or the tiles come back grey and offset.
+    if (map) setTimeout(function () { map.invalidateSize(); }, 0);
+  }
+
+  function detailRow(label, value) {
+    if (!value) return null;
+    return el('div', { class: 'detail-row' }, [
+      el('dt', { text: label }), el('dd', { text: value })
+    ]);
+  }
+
+  function detailLinkRow(label, href, text, external) {
+    if (!href) return null;
+    var attrs = { href: href, text: text };
+    if (external) { attrs.rel = 'noopener nofollow'; attrs.target = '_blank'; }
+    return el('div', { class: 'detail-row' }, [
+      el('dt', { text: label }), el('dd', {}, [el('a', attrs)])
+    ]);
+  }
+
+  function renderDetail(church) {
+    var body = dom.detailBody;
+    body.textContent = '';
+
+    body.appendChild(el('h2', { class: 'detail-name', id: 'detail-name', text: church.name }));
+    body.appendChild(badge(church));
+
+    var address = addressLine(church);
+    body.appendChild(address
+      ? el('p', { class: 'detail-address', text: address })
+      : el('p', { class: 'detail-address muted', text: 'Address not recorded' }));
+
+    var actions = [];
+    if (!mapUnavailable && church.lat != null) {
+      var locate = el('button', { type: 'button', class: 'action',
+        text: 'Show on map', 'aria-label': 'Show ' + church.name + ' on the map' });
+      locate.addEventListener('click', function () {
+        closeDetail();
+        focusChurch(church.id);
+      });
+      actions.push(locate);
+    }
+    actions.push(el('a', { class: 'action', href: directionsUrl(church),
+                           rel: 'noopener', target: '_blank', text: 'Directions' }));
+    var save = saveButton(church);
+    if (save) actions.push(save);
+    body.appendChild(el('div', { class: 'actions' }, actions));
+
+    var facts = el('dl', { class: 'detail-facts' }, [
+      detailLinkRow('Website', safeUrl(church.website), church.website, true),
+      detailLinkRow('Phone', telHref(church.phone), church.phone, false),
+      detailLinkRow('Email', church.email ? 'mailto:' + church.email : '', church.email, false),
+      detailRow('Denomination', church.denomination || 'Not recorded'),
+      detailRow('Services', church.service_text || church.services || church.hours || ''),
+      detailRow('Accessibility', accessibilityText(church)),
+      detailRow('Last edited in OpenStreetMap', church.updated || '')
+    ]);
+    if (facts.children.length) body.appendChild(facts);
+
+    body.appendChild(churchmanshipSection(church));
+
+    if (ChurchAccount.available()) {
+      var extra = [];
+      var reviews = el('button', { type: 'button', class: 'btn btn-ghost', text: 'Reviews' });
+      reviews.addEventListener('click', function () { ChurchReviews.open(church); });
+      extra.push(reviews);
+      var report = el('button', { type: 'button', class: 'btn btn-ghost',
+                                  text: 'Report a correction' });
+      report.addEventListener('click', function () { ChurchAccount.reportCorrection(church); });
+      extra.push(report);
+      body.appendChild(el('div', { class: 'detail-extra' }, extra));
+    }
+
+    body.appendChild(el('p', { class: 'detail-source' }, [
+      'Record from ',
+      el('a', { href: osmUrl(church), rel: 'noopener', target: '_blank',
+                text: 'OpenStreetMap' }),
+      ', which anyone can correct.'
+    ]));
+  }
+
+  function accessibilityText(church) {
+    var parts = [];
+    if (church.wheelchair === 'yes') parts.push('Wheelchair accessible');
+    else if (church.wheelchair === 'limited') parts.push('Limited wheelchair access');
+    if (church.hearing_loop === 'yes') parts.push('Hearing loop');
+    if (church.toilets_wheelchair === 'yes') parts.push('Accessible toilet');
+    return parts.join(' · ');
+  }
+
+  function osmUrl(church) {
+    var kinds = { n: 'node', w: 'way', r: 'relation' };
+    var kind = kinds[String(church.id).charAt(0)];
+    return kind
+      ? 'https://www.openstreetmap.org/' + kind + '/' + String(church.id).slice(1)
+      : 'https://www.openstreetmap.org/';
+  }
+
+  /* Churchmanship on the detail page rather than only behind a dialog: it is
+     one of the few things here the site worked out rather than copied, and
+     burying it behind a button nobody presses wasted it. Voting still needs an
+     account; reading does not. */
+  function churchmanshipSection(church) {
+    if (church.family !== 'anglican') return document.createDocumentFragment();
+
+    var section = el('section', { class: 'detail-cm' }, [
+      el('h3', { text: 'Churchmanship' })
+    ]);
+
+    if (!church.cm_confidence) {
+      section.appendChild(el('p', { class: 'muted', text:
+        'No estimate yet. Nothing in this parish’s website or Wikipedia article ' +
+        'said enough about its worship to place it.' }));
+    } else {
+      var meter = ChurchManship.meter({
+        known: true,
+        ceremonial: church.cm_ceremonial, theology: church.cm_theology,
+        ceremonialLabel: ChurchManship.label('ceremonial', church.cm_ceremonial),
+        theologyLabel: ChurchManship.label('theology', church.cm_theology),
+        confidence: church.cm_confidence, votes: church.cm_votes || 0,
+        source: church.cm_source, scrapedSource: church.cm_scraped_source
+      });
+      if (meter) section.appendChild(meter);
+
+      var evidence = (church.cm_evidence || '').split(',').filter(Boolean);
+      if (evidence.length) {
+        section.appendChild(el('details', { class: 'cm-evidence' }, [
+          el('summary', { text: 'What this is based on' }),
+          el('p', { text: 'Phrases found: ' + evidence.join(', ') + '.' }),
+          el('p', { class: 'cm-caveat', text:
+            'Dedications are deliberately ignored — St Mary the Virgin tells you ' +
+            'about the founding decade, not about this Sunday.' })
+        ]));
+      }
+    }
+
+    if (ChurchAccount.available()) {
+      var vote = el('button', { type: 'button', class: 'btn btn-ghost',
+        text: church.cm_confidence ? 'Correct this' : 'Add a reading' });
+      vote.addEventListener('click', function () { ChurchManship.open(church); });
+      section.appendChild(vote);
+    } else {
+      section.appendChild(el('p', { class: 'muted small', text:
+        'Readings come from parish websites and Wikipedia. Correcting one needs ' +
+        'an account, which needs the API server — this is the static build.' }));
+    }
+    return section;
   }
 
   function renderList() {
@@ -1039,6 +1277,12 @@
     if (!marker) { toast('That church is outside the range shown on the map.'); return; }
     map.setView(marker.getLatLng(), Math.max(map.getZoom(), 14));
     marker.openPopup();
+    // On a phone the map is above the list, so "show on map" used to move a pin
+    // on a pane that was off-screen -- indistinguishable from the button doing
+    // nothing at all. Scroll to whatever was just changed.
+    if (dom.mapPane && !dom.mapPane.hidden) {
+      dom.mapPane.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
     document.querySelectorAll('.church-card.is-active').forEach(function (node) {
       node.classList.remove('is-active');
     });
@@ -1087,17 +1331,41 @@
     window.history.replaceState(null, '', url);
   }
 
+  function stateEntry(code) {
+    if (!code) return null;
+    return ((state.meta && state.meta.states) || []).filter(function (s) {
+      return s.code === code.toUpperCase();
+    })[0] || null;
+  }
+
   function restoreFromUrl() {
     var params = new URLSearchParams(window.location.search);
 
     if (params.get('view') === 'saved' && ChurchAccount.user()) { showSaved(); return; }
 
     var stateParam = params.get('state');
+
+    // A shared link to one church. The state search still runs underneath so
+    // that Back from the detail lands on a populated list rather than an empty
+    // page -- and in static mode it is what puts the state file in memory.
+    var churchParam = params.get('church');
+    if (churchParam) {
+      var entry = stateEntry(stateParam);
+      var ready = entry ? browseState(entry) : Promise.resolve();
+      Promise.resolve(ready).catch(function () {}).then(function () {
+        return ChurchData.getChurch(churchParam, stateParam);
+      }).then(function (church) {
+        // 'replace': the search that just ran rewrote the URL and dropped the
+        // church param, so this puts it back without adding a history entry.
+        if (church) openChurch(church, 'replace');
+        else setStatus('That church could not be found.', 'error');
+      }).catch(function (error) { setStatus(error.message, 'error'); });
+      return;
+    }
+
     if (stateParam) {
-      var entry = ((state.meta && state.meta.states) || []).filter(function (s) {
-        return s.code === stateParam.toUpperCase();
-      })[0];
-      if (entry) { browseState(entry); return; }
+      var known = stateEntry(stateParam);
+      if (known) { browseState(known); return; }
     }
 
     var query = params.get('q');

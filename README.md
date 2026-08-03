@@ -80,10 +80,11 @@ Pages copies the tree verbatim instead of running it through Jekyll. Any other s
 host works the same; there is nothing to build.
 
 What you get is the static half: search, both denomination filters, service times,
-radius, the map, and browse-by-state, over all 235,667 churches. What you do not get is
-anything that needs the API — accounts, saved churches, correction reports, reviews and
-churchmanship voting all require the server. The page detects this at boot and says so
-in a banner rather than leaving you to wonder where the sign-in button went.
+radius, the map, browse-by-state, a page per church, and the churchmanship readings —
+over all 235,667 churches. What you do not get is anything that needs the API: accounts,
+saved churches, correction reports, reviews, and *submitting* a churchmanship reading.
+The page detects this at boot and says so in a banner rather than leaving you to wonder
+where the sign-in button went.
 
 ### With the API server
 
@@ -164,6 +165,29 @@ takes the space — the list, not the map, is the product.
 Everything rendered from scraped data is built with `document.createElement` and
 `textContent`, and links are scheme-checked before they reach an `href`. OpenStreetMap
 tags are public input and are treated as such.
+
+### A page per church
+
+A card is a summary; `?church=<osm-id>&state=<code>` is the whole record — every field
+the scrape holds, the churchmanship reading and the phrases behind it, and links to the
+website, directions and the OSM record anyone can correct. Tapping a card opens it, Back
+returns to the results, and the URL can be shared.
+
+The state code is in the URL because the static build needs it. An OSM id says nothing
+about where it is, and the data is one file per state, so without the code there is no
+way to know which of 51 files to open. The API has an index and ignores it.
+
+Before this, tapping a card moved a pin on the map. On a phone that happened off-screen,
+which is indistinguishable from the tap doing nothing — and everything the scrape knows
+beyond name, address and denomination had nowhere to be shown.
+
+**Churchmanship is part of the static build.** The API gets its readings from a `LEFT
+JOIN`; a file server has no join, so `server/build_db.py` also writes
+`data/churchmanship-merged.json` and `data.js` merges it onto churches as they load. Both
+backends then hand the UI the same `cm_*` fields. Until this existed the whole feature was
+invisible on the deployed site — the button was gated behind accounts, and the state files
+carried no scores to render. Reading a churchmanship estimate needs no account. Submitting
+one still does.
 
 ## Where the data comes from
 
@@ -702,10 +726,11 @@ server/queries.py              church search: R*Tree radius, FTS5 names
 server/auth.py                 argon2id, sessions, CSRF, throttling
 server/moderation.py           review moderation with Claude, fail-closed
 server/app.py                  FastAPI routes and the static host
-server/test_api.py             78 tests over the API, weighted to the security-critical parts
+server/test_api.py             80 tests over the API, weighted to the security-critical parts
 server/test_moderation.py      24 tests over moderation, with the Claude call stubbed
 data/churchmanship.json        churchmanship from parish websites
-data/churchmanship-wikipedia.json  churchmanship from Wikipedia, merged at build time
+data/churchmanship-wikipedia.json  churchmanship from Wikipedia
+data/churchmanship-merged.json     the two merged, for the no-server build
 .nojekyll                      tells GitHub Pages to serve the tree as-is
 ```
 

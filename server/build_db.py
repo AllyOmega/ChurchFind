@@ -27,6 +27,8 @@ STATE_DIR = ROOT / "data" / "states"
 INDEX_PATH = ROOT / "data" / "index.json"
 CHURCHMANSHIP_PATH = ROOT / "data" / "churchmanship.json"
 CHURCHMANSHIP_WIKI_PATH = ROOT / "data" / "churchmanship-wikipedia.json"
+# What the no-server build reads: the two sources already merged, ready to use.
+STATIC_CHURCHMANSHIP_PATH = ROOT / "data" / "churchmanship-merged.json"
 
 COLUMNS = [
     "id", "name", "denomination", "family", "address", "city", "state",
@@ -234,6 +236,45 @@ def recompute(connection, church_id):
     return blended
 
 
+def write_static_churchmanship():
+    """Emit the merged readings for the no-server build.
+
+    Without this the churchmanship feature exists only behind the API, which is
+    to say not at all on the deployed site -- the state files carry no scores and
+    the UI had nothing to render. The merge lives here rather than in the browser
+    so both backends show the same numbers from the same code.
+
+    Votes are deliberately absent: they need accounts, which need the server.
+    What ships is the scraped prior, labelled as such.
+    """
+    merged = {}
+    for path, source in ((CHURCHMANSHIP_PATH, "website"),
+                         (CHURCHMANSHIP_WIKI_PATH, "wikipedia")):
+        if not path.exists():
+            continue
+        for church_id, score in json.loads(path.read_text()).get("scores", {}).items():
+            score.setdefault("source", source)
+            merged.setdefault(church_id, []).append(score)
+
+    scores = {}
+    for church_id, found in merged.items():
+        combined = churchmanship.merge_sources(found)
+        if not combined:
+            continue
+        scores[church_id] = {
+            "ceremonial": combined["ceremonial"],
+            "theology": combined["theology"],
+            "confidence": combined["confidence"],
+            "source": combined.get("source", "website"),
+            "evidence": combined.get("matched", []),
+        }
+
+    STATIC_CHURCHMANSHIP_PATH.write_text(
+        json.dumps({"scores": scores}, indent=1, sort_keys=True))
+    print(f"  Wrote {len(scores):,} readings to {STATIC_CHURCHMANSHIP_PATH.name} "
+          f"for the static build.")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--db", help="database file (default: server/churchfind.db)")
@@ -247,6 +288,7 @@ def main():
 
     print("Loading state files...")
     total = rebuild(connection)
+    write_static_churchmanship()
 
     users = connection.execute("SELECT COUNT(*) FROM users").fetchone()[0]
     print(f"\nLoaded {total:,} churches. {users} account(s) left untouched.")
