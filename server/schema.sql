@@ -39,7 +39,11 @@ CREATE TABLE IF NOT EXISTS churches (
   -- Day and time together as ",6-0900,3-1900," -- see scraper/service_times.py
   -- on why they are pairs rather than two independent sets.
   service_pairs TEXT NOT NULL DEFAULT '',
-  service_text  TEXT NOT NULL DEFAULT ''    -- human-readable rendering
+  service_text  TEXT NOT NULL DEFAULT '',   -- human-readable rendering
+  -- Where the times came from: 'osm' (a service_times tag) or 'website' (read
+  -- off the parish's own page). A time nobody can trace is a time nobody can
+  -- correct, and turning up to a locked door is the cost of getting it wrong.
+  service_source TEXT NOT NULL DEFAULT ''
 );
 
 CREATE INDEX IF NOT EXISTS idx_churches_state  ON churches(state);

@@ -847,8 +847,15 @@
 
     var meta = [];
     if (church.service_text || church.services) {
-      meta.push(el('p', { class: 'services',
-        text: 'Services: ' + (church.service_text || church.services) }));
+      // Where a time came from is part of the time. OSM's is an explicit tag;
+      // the website reading is inferred from prose and can be a summer schedule
+      // nobody took down. Turning up to a locked door is the cost of hiding that.
+      meta.push(el('p', { class: 'services' }, [
+        'Services: ' + (church.service_text || church.services),
+        church.service_source === 'website'
+          ? el('span', { class: 'source-note', text: ' — from the parish website' })
+          : null
+      ]));
     }
     else if (church.hours) meta.push(el('p', { class: 'services', text: 'Open: ' + church.hours }));
     var access = [];
@@ -971,10 +978,11 @@
     if (map) setTimeout(function () { map.invalidateSize(); }, 0);
   }
 
-  function detailRow(label, value) {
+  function detailRow(label, value, note) {
     if (!value) return null;
     return el('div', { class: 'detail-row' }, [
-      el('dt', { text: label }), el('dd', { text: value })
+      el('dt', { text: label }),
+      el('dd', {}, [value, note ? el('span', { class: 'source-note', text: note }) : null])
     ]);
   }
 
@@ -1020,7 +1028,11 @@
       detailLinkRow('Phone', telHref(church.phone), church.phone, false),
       detailLinkRow('Email', church.email ? 'mailto:' + church.email : '', church.email, false),
       detailRow('Denomination', church.denomination || 'Not recorded'),
-      detailRow('Services', church.service_text || church.services || church.hours || ''),
+      detailRow('Services', church.service_text || church.services || church.hours || '',
+                church.service_source === 'website'
+                  ? 'Read from the parish website — check with them before travelling.'
+                  : church.service_source === 'osm'
+                    ? 'From an OpenStreetMap service_times tag.' : ''),
       detailRow('Accessibility', accessibilityText(church)),
       detailRow('Last edited in OpenStreetMap', church.updated || '')
     ]);

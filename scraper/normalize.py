@@ -165,6 +165,31 @@ def classify_denomination(raw):
     return (_titleize(raw), "other")
 
 
+# "Episcopal" in a name does not always mean the Episcopal Church. The
+# historically Black Methodist denominations -- African Methodist Episcopal, AME
+# Zion, Christian Methodist Episcopal -- carry the word for reasons of polity,
+# and mappers tag them `denomination=Episcopal`. Twenty of them were sitting in
+# the Anglican family, inflating its count and eligible to be handed an Anglican
+# churchmanship reading, which would be a straightforwardly wrong thing to say
+# about a Methodist congregation.
+_METHODIST_EPISCOPAL = re.compile(
+    r"\bafrican methodist episcopal\b|\bchristian methodist episcopal\b"
+    r"|\ba\.?\s?m\.?\s?e\.?\s+(?:zion|church)\b|\bc\.?m\.?e\.?\s+church\b",
+    re.IGNORECASE,
+)
+
+
+def _correct_from_name(name, label, family):
+    """Override a denomination the name plainly contradicts."""
+    if family == "anglican" and _METHODIST_EPISCOPAL.search(name or ""):
+        if re.search(r"\bzion\b", name, re.IGNORECASE):
+            return ("AME Zion", "methodist")
+        if re.search(r"\bchristian methodist\b", name, re.IGNORECASE):
+            return ("Christian Methodist Episcopal", "methodist")
+        return ("African Methodist Episcopal", "methodist")
+    return (label, family)
+
+
 def _first(tags, keys):
     for key in keys:
         value = tags.get(key, "").strip()
@@ -230,6 +255,7 @@ def normalize(element, state_code):
         return None
 
     label, family = classify_denomination(tags.get("denomination", ""))
+    label, family = _correct_from_name(name, label, family)
 
     return {
         "id": f"{element['type'][0]}{element['id']}",

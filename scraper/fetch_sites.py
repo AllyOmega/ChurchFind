@@ -37,10 +37,14 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import churchmanship  # noqa: E402
+import parse_prose_times  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 CACHE_DIR = ROOT / "data" / "sites-cache"
 OUTPUT = ROOT / "data" / "churchmanship.json"
+# Service times read off the same pages. Only 204 of 2,812 Anglican churches
+# have one in OpenStreetMap; the parish's own website is where they actually are.
+TIMES_OUTPUT = ROOT / "data" / "service-times-web.json"
 
 USER_AGENT = "ChurchFindBot/1.0 (+https://github.com/AllyOmega/ChurchFind; church directory)"
 TIMEOUT = 20
@@ -194,6 +198,8 @@ def gather(church_id, url, refresh=False):
                 result = churchmanship.score(record["text"], source="website")
                 record["score"] = result
                 record["status"] = "scored" if result else "no-signal"
+                record["times"] = parse_prose_times.to_pairs(record["text"])
+                record["times_text"] = parse_prose_times.describe(record["text"])
             return record
         except json.JSONDecodeError:
             pass
@@ -220,7 +226,9 @@ def gather(church_id, url, refresh=False):
                       "status": "scored" if result else "no-signal",
                       # Kept so a lexicon change is a rescore, not a re-crawl.
                       "text": text[:200_000],
-                      "score": result}
+                      "score": result,
+                      "times": parse_prose_times.to_pairs(text),
+                      "times_text": parse_prose_times.describe(text)}
 
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(record))
@@ -246,7 +254,7 @@ def main():
         rows = rows[: args.limit]
 
     print(f"{len(rows)} Anglican parishes with a website.\n")
-    scores, counts = {}, {}
+    scores, times, counts = {}, {}, {}
     for position, row in enumerate(rows, start=1):
         record = gather(row["id"], row["website"], refresh=args.refresh)
         counts[record["status"]] = counts.get(record["status"], 0) + 1
@@ -258,11 +266,15 @@ def main():
                   f"conf {score['confidence']:.2f}", flush=True)
         elif position % 25 == 0:
             print(f"  [{position}/{len(rows)}] ...", flush=True)
+        if record.get("times"):
+            times[row["id"]] = {"pairs": record["times"], "text": record["times_text"]}
         time.sleep(POLITE_GAP)
 
     OUTPUT.write_text(json.dumps({"scores": scores}, indent=1, sort_keys=True))
+    TIMES_OUTPUT.write_text(json.dumps({"times": times}, indent=1, sort_keys=True))
     print("\n" + "  ".join(f"{name}: {count}" for name, count in sorted(counts.items())))
     print(f"Wrote {len(scores)} scores to {OUTPUT}")
+    print(f"Wrote {len(times)} service-time sets to {TIMES_OUTPUT}")
     return 0
 
 

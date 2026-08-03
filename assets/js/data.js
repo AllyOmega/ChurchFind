@@ -176,17 +176,44 @@
   var churchmanship = null;          // id -> reading, once loaded
   var churchmanshipLoad = null;
 
+  // Service times read off parish websites. The API applies these with an
+  // UPDATE at build time; a file server has no build step, so the same merge
+  // happens here. OSM's own times already travel inside the state files.
+  var WEB_TIMES_URL = 'data/service-times-merged.json';
+  var webTimes = null;
+
   function loadChurchmanship() {
     if (churchmanshipLoad) return churchmanshipLoad;
-    churchmanshipLoad = fetch(CHURCHMANSHIP_URL)
-      .then(function (response) { return response.ok ? response.json() : { scores: {} }; })
-      // A missing or broken file means no readings, never a broken search.
-      .catch(function () { return { scores: {} }; })
-      .then(function (payload) { churchmanship = payload.scores || {}; return churchmanship; });
+    // Both side files are optional. A missing or broken one means less detail,
+    // never a broken search, so every failure resolves to an empty map.
+    var readings = fetch(CHURCHMANSHIP_URL)
+      .then(function (r) { return r.ok ? r.json() : { scores: {} }; })
+      .catch(function () { return { scores: {} }; });
+    var times = fetch(WEB_TIMES_URL)
+      .then(function (r) { return r.ok ? r.json() : { times: {} }; })
+      .catch(function () { return { times: {} }; });
+    churchmanshipLoad = Promise.all([readings, times]).then(function (both) {
+      churchmanship = both[0].scores || {};
+      webTimes = both[1].times || {};
+      return churchmanship;
+    });
     return churchmanshipLoad;
   }
 
   function attachChurchmanship(church) {
+    // OSM wins where it has a service_times tag -- it is an explicit statement
+    // of this exact fact. The website reading only fills the silence.
+    if (church.service_pairs) {
+      church.service_source = 'osm';
+    } else {
+      var times = webTimes && webTimes[church.id];
+      if (times) {
+        church.service_pairs = times.pairs;
+        church.service_text = times.text;
+        church.service_source = 'website';
+      }
+    }
+
     var reading = churchmanship && churchmanship[church.id];
     if (!reading) return church;
     church.cm_ceremonial = reading.ceremonial;

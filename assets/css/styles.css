@@ -663,3 +663,9 @@ input[type="range"] { width: 100%; accent-color: var(--indigo); }
   color: var(--ink); background: var(--paper);
   border: 1px solid var(--rule); border-radius: 8px;
 }
+
+/* Provenance on a service time. Quiet, but never absent -- a time read off a
+   website can be last summer's schedule, and the reader is the one who finds
+   out at a locked door. */
+.source-note { color: var(--ink-soft); font-size: .85em; display: block; }
+.services .source-note { display: inline; }

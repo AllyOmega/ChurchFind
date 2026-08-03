@@ -29,6 +29,10 @@ CHURCHMANSHIP_PATH = ROOT / "data" / "churchmanship.json"
 CHURCHMANSHIP_WIKI_PATH = ROOT / "data" / "churchmanship-wikipedia.json"
 # What the no-server build reads: the two sources already merged, ready to use.
 STATIC_CHURCHMANSHIP_PATH = ROOT / "data" / "churchmanship-merged.json"
+# Service times read off parish websites, and the merged set the no-server build
+# reads. OSM has a service time for 7% of Anglican churches; this is the rest.
+WEB_TIMES_PATH = ROOT / "data" / "service-times-web.json"
+STATIC_TIMES_PATH = ROOT / "data" / "service-times-merged.json"
 
 COLUMNS = [
     "id", "name", "denomination", "family", "address", "city", "state",
@@ -44,7 +48,7 @@ OPTIONAL = {"hearing_loop", "toilets_wheelchair", "updated", "wikipedia", "wikid
 
 # Derived at build time rather than stored by the scraper: the parser lives with
 # the site, so improving it only needs a rebuild, not a 45-minute re-scrape.
-DERIVED = ["service_pairs", "service_text"]
+DERIVED = ["service_pairs", "service_text", "service_source"]
 
 
 def load_state(path):
@@ -63,9 +67,11 @@ def load_state(path):
         values = [row[position[column]] if column in position else ""
                   for column in COLUMNS]
         raw_services = values[COLUMNS.index("services")]
+        pairs = service_times.to_pairs(raw_services)
         yield tuple(values) + (
-            service_times.to_pairs(raw_services),
+            pairs,
             service_times.describe(raw_services),
+            "osm" if pairs else "",
         )
 
 
@@ -132,12 +138,48 @@ def rebuild(connection):
             ],
         )
 
+    applied_times = load_web_service_times(connection, cursor)
     load_churchmanship(connection, cursor)
 
     connection.commit()
     cursor.execute("ANALYZE")
     connection.commit()
     return total
+
+
+def load_web_service_times(connection, cursor):
+    """Fill in service times read off parish websites.
+
+    OpenStreetMap wins wherever it has a `service_times` tag: it is an explicit
+    statement of exactly this fact, made by somebody who chose to record it. The
+    website extraction is inference from prose, and only fills the silence -- of
+    2,812 Anglican churches, OSM has times for 204.
+
+    `service_source` records which, because a time nobody can trace is a time
+    nobody can correct, and the cost of being wrong here is somebody standing
+    outside a locked church on a Sunday morning.
+    """
+    if not WEB_TIMES_PATH.exists():
+        return 0
+    times = json.loads(WEB_TIMES_PATH.read_text()).get("times", {})
+    if not times:
+        return 0
+
+    applied = 0
+    for church_id, entry in times.items():
+        pairs = entry.get("pairs") or ""
+        if not pairs:
+            continue
+        cursor.execute(
+            "UPDATE churches SET service_pairs = ?, service_text = ?, "
+            "service_source = 'website' "
+            "WHERE id = ? AND service_pairs = ''",
+            (pairs, entry.get("text", ""), church_id),
+        )
+        applied += cursor.rowcount
+    connection.commit()
+    print(f"\n  Filled {applied:,} service times from parish websites.")
+    return applied
 
 
 def load_churchmanship(connection, cursor):
@@ -236,6 +278,28 @@ def recompute(connection, church_id):
     return blended
 
 
+def write_static_service_times():
+    """Emit website-derived times for the no-server build.
+
+    Same reasoning as the churchmanship file: the API fills these in with an
+    UPDATE at build time, and a file server has no build step. Without this the
+    times exist only behind the API, which is to say not on the deployed site.
+
+    Only the website-derived ones are here. OSM times already travel inside the
+    per-state files, so repeating them would be dead weight.
+    """
+    if not WEB_TIMES_PATH.exists():
+        STATIC_TIMES_PATH.write_text(json.dumps({"times": {}}))
+        return 0
+    times = json.loads(WEB_TIMES_PATH.read_text()).get("times", {})
+    published = {church_id: {"pairs": entry["pairs"], "text": entry.get("text", "")}
+                 for church_id, entry in times.items() if entry.get("pairs")}
+    STATIC_TIMES_PATH.write_text(json.dumps({"times": published}, indent=1, sort_keys=True))
+    print(f"  Wrote {len(published):,} website service times to "
+          f"{STATIC_TIMES_PATH.name} for the static build.")
+    return len(published)
+
+
 def write_static_churchmanship():
     """Emit the merged readings for the no-server build.
 
@@ -289,6 +353,7 @@ def main():
     print("Loading state files...")
     total = rebuild(connection)
     write_static_churchmanship()
+    write_static_service_times()
 
     users = connection.execute("SELECT COUNT(*) FROM users").fetchone()[0]
     print(f"\nLoaded {total:,} churches. {users} account(s) left untouched.")

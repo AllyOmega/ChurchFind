@@ -14,7 +14,7 @@ CHURCH_COLUMNS = [
     "id", "name", "denomination", "family", "address", "city", "state",
     "postcode", "lat", "lon", "website", "phone", "email", "services",
     "hours", "wheelchair", "hearing_loop", "toilets_wheelchair", "updated",
-    "wikipedia", "wikidata", "service_pairs", "service_text",
+    "wikipedia", "wikidata", "service_pairs", "service_text", "service_source",
 ]
 
 SORTS = {
