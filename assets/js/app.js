@@ -118,6 +118,8 @@
       chips: $('family-chips'), denomBlock: $('denomination-block'),
       denomSelect: $('denomination-select'), denomChosen: $('denomination-chosen'),
       reset: $('reset-filters'),
+      filtersToggle: $('filters-toggle'), filtersBody: $('filters-body'),
+      filtersToggleText: $('filters-toggle-text'),
       website: $('filter-website'), phone: $('filter-phone'),
       services: $('filter-services'), wheelchair: $('filter-wheelchair'),
       hearing: $('filter-hearing'), serviceBlock: $('service-block'),
@@ -189,6 +191,7 @@
 
     dom.loadMore.addEventListener('click', loadMore);
     dom.reset.addEventListener('click', resetFilters);
+    setUpFilterCollapse();
     dom.denomSelect.addEventListener('change', function () {
       addDenomination(dom.denomSelect.value);
       dom.denomSelect.value = '';
@@ -507,6 +510,7 @@
   }
 
   function rerun() {
+    updateFilterToggleText();
     if (state.mode === null) return;
     runSearch(++searchToken, true).catch(function (error) {
       setStatus(error.message, 'error');
@@ -623,6 +627,60 @@
     state.filters.denominations.splice(index, 1);
     renderDenominationOptions();
     rerun();
+  }
+
+  // The filter panel is a full screen tall on a phone, and it sits above both
+  // the map and the results, so on a narrow viewport it starts collapsed. The
+  // markup ships expanded and this is the only thing that ever collapses it:
+  // if the script fails, the filters are still reachable.
+  var NARROW = '(max-width: 720px)';
+
+  function setUpFilterCollapse() {
+    if (!dom.filtersToggle || !dom.filtersBody) return;
+    dom.filtersToggle.hidden = false;
+    dom.filtersToggle.addEventListener('click', function () {
+      setFiltersOpen(dom.filtersToggle.getAttribute('aria-expanded') !== 'true');
+    });
+
+    var narrow = window.matchMedia(NARROW);
+    // Collapsed only while the viewport is narrow. Widening re-opens it, so a
+    // rotated phone or a resized window never leaves the sidebar shut with no
+    // visible way to open it -- the toggle is hidden above 720px.
+    var apply = function () { setFiltersOpen(!narrow.matches); };
+    apply();
+    if (narrow.addEventListener) narrow.addEventListener('change', apply);
+    else if (narrow.addListener) narrow.addListener(apply);   // older Safari
+  }
+
+  function setFiltersOpen(open) {
+    if (!dom.filtersToggle || !dom.filtersBody) return;
+    dom.filtersBody.hidden = !open;
+    dom.filtersToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    updateFilterToggleText();
+  }
+
+  function updateFilterToggleText() {
+    if (!dom.filtersToggleText) return;
+    var open = dom.filtersToggle.getAttribute('aria-expanded') === 'true';
+    var active = countActiveFilters();
+    // When the panel is shut the chips and pills go with it, so the count is
+    // the only thing telling you a filter is narrowing your results.
+    dom.filtersToggleText.textContent = open
+      ? 'Hide filters'
+      : active
+        ? 'Filters (' + active + ' active)'
+        : 'Filters';
+  }
+
+  function countActiveFilters() {
+    var f = state.filters;
+    var n = f.families.length + f.denominations.length +
+            f.serviceDays.length + f.servicePeriods.length;
+    if (f.name) n += 1;
+    ['hasWebsite', 'hasPhone', 'hasServices', 'wheelchair', 'hearingLoop']
+      .forEach(function (key) { if (f[key]) n += 1; });
+    if (state.mode === 'near' && f.radius !== 25) n += 1;
+    return n;
   }
 
   function resetFilters() {

@@ -61,6 +61,17 @@
       <button type="button" class="link-btn" id="reset-filters">Reset</button>
     </div>
 
+    <!-- Collapsed on phones only, and only once JS has confirmed the viewport
+         is narrow. Without script the panel stays open, which is the safe way
+         round: filters nobody can reach are worse than filters that take
+         scrolling. -->
+    <button type="button" class="filters-toggle" id="filters-toggle"
+            aria-expanded="true" aria-controls="filters-body" hidden>
+      <span id="filters-toggle-text">Hide filters</span>
+    </button>
+
+    <div class="filters-body" id="filters-body">
+
     <div class="filter-block">
       <label for="radius-input">
         Within <output id="radius-output">25</output> miles
@@ -101,7 +112,19 @@
       <label class="check"><input type="checkbox" id="filter-wheelchair"> Wheelchair accessible</label>
       <label class="check"><input type="checkbox" id="filter-hearing"> Hearing loop</label>
     </div>
+
+    </div><!-- /.filters-body -->
   </aside>
+
+  <!-- The map comes before the results in source order so that a one-column
+       phone layout gets it without any CSS reordering: the list runs to
+       hundreds of cards, and a map after it sits a dozen screens down where
+       nobody will ever scroll to it. On wide screens the grid puts the two
+       side by side and explicit `grid-column` keeps the map on the right, so
+       this ordering is only visible on narrow ones. -->
+  <section class="map-pane" aria-label="Map of results">
+    <div id="map"></div>
+  </section>
 
   <section class="results" aria-label="Search results">
     <div class="results-head">
@@ -117,10 +140,6 @@
     </div>
     <ol class="church-list" id="church-list"></ol>
     <button type="button" class="btn btn-ghost load-more" id="load-more" hidden>Show more</button>
-  </section>
-
-  <section class="map-pane" aria-label="Map of results">
-    <div id="map"></div>
   </section>
 
 </main>

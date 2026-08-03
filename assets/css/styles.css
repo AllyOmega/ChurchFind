@@ -147,16 +147,43 @@ code {
   align-items: start;
 }
 
+/* The map is before the results in the HTML so a one-column phone gets it
+   first without reordering. On three columns the results belong in the middle
+   and the map on the right, so both are placed explicitly rather than left to
+   source order.
+
+   The row is explicit as well as the column. Auto-placement walks the grid in
+   source order and never goes back: once the map takes column 3 of row 1, the
+   cursor is past column 2, so the results would land in row 2 and hang a
+   screen below the fold. */
+.filters  { grid-column: 1; grid-row: 1; }
+.results  { grid-column: 2; grid-row: 1; }
+.map-pane { grid-column: 3; grid-row: 1; }
+
 /* Set when Leaflet or the tile host can't be reached -- results take the space. */
 .layout.no-map { grid-template-columns: 250px minmax(0, 1fr); }
 
 @media (max-width: 1100px) {
   .layout { grid-template-columns: 220px minmax(0, 1fr); }
   .layout.no-map { grid-template-columns: 220px minmax(0, 1fr); }
-  .map-pane { grid-column: 1 / -1; order: 3; }
+  /* Two columns: filters beside a stack of map-then-results. Keeping the map
+     above the list here for the same reason it is above on a phone. */
+  .filters  { grid-column: 1; grid-row: 1 / span 2; }
+  .map-pane { grid-column: 2; grid-row: 1; }
+  .results  { grid-column: 2; grid-row: 2; }
+  /* With no map there is no second row to span, and spanning an empty one
+     leaves the sidebar floating against a full-height track. */
+  .layout.no-map .filters,
+  .layout.no-map .results { grid-row: 1; }
 }
 @media (max-width: 720px) {
-  .layout { grid-template-columns: minmax(0, 1fr); }
+  /* `.layout.no-map` has to be named here too. It is the more specific
+     selector, so a rule for `.layout` alone does not override the two-column
+     value it picks up at 1100px -- which left a phone with Leaflet unavailable
+     showing a 220px sidebar beside a 122px results column, scrolling sideways. */
+  .layout, .layout.no-map { grid-template-columns: minmax(0, 1fr); }
+  /* One column: source order is already right, so clear the placement above. */
+  .filters, .results, .map-pane { grid-column: auto; grid-row: auto; }
 }
 
 /* ------------------------------------------------------------------- filters */
@@ -172,6 +199,20 @@ code {
 @media (max-width: 720px) { .filters { position: static; } }
 
 .filters-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 1rem; }
+
+/* Only ever shown on a phone, where the panel is a screenful on its own and
+   sits between the top of the page and the map. */
+.filters-toggle { display: none; }
+@media (max-width: 720px) {
+  .filters-toggle {
+    display: flex; width: 100%; justify-content: space-between; align-items: center;
+    gap: .5rem; padding: .6rem .8rem; margin-bottom: .75rem;
+    font: inherit; font-size: .95rem; color: inherit; cursor: pointer;
+    background: none; border: 1px solid var(--rule); border-radius: 8px;
+  }
+  .filters-toggle::after { content: "▾"; font-size: .8rem; }
+  .filters-toggle[aria-expanded="false"]::after { content: "▸"; }
+}
 .filters-head h2 { font-size: 1rem; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-soft); }
 
 .link-btn {
@@ -310,6 +351,11 @@ input[type="range"] { width: 100%; accent-color: var(--indigo); }
 
 #map { height: min(72vh, 760px); min-height: 380px; background: var(--rule); }
 @media (max-width: 1100px) { #map { height: 420px; } }
+/* Shorter on a phone, where the map now sits above the list: at 420px it would
+   fill most of the screen and push the first result below the fold, trading one
+   scrolling problem for another. Tall enough to read, short enough to scroll
+   past. min-height has to be overridden too or it wins. */
+@media (max-width: 720px) { #map { height: 46vh; min-height: 240px; max-height: 320px; } }
 
 .popup strong { display: block; font-size: .95rem; margin-bottom: .2rem; }
 .popup-den { color: var(--indigo); font-size: .8rem; font-weight: 600; }
