@@ -201,17 +201,15 @@
   }
 
   function attachChurchmanship(church) {
-    // OSM wins where it has a service_times tag -- it is an explicit statement
-    // of this exact fact. The website reading only fills the silence.
-    if (church.service_pairs) {
-      church.service_source = 'osm';
-    } else {
-      var times = webTimes && webTimes[church.id];
-      if (times) {
-        church.service_pairs = times.pairs;
-        church.service_text = times.text;
-        church.service_source = 'website';
-      }
+    // The state files carry the raw `services` tag but not the parsed pairs --
+    // those are derived at build time, so without this the day/period filter
+    // matches nothing here and the card shows raw `Su 11:00`. The merge is
+    // already done: this file holds both sources with provenance on each.
+    var times = webTimes && webTimes[church.id];
+    if (times) {
+      church.service_pairs = times.pairs;
+      church.service_text = times.text;
+      church.service_source = times.source || 'osm';
     }
 
     var reading = churchmanship && churchmanship[church.id];

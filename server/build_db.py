@@ -278,26 +278,40 @@ def recompute(connection, church_id):
     return blended
 
 
-def write_static_service_times():
-    """Emit website-derived times for the no-server build.
+def write_static_service_times(connection):
+    """Emit every service time the no-server build needs, from both sources.
 
-    Same reasoning as the churchmanship file: the API fills these in with an
-    UPDATE at build time, and a file server has no build step. Without this the
-    times exist only behind the API, which is to say not on the deployed site.
+    The state files carry the raw `services` tag but not the parsed pairs, which
+    are derived at build time -- so on a file server the day/period filter
+    matched nothing for an OSM-tagged church, and its card showed raw
+    `Su 11:00` instead of "Sunday 11am". Same shape of bug as churchmanship:
+    a feature that works behind the API and quietly does not on the deployed
+    site.
 
-    Only the website-derived ones are here. OSM times already travel inside the
-    per-state files, so repeating them would be dead weight.
+    Both sources go in one file with `source` on each entry, so the static path
+    gets the same times, the same readable text and the same provenance the API
+    serves, from the same build.
     """
-    if not WEB_TIMES_PATH.exists():
-        STATIC_TIMES_PATH.write_text(json.dumps({"times": {}}))
-        return 0
-    times = json.loads(WEB_TIMES_PATH.read_text()).get("times", {})
-    published = {church_id: {"pairs": entry["pairs"], "text": entry.get("text", "")}
-                 for church_id, entry in times.items() if entry.get("pairs")}
-    STATIC_TIMES_PATH.write_text(json.dumps({"times": published}, indent=1, sort_keys=True))
-    print(f"  Wrote {len(published):,} website service times to "
-          f"{STATIC_TIMES_PATH.name} for the static build.")
-    return len(published)
+    rows = connection.execute(
+        "SELECT id, service_pairs, service_text, service_source FROM churches "
+        "WHERE service_pairs <> ''"
+    ).fetchall()
+    times = {
+        row["id"]: {"pairs": row["service_pairs"],
+                    "text": row["service_text"],
+                    "source": row["service_source"] or "osm"}
+        for row in rows
+    }
+    STATIC_TIMES_PATH.write_text(json.dumps({"times": times}, separators=(",", ":"),
+                                            sort_keys=True))
+    size = STATIC_TIMES_PATH.stat().st_size
+    by_source = {}
+    for entry in times.values():
+        by_source[entry["source"]] = by_source.get(entry["source"], 0) + 1
+    detail = ", ".join(f"{n} {name}" for name, n in sorted(by_source.items()))
+    print(f"  Wrote {len(times):,} service times ({detail}) to "
+          f"{STATIC_TIMES_PATH.name}, {size // 1024} KB.")
+    return len(times)
 
 
 def write_static_churchmanship():
@@ -353,7 +367,7 @@ def main():
     print("Loading state files...")
     total = rebuild(connection)
     write_static_churchmanship()
-    write_static_service_times()
+    write_static_service_times(connection)
 
     users = connection.execute("SELECT COUNT(*) FROM users").fetchone()[0]
     print(f"\nLoaded {total:,} churches. {users} account(s) left untouched.")

@@ -132,6 +132,12 @@ def test_pairs_are_comma_wrapped_so_a_prefix_cannot_match():
     assert pairs.startswith(",") and pairs.endswith(",")
 
 
-def test_describe_is_readable():
+def test_describe_matches_the_osm_renderer_exactly():
+    """A results list mixes both sources. "Sunday 11am" beside "Su 11am" reads
+    as two different kinds of fact rather than one fact from two places."""
+    import service_times
+
     text = "Sunday Eucharist at 8:00 am and 10:30 am. Wednesday Mass at 12:10 pm."
-    assert ppt.describe(text) == "Wednesday 12:10pm; Sunday 8am, 10:30am"
+    rendered = ppt.describe(text)
+    assert rendered == "We 12:10pm; Su 8am, 10:30am"
+    assert rendered == service_times.describe("We 12:10; Su 08:00,10:30")

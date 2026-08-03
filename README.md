@@ -391,6 +391,67 @@ reads 96% of the 7,466 values that have one. The filter panel offers weekdays an
 five time-of-day buckets, and says plainly how few records it can see: only about
 3% of churches have any service time recorded at all.
 
+### Reading times off parish websites
+
+OpenStreetMap will never have many of these. The `service_times` tag runs roughly
+[100:1 rarer than `opening_hours`](https://wiki.openstreetmap.org/wiki/Key:opening_hours),
+and for Anglican churches specifically it covers 204 of 2,812 — 7.3%. Nobody maps
+service times.
+
+So `scraper/parse_prose_times.py` reads them off the parish's own website, from
+the page text already cached for churchmanship. 78% of those pages carry a clock
+time next to a weekday, and 77% yield times. Anglican coverage goes from **7.3% to
+20.8%** — 204 from OSM, 380 more from websites.
+
+A wrong service time is worse than a missing one: somebody drives out on a Sunday
+morning and finds a locked door. So the parser is biased hard towards silence — a
+time must be anchored to a weekday, the weekday must be within 120 characters,
+worship words raise a slot and admin words *veto* it. Four false positives came
+out of auditing it against real pages, each now a regression test:
+
+- **A day's times leaking into the next day.** All Saints, Austin lists "Sunday:
+  8:00, 10:15, 6:30 … Wednesday: 7:05, 12:05", and Sunday was given a 7:05am
+  service that does not exist. The window now stops at the next weekday.
+- **An annual service read as weekly.** "11 p.m. Christmas Eve" inside a Sunday
+  block at Saint Mark's, Seattle became a weekly 11pm Sunday service.
+- **Dated announcements read as schedules.** "Sunday 4 August at 3pm" is one
+  concert.
+- **`service\b` never matching "services"** — no word boundary between the "e"
+  and the "s" — which silently suppressed one of the commonest phrasings there is.
+
+**Every time carries its source.** OSM wins wherever it has a `service_times`
+tag: that is an explicit statement of exactly this fact. The website reading fills
+the silence and says so, on the card and again on the church page, where it adds
+"check with them before travelling". A time nobody can trace is a time nobody can
+correct.
+
+### Why this is as far as scraping goes
+
+[Masstimes.org](https://masstimes.org/components/about/about.html) is the model,
+and it is not a scraper. It is a trust with employees, volunteers and diocesan
+relationships covering 121,000 churches, and it "only lists Catholic churches that
+are on diocesan web sites or authenticated by information provided by a diocese".
+Archdioceses [publish instructions](https://www.archmil.org/Resources-2.0/Updating-Church-Information-in-Masstimes.org.htm)
+telling parishes how to keep their entry current. That is data governance, not
+parsing.
+
+The Anglican equivalents do not hold schedules. The Episcopal Church's
+[Find a Church](https://www.episcopalchurch.org/find-a-church/) resolves to the
+[Episcopal Asset Map](https://www.episcopalassetmap.org/) — Drupal, ~7,000
+congregations, a complete sitemap — but it is a *ministry* directory: its filters
+are food pantries and community gardens, not service times. The
+[Parish Register](https://parishregister.episcopalchurch.org/) records services
+that already happened, for the annual Parochial Report, behind a login.
+
+Structured data on parish sites is thinner than it looks. Of 31 live sites
+sampled, 58% carry JSON-LD but only four had `openingHours` and one an `Event` —
+the rest is Squarespace and Wix boilerplate.
+
+Which leaves the ceiling around 20–25% from OSM plus websites, or perhaps 35–45%
+if the Asset Map were used as a roster to widen the pool of known parish sites.
+Past that it needs people confirming times, with a date attached — which is what
+Masstimes really is, and what the accounts here already make possible.
+
 Two decisions are worth knowing about, because both were wrong first.
 
 **Anything unparseable produces no slots rather than a guess.** Sending someone to
@@ -712,6 +773,8 @@ scraper/scrape_churches.py     the Overpass scrape
 scraper/normalize.py           OSM tags -> flat records, denomination and state mapping
 scraper/states.py              state codes and centroids
 scraper/service_times.py       OSM opening_hours -> searchable (day, time) pairs
+scraper/parse_prose_times.py   service times out of parish-website prose
+scraper/test_prose_times.py    19 tests, several from real false positives
 scraper/churchmanship.py       the two-axis Anglican scorer, source merge, vote blend
 scraper/fetch_sites.py         robots-respecting fetch of Anglican parish websites
 scraper/fetch_wikipedia.py     Wikipedia extracts, joined exactly via OSM wiki tags
@@ -731,6 +794,7 @@ server/test_moderation.py      24 tests over moderation, with the Claude call st
 data/churchmanship.json        churchmanship from parish websites
 data/churchmanship-wikipedia.json  churchmanship from Wikipedia
 data/churchmanship-merged.json     the two merged, for the no-server build
+data/service-times-merged.json     all service times + provenance, for the same
 .nojekyll                      tells GitHub Pages to serve the tree as-is
 ```
 

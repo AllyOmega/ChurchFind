@@ -199,12 +199,18 @@ def to_pairs(text):
     return "," + ",".join(f"{day}-{m // 60:02d}{m % 60:02d}" for day, m in slots) + ","
 
 
-DAY_LABELS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
-              "Saturday", "Sunday"]
+# The same abbreviations service_times.describe() uses. A card can carry times
+# from either source and they must not be rendered two different ways.
+DAY_LABELS = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
 
 
 def describe(text):
-    """Human-readable rendering, grouped by day."""
+    """Human-readable rendering, grouped by day.
+
+    Deliberately identical in shape to service_times.describe(), because a
+    results list mixes both sources and "Sunday 11am" beside "Su 11am" reads as
+    two different kinds of fact rather than one fact from two places.
+    """
     slots = extract(text)
     if not slots:
         return ""
