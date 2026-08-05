@@ -113,6 +113,7 @@
     dom = {
       form: $('search-form'), input: $('location-input'), geolocate: $('geolocate-btn'),
       status: $('search-status'), layout: $('results-layout'), list: $('church-list'),
+      hero: $('hero'),
       detail: $('church-detail'), detailBody: $('detail-body'), detailBack: $('detail-back'),
       results: document.querySelector('.results'), mapPane: document.querySelector('.map-pane'),
       count: $('results-count'), loadMore: $('load-more'), sort: $('sort-select'),
@@ -474,8 +475,10 @@
     state.mode = 'state';
     state.origin = null;
     state.stateCode = entry.code;
-    state.sort = 'name';
-    dom.sort.value = 'name';
+    // Alphabetical over a whole state opens on "638" and "2nda Iglesia" and
+    // buries everything usable. Rank by what is known instead.
+    state.sort = 'complete';
+    dom.sort.value = 'complete';
     dom.radius.closest('.filter-block').hidden = true;   // meaningless for a whole state
 
     setStatus('Loading churches in ' + entry.name + '…');
@@ -560,6 +563,12 @@
   }
 
   function reveal() {
+    // The hero sells the site to someone who has just arrived. Once they have a
+    // list it is half a screen of nothing between them and what they came for,
+    // so it shrinks to the search box and stays out of the way. The box itself
+    // never goes: it is how you start the next search.
+    dom.hero.classList.add('is-compact');
+
     if (dom.layout.hidden) {
       dom.layout.hidden = false;
       ensureMap();

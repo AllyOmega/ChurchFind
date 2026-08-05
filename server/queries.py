@@ -19,8 +19,26 @@ CHURCH_COLUMNS = [
 
 SORTS = {
     "distance": "distance ASC, c.name ASC",
-    "name": "c.name ASC",
+    # Leading punctuation and quotes sort before letters, so a state browse
+    # opened with "(former) Church of the Immaculate Conception" above every
+    # real parish. ltrim takes a set of characters, not a prefix, so this
+    # strips any run of them. Mirrored in data.js -- the two backends must
+    # order identically.
+    "name": "ltrim(c.name, ' \"''(-.') COLLATE NOCASE ASC, c.name ASC",
     "denomination": "CASE WHEN c.denomination = '' THEN 1 ELSE 0 END, c.denomination ASC, c.name ASC",
+    # Browsing a whole state alphabetically is nobody's actual task -- it opens
+    # on "638" and "2nda Iglesia" and buries every record you could act on. This
+    # ranks by how much is known: an address you can drive to, a number you can
+    # ring, a site you can read, a time you can turn up for. Ties fall back to
+    # name so the order is stable. Mirrored in data.js.
+    "complete": (
+        "(CASE WHEN c.address <> '' THEN 3 ELSE 0 END + "
+        " CASE WHEN c.service_pairs <> '' THEN 3 ELSE 0 END + "
+        " CASE WHEN c.phone <> '' THEN 2 ELSE 0 END + "
+        " CASE WHEN c.website <> '' THEN 2 ELSE 0 END + "
+        " CASE WHEN c.denomination <> '' THEN 1 ELSE 0 END) DESC, "
+        "ltrim(c.name, ' \"''(-.') COLLATE NOCASE ASC"
+    ),
 }
 
 MAX_LIMIT = 200

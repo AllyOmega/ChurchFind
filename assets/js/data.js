@@ -390,6 +390,25 @@
     return hours.some(function (hour) { return pairs.indexOf('-' + hour) !== -1; });
   }
 
+  // Same character set as the SQL ltrim: space, double quote, apostrophe,
+  // opening bracket, hyphen, full stop.
+  var SORT_STRIP = /^[ "'(\-.]+/;
+
+  function sortName(name) {
+    return String(name || '').replace(SORT_STRIP, '').toLowerCase();
+  }
+
+  // Mirrors SORTS.complete in queries.py. The weights say what is worth most to
+  // somebody trying to attend: somewhere to go and a time to be there, then a
+  // way to make contact, then what kind of church it is.
+  function completeness(church) {
+    return (church.address ? 3 : 0) +
+           (church.service_pairs ? 3 : 0) +
+           (church.phone ? 2 : 0) +
+           (church.website ? 2 : 0) +
+           (church.denomination ? 1 : 0);
+  }
+
   function searchStatic(params) {
     var families = params.families || [];
     var denominations = params.denominations || [];
@@ -422,7 +441,18 @@
     var sort = params.sort || 'distance';
     if (!near && sort === 'distance') sort = 'name';
     matched.sort(function (a, b) {
-      if (sort === 'name') return a.name.localeCompare(b.name);
+      if (sort === 'complete') {
+        return completeness(b) - completeness(a) ||
+               sortName(a.name).localeCompare(sortName(b.name));
+      }
+      if (sort === 'name') {
+        // Mirrors the ltrim in queries.py SORTS.name. Leading punctuation sorts
+        // before letters, which put "(former) Church of the Immaculate
+        // Conception" at the top of a whole-state browse. Both backends must
+        // order identically, so this strips the same character set.
+        return sortName(a.name).localeCompare(sortName(b.name)) ||
+               a.name.localeCompare(b.name);
+      }
       if (sort === 'denomination') {
         var left = a.denomination || '￿';
         var right = b.denomination || '￿';

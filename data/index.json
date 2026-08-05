@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-02T19:27:01Z",
+  "generated_at": "2026-08-05T00:31:07Z",
   "osm_snapshot": "2026-08-02T19:20:58Z",
   "source": "OpenStreetMap via Overpass API",
   "license": "ODbL 1.0",
@@ -16,7 +16,7 @@
     },
     "methodist": {
       "label": "Methodist & Wesleyan",
-      "count": 15572
+      "count": 15591
     },
     "catholic": {
       "label": "Catholic",
@@ -40,7 +40,7 @@
     },
     "anglican": {
       "label": "Anglican & Episcopal",
-      "count": 2812
+      "count": 2793
     },
     "nondenominational": {
       "label": "Non-denominational",
@@ -67,11 +67,11 @@
     "anglican": [
       {
         "label": "Episcopal",
-        "count": 2302
+        "count": 2285
       },
       {
         "label": "Anglican",
-        "count": 510
+        "count": 508
       }
     ],
     "baptist": [
@@ -159,7 +159,7 @@
       },
       {
         "label": "African Methodist Episcopal",
-        "count": 495
+        "count": 509
       },
       {
         "label": "Church of the Nazarene",
@@ -167,7 +167,7 @@
       },
       {
         "label": "AME Zion",
-        "count": 383
+        "count": 384
       },
       {
         "label": "Wesleyan",
@@ -176,6 +176,10 @@
       {
         "label": "Free Methodist",
         "count": 30
+      },
+      {
+        "label": "Christian Methodist Episcopal",
+        "count": 4
       }
     ],
     "nondenominational": [

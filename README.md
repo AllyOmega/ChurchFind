@@ -29,14 +29,14 @@ Denominational families, largest first:
 |---|---:|---:|
 | Unspecified | 127,756 | 54.2% |
 | Baptist | 38,465 | 16.3% |
-| Methodist & Wesleyan | 15,572 | 6.6% |
+| Methodist & Wesleyan | 15,591 | 6.6% |
 | Catholic | 13,837 | 5.9% |
 | Lutheran | 9,028 | 3.8% |
 | Restorationist | 8,672 | 3.7% |
 | Presbyterian & Reformed | 7,325 | 3.1% |
 | Pentecostal & Charismatic | 4,787 | 2.0% |
 | Other | 2,828 | 1.2% |
-| Anglican & Episcopal | 2,812 | 1.2% |
+| Anglican & Episcopal | 2,793 | 1.2% |
 | Non-denominational | 2,089 | 0.9% |
 | Orthodox | 1,708 | 0.7% |
 | Anabaptist & Peace Churches | 788 | 0.3% |
@@ -778,7 +778,7 @@ scraper/test_prose_times.py    19 tests, several from real false positives
 scraper/churchmanship.py       the two-axis Anglican scorer, source merge, vote blend
 scraper/fetch_sites.py         robots-respecting fetch of Anglican parish websites
 scraper/fetch_wikipedia.py     Wikipedia extracts, joined exactly via OSM wiki tags
-scraper/test_churchmanship.py  21 tests over the scorer, several from measurements
+scraper/test_churchmanship.py  24 tests over the scorer and denomination correction
 scraper/validate.py            consistency checks over data/
 scraper/test_scrape.py         8 tests over index bookkeeping and resilience
 scraper/update_readme.py       regenerates the stats block in this file

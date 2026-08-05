@@ -5,16 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ChurchFind — Find a church near you</title>
 <meta name="description" content="Search more than a hundred thousand churches across the United States by location, denomination and distance. Open data from OpenStreetMap.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>⛪</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23faf8f5'/><g fill='none' stroke='%2333477f' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'><path d='M16 5.5v4.3M14.2 7.6h3.6'/><path d='M16 10.2 9.8 15.4v11.1h12.4V15.4L16 10.2Z'/><path d='M13.9 26.5v-4.4a2.1 2.1 0 0 1 4.2 0v4.4'/></g></svg>">
 <link rel="stylesheet" href="assets/vendor/leaflet/leaflet.css">
 <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
 
 <header class="masthead">
-  <a class="brand" href="./">
-    <span class="brand-mark" aria-hidden="true">⛪</span>
-    <span class="brand-text">Church<strong>Find</strong></span>
+  <!-- A drawn mark rather than the ⛪ emoji, and one weight rather than
+       Church<strong>Find</strong>. An emoji logo and a two-tone wordmark are
+       both stock-template shorthand; a plain steeple in a circle is a mark
+       somebody chose. Inline so it inherits currentColor in both themes. -->
+  <a class="brand" href="./" aria-label="ChurchFind — home">
+    <svg class="brand-mark" viewBox="0 0 32 32" width="30" height="30" aria-hidden="true"
+         fill="none" stroke="currentColor" stroke-width="1.5"
+         stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="16" cy="16" r="14.4" stroke-width="1.1" opacity=".45"/>
+      <path d="M16 6.2v4.1M14.3 8.2h3.4"/>
+      <path d="M16 10.6 10.6 15v9.4h10.8V15L16 10.6Z"/>
+      <path d="M14.2 24.4v-4a1.8 1.8 0 0 1 3.6 0v4"/>
+    </svg>
+    <span class="brand-text">ChurchFind</span>
   </a>
   <nav class="masthead-nav">
     <a href="#browse">Browse by state</a>
@@ -28,7 +39,10 @@
 
 <p class="mode-note" id="mode-note" hidden></p>
 
-<section class="hero">
+<!-- `is-compact` is set once a search has results. The pitch is for someone who
+     has just arrived; once they have a list it is 500px of nothing between them
+     and what they came for. -->
+<section class="hero" id="hero">
   <div class="hero-inner">
     <h1>Find a church near you</h1>
     <p class="hero-sub">
@@ -141,6 +155,7 @@
         Sort
         <select id="sort-select">
           <option value="distance">Nearest first</option>
+          <option value="complete">Most detail known</option>
           <option value="name">Name A–Z</option>
           <option value="denomination">Denomination</option>
         </select>

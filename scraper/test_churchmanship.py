@@ -209,3 +209,40 @@ def test_informality_still_counts_when_it_describes_the_worship():
         result = cm.score(text)
         assert result is not None, text
         assert result["ceremonial"] < 0, text
+
+
+# -- denomination correction ---------------------------------------------------
+
+def test_african_methodist_episcopal_is_not_anglican():
+    """OSM tags these `denomination=Episcopal` because the word is in their name.
+    Nineteen of them were sitting in the Anglican family, inflating its count and
+    eligible to be handed an Anglican churchmanship reading -- a straightforwardly
+    wrong thing to say about a Methodist congregation."""
+    import normalize
+
+    for name in ("Allen Chapel African Methodist Episcopal Church",
+                 "First African Methodist Episcopal Church",
+                 "Christian Methodist Episcopal Church"):
+        label, family = normalize._correct_from_name(name, "Episcopal", "anglican")
+        assert family == "methodist", name
+        assert "Methodist" in label
+
+
+def test_ame_zion_keeps_its_own_label():
+    import normalize
+
+    label, family = normalize._correct_from_name(
+        "Mount Zion A.M.E. Zion Church", "Episcopal", "anglican")
+    assert (label, family) == ("AME Zion", "methodist")
+
+
+def test_a_real_episcopal_parish_is_left_alone():
+    """The correction must not catch parishes that merely have "Methodist"
+    somewhere nearby, or every St Paul's would be reclassified."""
+    import normalize
+
+    for name in ("Saint Paul's Episcopal Church",
+                 "Christ Church Episcopal",
+                 "Church of the Resurrection"):
+        assert normalize._correct_from_name(name, "Episcopal", "anglican") == \
+            ("Episcopal", "anglican"), name

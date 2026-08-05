@@ -19,6 +19,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scraper"))
 
 import churchmanship  # noqa: E402
+import normalize  # noqa: E402
 import service_times  # noqa: E402
 from db import connect, init_schema  # noqa: E402
 
@@ -63,9 +64,19 @@ def load_state(path):
     if missing:
         raise SystemExit(f"{path.name} is missing column(s): {', '.join(missing)}")
 
+    name_at = COLUMNS.index("name")
+    denom_at = COLUMNS.index("denomination")
+    family_at = COLUMNS.index("family")
+
     for row in payload["churches"]:
         values = [row[position[column]] if column in position else ""
                   for column in COLUMNS]
+
+        # Applied here as well as in the scraper so a correction lands on the
+        # next build rather than waiting on a 45-minute re-scrape of 51 states.
+        # It is the scraper's rule, called rather than restated.
+        values[denom_at], values[family_at] = normalize._correct_from_name(
+            values[name_at], values[denom_at], values[family_at])
         raw_services = values[COLUMNS.index("services")]
         pairs = service_times.to_pairs(raw_services)
         yield tuple(values) + (
