@@ -75,6 +75,7 @@ _ADDED_CHURCH_COLUMNS = [
     ("service_pairs", "TEXT NOT NULL DEFAULT ''"),
     ("service_text", "TEXT NOT NULL DEFAULT ''"),
     ("service_source", "TEXT NOT NULL DEFAULT ''"),
+    ("service_checked", "TEXT NOT NULL DEFAULT ''"),
 ]
 
 

@@ -419,6 +419,13 @@ out of auditing it against real pages, each now a regression test:
 - **`service\b` never matching "services"** — no word boundary between the "e"
   and the "s" — which silently suppressed one of the commonest phrasings there is.
 
+**Every time carries a date as well as a source.** A scraped schedule goes stale
+the first time a parish changes its summer hours without telling anyone, so the
+fetch date travels with the time: "from the parish website, checked 3 days ago",
+and past six months it stops claiming to be current and says how long ago it was
+read. Nothing is hidden — a stale time is still the best guess available — but it
+stops being presented as fact.
+
 **Every time carries its source.** OSM wins wherever it has a `service_times`
 tag: that is an explicit statement of exactly this fact. The website reading fills
 the silence and says so, on the card and again on the church page, where it adds
@@ -446,6 +453,19 @@ that already happened, for the annual Parochial Report, behind a login.
 Structured data on parish sites is thinner than it looks. Of 31 live sites
 sampled, 58% carry JSON-LD but only four had `openingHours` and one an `Event` —
 the rest is Squarespace and Wix boilerplate.
+
+### Filtering by churchmanship
+
+The axes are stored, so "high-church parishes within 20 miles" is now a filter — four
+bands, shown only when the Anglican family is selected, because the concept means
+nothing for a Baptist chapel.
+
+The reason it took this long is that 422 of 2,793 Anglican parishes have a reading, so
+the filter necessarily hides most of them. A filter that silently discards five sixths
+of the candidates is worse than no filter, because it looks like an answer. So the panel
+says what it is doing — "only parishes with a churchmanship reading can match; most have
+none, and those are hidden while this is on" — and an unrated parish never matches a
+band in either backend, which is a test rather than a hope.
 
 Which leaves the ceiling around 20–25% from OSM plus websites, or perhaps 35–45%
 if the Asset Map were used as a roster to widen the pool of known parish sites.
@@ -742,10 +762,10 @@ Ordered by what the data already supports.
 - **Claimed listings** — let a congregation verify itself and correct its own entry,
   with changes pushed back to OpenStreetMap so everyone downstream benefits.
 - **"New near home"** — a monthly digest, which needs the email path above first.
-- **Churchmanship as a filter, not just a label.** The axes exist and are stored; what
-  is missing is "show me high-church parishes within 20 miles". That wants enough
-  coverage to be worth offering — right now most Anglican parishes have no score at
-  all, and a filter that silently drops the unknowns would be worse than none.
+- **A confirmation loop for service times.** The dates are recorded and shown; what is
+  missing is a signed-in "still correct?" that resets the clock. That is what makes
+  Masstimes a live directory rather than a snapshot, and it needs the API hosted
+  somewhere.
 
 One I would still push back on: **attendance or "popularity" figures** are not in
 the data and cannot be estimated from it honestly.
@@ -789,7 +809,7 @@ server/queries.py              church search: R*Tree radius, FTS5 names
 server/auth.py                 argon2id, sessions, CSRF, throttling
 server/moderation.py           review moderation with Claude, fail-closed
 server/app.py                  FastAPI routes and the static host
-server/test_api.py             80 tests over the API, weighted to the security-critical parts
+server/test_api.py             83 tests over the API, weighted to the security-critical parts
 server/test_moderation.py      24 tests over moderation, with the Claude call stubbed
 data/churchmanship.json        churchmanship from parish websites
 data/churchmanship-wikipedia.json  churchmanship from Wikipedia

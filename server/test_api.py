@@ -835,3 +835,58 @@ def test_every_static_reading_carries_its_provenance():
         assert reading["source"], f"{church_id} has a reading with no source"
         assert reading["confidence"] > 0, f"{church_id} has a reading with no confidence"
         assert reading["evidence"], f"{church_id} has a reading with no evidence"
+
+
+# ---------------------------------------------------- churchmanship filtering
+
+@pytest.fixture
+def rated_churches(client):
+    """Two Anglican parishes with opposite readings, plus one with none."""
+    connection = app_module._connection
+    connection.executemany(
+        "INSERT OR REPLACE INTO churches "
+        "(id, name, denomination, family, state, lat, lon) VALUES (?,?,?,?,?,?,?)",
+        [("cm1", "Saint Mary the Virgin", "Episcopal", "anglican", "CO", 39.74, -104.98),
+         ("cm2", "Christ Church Plain", "Episcopal", "anglican", "CO", 39.75, -104.99),
+         ("cm3", "Saint Nobody", "Episcopal", "anglican", "CO", 39.76, -104.97)],
+    )
+    connection.executemany(
+        "INSERT OR REPLACE INTO churchmanship "
+        "(church_id, ceremonial, theology, confidence) VALUES (?,?,?,?)",
+        [("cm1", 0.8, 0.7, 0.5), ("cm2", -0.8, -0.7, 0.5)],
+    )
+    connection.commit()
+    yield
+    connection.execute("DELETE FROM churchmanship WHERE church_id IN ('cm1','cm2')")
+    connection.execute("DELETE FROM churches WHERE id IN ('cm1','cm2','cm3')")
+    connection.commit()
+
+
+def test_churchmanship_bands_select_the_right_parishes(client, rated_churches):
+    high = client.get("/api/churches", params={"state": "CO", "churchmanship": "high"}).json()
+    assert [c["id"] for c in high["results"]] == ["cm1"]
+
+    low = client.get("/api/churches", params={"state": "CO", "churchmanship": "low"}).json()
+    assert [c["id"] for c in low["results"]] == ["cm2"]
+
+    both = client.get("/api/churches",
+                      params={"state": "CO", "churchmanship": "high,low"}).json()
+    assert {c["id"] for c in both["results"]} == {"cm1", "cm2"}
+
+
+def test_an_unrated_parish_never_matches_a_band(client, rated_churches):
+    """There is nothing to compare it against. This is why the UI has to say how
+    many parishes a band filter is hiding -- silently dropping five in six looks
+    like an answer."""
+    for band in ("high", "low", "catholic", "evangelical"):
+        body = client.get("/api/churches",
+                          params={"state": "CO", "churchmanship": band}).json()
+        assert "cm3" not in [c["id"] for c in body["results"]], band
+
+
+def test_an_unknown_band_is_ignored_rather_than_matching_everything(client, rated_churches):
+    """A typo must not silently turn the filter off and return the whole state."""
+    unfiltered = client.get("/api/churches", params={"state": "CO"}).json()["total"]
+    bogus = client.get("/api/churches",
+                       params={"state": "CO", "churchmanship": "sideways"}).json()
+    assert bogus["total"] == unfiltered

@@ -22,6 +22,7 @@ Usage:
 """
 
 import argparse
+import datetime
 import hashlib
 import json
 import re
@@ -194,6 +195,11 @@ def gather(church_id, url, refresh=False):
     if path.exists() and not refresh:
         try:
             record = json.loads(path.read_text())
+            # Entries written before fetch dates were recorded: the cache file's
+            # mtime is exactly when it was fetched, so it is not a guess.
+            if not record.get("fetched"):
+                record["fetched"] = datetime.date.fromtimestamp(
+                    path.stat().st_mtime).isoformat()
             if record.get("text"):
                 result = churchmanship.score(record["text"], source="website")
                 record["score"] = result
@@ -224,6 +230,11 @@ def gather(church_id, url, refresh=False):
             result = churchmanship.score(text, source="website")
             record = {"id": church_id, "url": url,
                       "status": "scored" if result else "no-signal",
+                      # When this page was read. A service time with no date on
+                      # it cannot be judged stale, and a scraped schedule goes
+                      # out of date the first time a parish changes its summer
+                      # hours without telling anyone.
+                      "fetched": datetime.date.today().isoformat(),
                       # Kept so a lexicon change is a rescore, not a re-crawl.
                       "text": text[:200_000],
                       "score": result,
@@ -267,7 +278,8 @@ def main():
         elif position % 25 == 0:
             print(f"  [{position}/{len(rows)}] ...", flush=True)
         if record.get("times"):
-            times[row["id"]] = {"pairs": record["times"], "text": record["times_text"]}
+            times[row["id"]] = {"pairs": record["times"], "text": record["times_text"],
+                                "fetched": record.get("fetched", "")}
         time.sleep(POLITE_GAP)
 
     OUTPUT.write_text(json.dumps({"scores": scores}, indent=1, sort_keys=True))

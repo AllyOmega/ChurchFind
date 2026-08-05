@@ -32,7 +32,8 @@
       wheelchair: false,
       hearingLoop: false,
       serviceDays: [],
-      servicePeriods: []
+      servicePeriods: [],
+      churchmanship: []
     },
     sort: 'distance'
   };
@@ -126,6 +127,8 @@
       website: $('filter-website'), phone: $('filter-phone'),
       services: $('filter-services'), wheelchair: $('filter-wheelchair'),
       hearing: $('filter-hearing'), serviceBlock: $('service-block'),
+      cmBlock: $('churchmanship-block'), cmChips: $('churchmanship-chips'),
+      cmNote: $('churchmanship-note'),
       serviceDays: $('service-day-chips'), servicePeriods: $('service-period-chips'),
       serviceNote: $('service-note'),
       stateGrid: $('state-grid'), aboutStats: $('about-stats'),
@@ -310,6 +313,61 @@
   /* Only 3% of churches have a service time recorded, so the panel says so
      rather than letting someone filter to almost nothing and conclude the site
      is broken. */
+  /* Churchmanship bands. Offered only when the Anglican family is selected --
+     the concept does not apply to a Baptist chapel, and a filter that appears
+     everywhere invites people to use it where it means nothing.
+
+     422 of 2,793 Anglican parishes have a reading, so this hides most of them.
+     The note says exactly how many rather than letting the count quietly drop:
+     a filter that silently discards five sixths of the candidates is worse than
+     no filter, because it looks like an answer. */
+  var CHURCHMANSHIP_BANDS = [
+    { key: 'high',        label: 'High church' },
+    { key: 'low',         label: 'Low church' },
+    { key: 'catholic',    label: 'Anglo-Catholic' },
+    { key: 'evangelical', label: 'Evangelical' }
+  ];
+
+  function renderChurchmanshipFilter() {
+    var anglicanSelected = state.filters.families.indexOf('anglican') !== -1;
+    dom.cmBlock.hidden = !anglicanSelected;
+    if (!anglicanSelected) {
+      if (state.filters.churchmanship.length) {
+        state.filters.churchmanship = [];
+        return true;                       // caller must re-run
+      }
+      return false;
+    }
+
+    if (!dom.cmChips.childNodes.length) {
+      CHURCHMANSHIP_BANDS.forEach(function (band) {
+        var chip = el('button', {
+          type: 'button', class: 'chip', 'aria-pressed': 'false', text: band.label
+        });
+        chip.addEventListener('click', function () {
+          var chosen = state.filters.churchmanship;
+          var at = chosen.indexOf(band.key);
+          if (at === -1) chosen.push(band.key); else chosen.splice(at, 1);
+          chip.classList.toggle('is-on');
+          chip.setAttribute('aria-pressed', at === -1 ? 'true' : 'false');
+          rerun();
+        });
+        dom.cmChips.appendChild(chip);
+      });
+    }
+    updateChurchmanshipNote();
+    return false;
+  }
+
+  function updateChurchmanshipNote() {
+    if (!dom.cmNote) return;
+    dom.cmNote.textContent = state.filters.churchmanship.length
+      ? 'Only parishes with a churchmanship reading can match — most have none, ' +
+        'and those are hidden while this is on.'
+      : 'Readings come from parish websites and Wikipedia. Around one Anglican ' +
+        'parish in six has one.';
+  }
+
   function renderServiceFilters(meta) {
     dom.serviceBlock.hidden = false;
 
@@ -506,6 +564,7 @@
       hasServices: filters.hasServices, wheelchair: filters.wheelchair,
       hearingLoop: filters.hearingLoop,
       serviceDays: filters.serviceDays, servicePeriods: filters.servicePeriods,
+      churchmanship: filters.churchmanship,
       sort: state.sort, limit: PAGE_SIZE, offset: offset || 0
     };
     if (state.mode === 'near' && state.origin) {
@@ -533,6 +592,7 @@
 
   function rerun() {
     updateFilterToggleText();
+    updateChurchmanshipNote();
     // Changing a filter is a request to see the search, not the church that
     // happens to be open. 'replace' rather than 'push' because closing as a
     // side effect of a filter change is not a navigation worth a Back stop.
@@ -595,6 +655,9 @@
       return familyOf(label) === null || state.filters.families.indexOf(familyOf(label)) !== -1;
     });
     renderDenominationOptions();
+    // Deselecting Anglican has to clear any band still chosen, or the filter
+    // stays applied from a panel nobody can see.
+    renderChurchmanshipFilter();
     rerun();
   }
 
@@ -719,7 +782,7 @@
     state.filters = {
       radius: 25, name: '', families: [], denominations: [],
       hasWebsite: false, hasPhone: false, hasServices: false, wheelchair: false,
-      hearingLoop: false, serviceDays: [], servicePeriods: []
+      hearingLoop: false, serviceDays: [], servicePeriods: [], churchmanship: []
     };
     dom.radius.value = 25;
     dom.radiusOut.textContent = '25';
@@ -862,7 +925,10 @@
       meta.push(el('p', { class: 'services' }, [
         'Services: ' + (church.service_text || church.services),
         church.service_source === 'website'
-          ? el('span', { class: 'source-note', text: ' — from the parish website' })
+          ? el('span', {
+              class: 'source-note' + (serviceIsStale(church) ? ' is-stale' : ''),
+              text: ' — ' + serviceProvenance(church)
+            })
           : null
       ]));
     }
@@ -1039,7 +1105,8 @@
       detailRow('Denomination', church.denomination || 'Not recorded'),
       detailRow('Services', church.service_text || church.services || church.hours || '',
                 church.service_source === 'website'
-                  ? 'Read from the parish website — check with them before travelling.'
+                  ? capitalise(serviceProvenance(church)) +
+                    '. Check with them before travelling.'
                   : church.service_source === 'osm'
                     ? 'From an OpenStreetMap service_times tag.' : ''),
       detailRow('Accessibility', accessibilityText(church)),
@@ -1067,6 +1134,47 @@
                 text: 'OpenStreetMap' }),
       ', which anyone can correct.'
     ]));
+  }
+
+  /* A scraped service time is only as good as the day it was read. Past this
+     many months a parish has had a summer schedule, a Christmas, and possibly a
+     new priest, so the note stops saying "from the website" and starts saying
+     how long ago. Nothing is hidden -- a stale time is still the best guess
+     available -- but it stops being presented as current fact. */
+  var STALE_AFTER_DAYS = 180;
+
+  function serviceAgeDays(church) {
+    if (!church.service_checked) return null;
+    var when = Date.parse(church.service_checked + 'T00:00:00Z');
+    if (isNaN(when)) return null;
+    return Math.floor((Date.now() - when) / 86400000);
+  }
+
+  function serviceIsStale(church) {
+    var days = serviceAgeDays(church);
+    return days !== null && days > STALE_AFTER_DAYS;
+  }
+
+  function serviceProvenance(church) {
+    var days = serviceAgeDays(church);
+    if (days === null) return 'from the parish website';
+    if (days > STALE_AFTER_DAYS) {
+      var months = Math.round(days / 30);
+      return 'read from the parish website ' +
+             (months >= 12 ? 'over a year ago' : months + ' months ago');
+    }
+    return 'from the parish website, checked ' + relativeDate(days);
+  }
+
+  function relativeDate(days) {
+    if (days <= 1) return 'today';
+    if (days < 14) return days + ' days ago';
+    if (days < 60) return Math.round(days / 7) + ' weeks ago';
+    return Math.round(days / 30) + ' months ago';
+  }
+
+  function capitalise(text) {
+    return text.charAt(0).toUpperCase() + text.slice(1);
   }
 
   function accessibilityText(church) {

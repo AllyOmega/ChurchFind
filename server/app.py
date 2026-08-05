@@ -34,6 +34,11 @@ from states import STATE_NAMES  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 
+# The four churchmanship bands the filter offers, as query values. Kept here
+# rather than derived from the axes so an unknown value is rejected outright
+# instead of quietly matching nothing.
+CHURCHMANSHIP_BANDS = ("high", "low", "catholic", "evangelical")
+
 # OSM's public tiles are fine for local use but their usage policy rules out
 # real traffic -- point this at your own tile server or a commercial provider
 # before deploying. The CSP below is derived from it, so overriding the URL is
@@ -291,6 +296,7 @@ def search_churches(
     hearing_loop: bool = False,
     service_days: str = None,
     service_periods: str = None,
+    churchmanship: str = None,
     sort: str = "distance",
     limit: int = 50,
     offset: int = 0,
@@ -314,6 +320,8 @@ def search_churches(
         "hearing_loop": hearing_loop,
         "service_days": [d for d in (service_days or "").split(",") if d.isdigit() and 0 <= int(d) <= 6],
         "service_periods": [p for p in (service_periods or "").split(",") if p in SERVICE_PERIODS],
+        "churchmanship": [b for b in (churchmanship or "").split(",")
+                          if b in CHURCHMANSHIP_BANDS],
         "sort": sort, "limit": limit, "offset": offset,
     })
 

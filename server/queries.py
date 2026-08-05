@@ -14,7 +14,7 @@ CHURCH_COLUMNS = [
     "id", "name", "denomination", "family", "address", "city", "state",
     "postcode", "lat", "lon", "website", "phone", "email", "services",
     "hours", "wheelchair", "hearing_loop", "toilets_wheelchair", "updated",
-    "wikipedia", "wikidata", "service_pairs", "service_text", "service_source",
+    "wikipedia", "wikidata", "service_pairs", "service_text", "service_source", "service_checked",
 ]
 
 SORTS = {
@@ -93,6 +93,26 @@ def _filter_clauses(params):
 
     if params.get("hearing_loop"):
         clauses.append("c.hearing_loop = 'yes'")
+
+    # Churchmanship bands. Only 422 of 2,793 Anglican parishes have a reading, so
+    # this necessarily hides the rest -- the UI says how many, because a filter
+    # that silently drops five sixths of the candidates is worse than no filter.
+    bands = params.get("churchmanship") or []
+    if bands:
+        parts = []
+        for band in bands:
+            if band == "high":
+                parts.append("m.ceremonial >= 0.2")
+            elif band == "low":
+                parts.append("m.ceremonial <= -0.2")
+            elif band == "catholic":
+                parts.append("m.theology >= 0.2")
+            elif band == "evangelical":
+                parts.append("m.theology <= -0.2")
+        if parts:
+            clauses.append(
+                "c.id IN (SELECT church_id FROM churchmanship m WHERE ("
+                + " OR ".join(parts) + ") AND m.confidence > 0)")
 
     # Service-time search over the ",D-HHMM," pairs. Selecting a day AND a
     # period asks for a service at that time *on that day* -- matching them

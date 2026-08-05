@@ -183,9 +183,9 @@ def load_web_service_times(connection, cursor):
             continue
         cursor.execute(
             "UPDATE churches SET service_pairs = ?, service_text = ?, "
-            "service_source = 'website' "
+            "service_source = 'website', service_checked = ? "
             "WHERE id = ? AND service_pairs = ''",
-            (pairs, entry.get("text", ""), church_id),
+            (pairs, entry.get("text", ""), entry.get("fetched", ""), church_id),
         )
         applied += cursor.rowcount
     connection.commit()
@@ -304,13 +304,14 @@ def write_static_service_times(connection):
     serves, from the same build.
     """
     rows = connection.execute(
-        "SELECT id, service_pairs, service_text, service_source FROM churches "
-        "WHERE service_pairs <> ''"
+        "SELECT id, service_pairs, service_text, service_source, service_checked "
+        "FROM churches WHERE service_pairs <> ''"
     ).fetchall()
     times = {
         row["id"]: {"pairs": row["service_pairs"],
                     "text": row["service_text"],
-                    "source": row["service_source"] or "osm"}
+                    "source": row["service_source"] or "osm",
+                    "checked": row["service_checked"]}
         for row in rows
     }
     STATIC_TIMES_PATH.write_text(json.dumps({"times": times}, separators=(",", ":"),

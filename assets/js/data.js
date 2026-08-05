@@ -342,6 +342,9 @@
     if (params.servicePeriods && params.servicePeriods.length) {
       query.set('service_periods', params.servicePeriods.join(','));
     }
+    if (params.churchmanship && params.churchmanship.length) {
+      query.set('churchmanship', params.churchmanship.join(','));
+    }
     ['hasWebsite', 'hasPhone', 'hasServices', 'wheelchair', 'hearingLoop'].forEach(function (key) {
       if (params[key]) query.set(key.replace(/[A-Z]/g, function (c) { return '_' + c.toLowerCase(); }), 'true');
     });
@@ -409,6 +412,22 @@
            (church.denomination ? 1 : 0);
   }
 
+  /* Mirrors the churchmanship clause in queries.py. A parish with no reading
+     cannot match any band -- there is nothing to compare -- which is why the UI
+     has to say how many are being hidden. */
+  function matchesChurchmanship(church, params) {
+    var bands = params.churchmanship || [];
+    if (!bands.length) return true;
+    if (!church.cm_confidence) return false;
+    return bands.some(function (band) {
+      if (band === 'high') return church.cm_ceremonial >= 0.2;
+      if (band === 'low') return church.cm_ceremonial <= -0.2;
+      if (band === 'catholic') return church.cm_theology >= 0.2;
+      if (band === 'evangelical') return church.cm_theology <= -0.2;
+      return false;
+    });
+  }
+
   function searchStatic(params) {
     var families = params.families || [];
     var denominations = params.denominations || [];
@@ -429,6 +448,7 @@
       if (params.wheelchair && church.wheelchair !== 'yes') continue;
       if (params.hearingLoop && church.hearing_loop !== 'yes') continue;
       if (!matchesServiceTimes(church, params)) continue;
+      if (!matchesChurchmanship(church, params)) continue;
 
       var distance = near ? haversine(params.lat, params.lon, church.lat, church.lon) : null;
       if (near && distance > params.radius) continue;

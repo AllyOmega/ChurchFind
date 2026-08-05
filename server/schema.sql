@@ -43,7 +43,11 @@ CREATE TABLE IF NOT EXISTS churches (
   -- Where the times came from: 'osm' (a service_times tag) or 'website' (read
   -- off the parish's own page). A time nobody can trace is a time nobody can
   -- correct, and turning up to a locked door is the cost of getting it wrong.
-  service_source TEXT NOT NULL DEFAULT ''
+  service_source TEXT NOT NULL DEFAULT '',
+  -- When a website-derived time was read, YYYY-MM-DD. A scraped schedule goes
+  -- stale the first time a parish changes its summer hours without telling
+  -- anyone, and a time with no date on it cannot be judged at all.
+  service_checked TEXT NOT NULL DEFAULT ''
 );
 
 CREATE INDEX IF NOT EXISTS idx_churches_state  ON churches(state);
