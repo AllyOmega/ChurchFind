@@ -1,0 +1,10 @@
+# Runtime only. The scraper and the database build need nothing but the standard
+# library, which is why neither appears here.
+#
+# Pinned to the versions the test suite actually runs against. An earlier draft
+# of this file carried plausible-looking pins written from memory, several minor
+# versions behind what was installed and never once exercised -- a pin you have
+# not run is a guess with extra confidence.
+fastapi==0.141.1
+uvicorn[standard]==0.52.1
+argon2-cffi==25.1.0

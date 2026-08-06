@@ -86,45 +86,97 @@ def load_state(path):
         )
 
 
-def rebuild(connection):
-    cursor = connection.cursor()
+def rebuild(connection, force=False):
+    """Refresh the church rows in place, keeping everything users have added.
 
-    # Order matters: saved_churches and correction_reports point at churches, so
-    # the delete has to be a replace-in-place rather than a drop.
-    #
-    # churches_fts is external-content FTS5 -- a plain DELETE makes it read the
-    # content table to work out which terms to remove, and reports "database disk
-    # image is malformed" the moment the two disagree. 'delete-all' is the
-    # documented way to empty one.
-    cursor.execute("INSERT INTO churches_fts(churches_fts) VALUES('delete-all')")
-    cursor.execute("DELETE FROM churches_geo")
-    cursor.execute("DELETE FROM churches")
+    This used to `DELETE FROM churches` and re-insert. Every user table has a
+    foreign key into churches with ON DELETE CASCADE, so the delete silently took
+    every saved church, every review and every churchmanship vote with it -- on
+    every rebuild, including the monthly refresh workflow. The `users` row
+    survived, which is why the old summary line claiming accounts were untouched
+    was the most misleading thing in the file.
+
+    So: load the new snapshot into a temp table, upsert it over the top, and
+    delete only the churches that are genuinely gone from OpenStreetMap. A parish
+    that still exists keeps its id, and everything attached to that id survives.
+    """
+    cursor = connection.cursor()
 
     all_columns = COLUMNS + DERIVED
     placeholders = ",".join("?" * len(all_columns))
-    # OR IGNORE, not a plain INSERT: a church sitting on a state line comes back
-    # from both states' Overpass queries, so the same OSM id appears in two
-    # files. First file wins -- the rows are identical anyway.
-    insert = f"INSERT OR IGNORE INTO churches ({','.join(all_columns)}) VALUES ({placeholders})"
+    cursor.execute("DROP TABLE IF EXISTS incoming")
+    cursor.execute(f"CREATE TEMP TABLE incoming ({','.join(c + ' TEXT' for c in all_columns)})")
+    insert = f"INSERT INTO incoming ({','.join(all_columns)}) VALUES ({placeholders})"
 
     total = 0
     seen = set()
     duplicates = []
     for path in sorted(STATE_DIR.glob("*.json")):
-        rows = list(load_state(path))
+        rows = [r for r in load_state(path)]
+        fresh = []
         for row in rows:
             if row[0] in seen:
                 duplicates.append((row[0], row[1], path.stem))
+                continue
             seen.add(row[0])
-        cursor.executemany(insert, rows)
-        total += len(rows)
-        print(f"  {path.stem}: {len(rows):,}", flush=True)
+            fresh.append(row)
+        cursor.executemany(insert, fresh)
+        total += len(fresh)
+        print(f"  {path.stem}: {len(fresh):,}", flush=True)
 
     if duplicates:
         print(f"\n  {len(duplicates)} border church(es) skipped as duplicates:")
         for church_id, name, state in duplicates[:10]:
             print(f"    {church_id} {name} (also in {state})")
-    total -= len(duplicates)
+
+    existing = cursor.execute("SELECT COUNT(*) FROM churches").fetchone()[0]
+
+    # A truncated scrape must not be able to empty the country and take every
+    # review with it. Overpass has spent this week returning 504s; a run that
+    # lost half its states should stop, not quietly delete the difference.
+    if existing and total < existing * 0.5 and not force:
+        raise SystemExit(
+            f"Refusing to rebuild: the new snapshot has {total:,} churches against "
+            f"{existing:,} already loaded. That would delete "
+            f"{existing - total:,} rows and any user data attached to them. "
+            f"Re-run the scrape, or pass --force if the drop is real."
+        )
+
+    updates = ", ".join(f"{c} = excluded.{c}" for c in all_columns if c != "id")
+    cursor.execute(
+        f"INSERT INTO churches ({','.join(all_columns)}) "
+        # `WHERE true` is not filler. With INSERT ... SELECT the parser cannot
+        # tell whether ON CONFLICT belongs to the SELECT or the upsert, and
+        # errors with "near DO: syntax error"; a WHERE clause disambiguates it.
+        # This is called out in the SQLite upsert documentation.
+        f"SELECT {','.join(all_columns)} FROM incoming WHERE true "
+        f"ON CONFLICT(id) DO UPDATE SET {updates}"
+    )
+
+    # Only now, and only the ones actually gone. Report what goes with them so a
+    # disappearing parish is never a silent loss of somebody's saved list.
+    gone = cursor.execute(
+        "SELECT COUNT(*) FROM churches WHERE id NOT IN (SELECT id FROM incoming)"
+    ).fetchone()[0]
+    if gone:
+        attached = cursor.execute(
+            "SELECT (SELECT COUNT(*) FROM saved_churches WHERE church_id NOT IN "
+            "  (SELECT id FROM incoming)) + "
+            "(SELECT COUNT(*) FROM reviews WHERE church_id NOT IN "
+            "  (SELECT id FROM incoming)) + "
+            "(SELECT COUNT(*) FROM churchmanship_votes WHERE church_id NOT IN "
+            "  (SELECT id FROM incoming))"
+        ).fetchone()[0]
+        print(f"\n  {gone:,} church(es) no longer in OpenStreetMap; removing them"
+              + (f" and {attached:,} attached user record(s)" if attached else ""))
+        cursor.execute("DELETE FROM churches WHERE id NOT IN (SELECT id FROM incoming)")
+
+    cursor.execute("DROP TABLE incoming")
+
+    # Both derived indexes are rebuilt wholesale -- they hold no user data, and
+    # regenerating them from the content table is the only way FTS5 cannot drift.
+    cursor.execute("INSERT INTO churches_fts(churches_fts) VALUES('delete-all')")
+    cursor.execute("DELETE FROM churches_geo")
 
     # Degenerate boxes -- a point is a box with min == max.
     cursor.execute("""
@@ -368,6 +420,8 @@ def write_static_churchmanship():
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--db", help="database file (default: server/churchfind.db)")
+    parser.add_argument("--force", action="store_true",
+                        help="rebuild even if the snapshot is much smaller than what is loaded")
     args = parser.parse_args()
 
     if not STATE_DIR.exists():
@@ -377,12 +431,16 @@ def main():
     init_schema(connection)
 
     print("Loading state files...")
-    total = rebuild(connection)
+    total = rebuild(connection, force=args.force)
     write_static_churchmanship()
     write_static_service_times(connection)
 
     users = connection.execute("SELECT COUNT(*) FROM users").fetchone()[0]
-    print(f"\nLoaded {total:,} churches. {users} account(s) left untouched.")
+    kept = connection.execute(
+        "SELECT (SELECT COUNT(*) FROM saved_churches) + (SELECT COUNT(*) FROM reviews) "
+        "+ (SELECT COUNT(*) FROM churchmanship_votes)").fetchone()[0]
+    print(f"\nLoaded {total:,} churches. "
+          f"{users} account(s) and {kept:,} user record(s) preserved.")
     print(f"Database: {connection.execute('PRAGMA database_list').fetchone()[2]}")
     connection.close()
     return 0

@@ -890,3 +890,108 @@ def test_an_unknown_band_is_ignored_rather_than_matching_everything(client, rate
     bogus = client.get("/api/churches",
                        params={"state": "CO", "churchmanship": "sideways"}).json()
     assert bogus["total"] == unfiltered
+
+
+# --------------------------------------------------- rebuild preserves user data
+
+def test_a_rebuild_does_not_destroy_user_contributions(tmp_path, monkeypatch):
+    """The bug this exists to prevent, and it was live.
+
+    Every user table has a foreign key into churches with ON DELETE CASCADE, and
+    rebuild() opened with `DELETE FROM churches`. So every refresh -- including
+    the monthly workflow -- silently deleted every saved church, every review and
+    every churchmanship vote. The `users` row survived, which is why the summary
+    line claiming accounts were untouched read as reassuring.
+    """
+    import build_db
+    import db as db_module
+
+    state_dir = tmp_path / "states"
+    state_dir.mkdir()
+    fields = build_db.COLUMNS
+    def row(church_id, name):
+        values = {"id": church_id, "name": name, "family": "anglican",
+                  "state": "CO", "lat": 39.7, "lon": -104.9}
+        return [values.get(f, "") for f in fields]
+
+    (state_dir / "CO.json").write_text(json.dumps({
+        "state": "CO", "fields": fields,
+        "churches": [row("keep1", "Saint Kept"), row("keep2", "Saint Also Kept")],
+    }))
+    monkeypatch.setattr(build_db, "STATE_DIR", state_dir)
+    monkeypatch.setattr(build_db, "INDEX_PATH", tmp_path / "missing.json")
+    monkeypatch.setattr(build_db, "WEB_TIMES_PATH", tmp_path / "missing.json")
+    monkeypatch.setattr(build_db, "CHURCHMANSHIP_PATH", tmp_path / "missing.json")
+    monkeypatch.setattr(build_db, "CHURCHMANSHIP_WIKI_PATH", tmp_path / "missing.json")
+    monkeypatch.setattr(build_db, "STATIC_CHURCHMANSHIP_PATH", tmp_path / "cm.json")
+    monkeypatch.setattr(build_db, "STATIC_TIMES_PATH", tmp_path / "st.json")
+
+    connection = db_module.connect(tmp_path / "build.db")
+    db_module.init_schema(connection)
+    build_db.rebuild(connection)
+
+    connection.execute("INSERT INTO users (id,email,password_hash,created_at) "
+                       "VALUES (1,'a@b.c','x','2026-01-01')")
+    connection.execute("INSERT INTO saved_churches (user_id,church_id,note,created_at) "
+                       "VALUES (1,'keep1','my note','2026-01-01')")
+    connection.execute("INSERT INTO reviews (user_id,church_id,rating,body,created_at,updated_at) "
+                       "VALUES (1,'keep1',5,'lovely','2026-01-01','2026-01-01')")
+    connection.execute("INSERT INTO churchmanship_votes "
+                       "(user_id,church_id,ceremonial,theology,created_at) "
+                       "VALUES (1,'keep1',0.5,0.5,'2026-01-01')")
+    connection.commit()
+
+    build_db.rebuild(connection)          # the refresh that used to wipe it all
+
+    def count(table):
+        return connection.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
+
+    assert count("saved_churches") == 1, "a rebuild deleted a saved church"
+    assert count("reviews") == 1, "a rebuild deleted a review"
+    assert count("churchmanship_votes") == 1, "a rebuild deleted a churchmanship vote"
+    assert connection.execute(
+        "SELECT note FROM saved_churches WHERE church_id='keep1'").fetchone()[0] == "my note"
+    connection.close()
+
+
+def test_a_truncated_snapshot_is_refused_rather_than_applied(tmp_path, monkeypatch):
+    """Overpass returns 504s for days at a time. A run that lost half its states
+    must not be allowed to delete the difference and every review attached."""
+    import build_db
+    import db as db_module
+
+    state_dir = tmp_path / "states"
+    state_dir.mkdir()
+    fields = build_db.COLUMNS
+    def row(church_id):
+        values = {"id": church_id, "name": church_id, "family": "anglican",
+                  "state": "CO", "lat": 39.7, "lon": -104.9}
+        return [values.get(f, "") for f in fields]
+
+    full = {"state": "CO", "fields": fields, "churches": [row(f"c{n}") for n in range(20)]}
+    (state_dir / "CO.json").write_text(json.dumps(full))
+    for name in ("INDEX_PATH", "WEB_TIMES_PATH", "CHURCHMANSHIP_PATH",
+                 "CHURCHMANSHIP_WIKI_PATH"):
+        monkeypatch.setattr(build_db, name, tmp_path / "missing.json")
+    monkeypatch.setattr(build_db, "STATE_DIR", state_dir)
+    monkeypatch.setattr(build_db, "STATIC_CHURCHMANSHIP_PATH", tmp_path / "cm.json")
+    monkeypatch.setattr(build_db, "STATIC_TIMES_PATH", tmp_path / "st.json")
+
+    connection = db_module.connect(tmp_path / "guard.db")
+    db_module.init_schema(connection)
+    build_db.rebuild(connection)
+    assert connection.execute("SELECT COUNT(*) FROM churches").fetchone()[0] == 20
+
+    # Now a scrape that only managed three of the twenty.
+    (state_dir / "CO.json").write_text(json.dumps(
+        {"state": "CO", "fields": fields, "churches": [row(f"c{n}") for n in range(3)]}))
+
+    with pytest.raises(SystemExit) as refused:
+        build_db.rebuild(connection)
+    assert "Refusing to rebuild" in str(refused.value)
+    assert connection.execute("SELECT COUNT(*) FROM churches").fetchone()[0] == 20
+
+    # --force is the deliberate override.
+    build_db.rebuild(connection, force=True)
+    assert connection.execute("SELECT COUNT(*) FROM churches").fetchone()[0] == 3
+    connection.close()

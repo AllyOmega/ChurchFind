@@ -33,6 +33,12 @@ jobs:
         run: python scrape_churches.py --force
         working-directory: scraper
 
+      - name: Re-apply classification rules to the refreshed files
+        # Cheap, and it keeps the state files -- which are the static build --
+        # in step with the scraper's rules without another network round.
+        run: python renormalize.py
+        working-directory: scraper
+
       - name: Validate the generated data
         run: python validate.py
         working-directory: scraper

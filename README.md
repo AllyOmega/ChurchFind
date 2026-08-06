@@ -103,6 +103,66 @@ database is a build artifact — it is rebuilt from `data/`, and is not in the r
 sign-in silently fails without it. Behind HTTPS, leave it unset. The name is deliberately
 unpleasant so it does not survive a copy-paste into production.
 
+## Deploying it
+
+The site works as static files, but the interesting half needs the server:
+accounts, saved churches, reviews, correction reports, and submitting a
+churchmanship reading. User-contributed data is the point of running it for real.
+
+```bash
+docker build -t churchfind .
+docker run -p 8000:8000 -v churchfind_data:/data churchfind
+```
+
+Or on Fly, where `fly.toml` is committed:
+
+```bash
+fly launch --no-deploy      # accepts the committed fly.toml
+fly volumes create churchfind_data --size 1
+fly deploy
+```
+
+**The volume is not optional.** The database holds the churches *and* every
+account, saved church, review and vote in one file. Without `/data` mounted it
+lives inside the container and every deploy destroys it.
+
+The image is stateless and two-stage: the builder compiles `data/` into a 60 MB
+SQLite file, and the runtime image copies out only the result — the 40 MB of
+state JSON that produced it never ships. On first boot the entrypoint seeds the
+volume from that baked copy; on every later boot it finds a database and leaves
+it alone. It is a copy-once and never an overwrite, because the baked database
+has no users in it and a deploy must not be able to replace a live one with it.
+
+Refreshing the church data later is a separate, deliberate act:
+
+```bash
+python server/build_db.py --db /data/churchfind.db
+```
+
+which upserts over the top and leaves user data alone — see below.
+
+### Why a rebuild no longer destroys user data
+
+`build_db.py` used to open with `DELETE FROM churches` and re-insert. Every user
+table has a foreign key into `churches` with `ON DELETE CASCADE`, so that delete
+silently took every saved church, every review and every churchmanship vote with
+it. The `users` row survived, which is why the old summary line — "1 account(s)
+left untouched" — was the most misleading thing in the file: the account
+remained and everything it had ever contributed was gone.
+
+It now loads the snapshot into a temp table, upserts over the top, and deletes
+only churches genuinely absent from the new data. A parish that still exists
+keeps its id, and everything attached to that id survives. When a church really
+does disappear from OpenStreetMap the run says so, and says how many user records
+went with it, rather than doing it quietly.
+
+There is also a guard: a snapshot smaller than half of what is already loaded is
+refused rather than applied. Overpass returns 504s for days at a time, and a run
+that lost half its states should stop, not delete the difference. `--force` is
+the deliberate override.
+
+Both are tests, not intentions.
+
 ## How the site works
 
 Search goes through one interface with two backends behind it. With the API server
@@ -809,7 +869,10 @@ server/queries.py              church search: R*Tree radius, FTS5 names
 server/auth.py                 argon2id, sessions, CSRF, throttling
 server/moderation.py           review moderation with Claude, fail-closed
 server/app.py                  FastAPI routes and the static host
-server/test_api.py             83 tests over the API, weighted to the security-critical parts
+server/test_api.py             85 tests over the API, weighted to the security-critical parts
+Dockerfile                     two-stage build; the volume holds the live database
+docker-entrypoint.sh           seeds a fresh volume once, never overwrites one
+fly.toml                       Fly config; [mounts] is the line that matters
 server/test_moderation.py      24 tests over moderation, with the Claude call stubbed
 data/churchmanship.json        churchmanship from parish websites
 data/churchmanship-wikipedia.json  churchmanship from Wikipedia

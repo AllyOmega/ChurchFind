@@ -1,9 +1,9 @@
-# The site runs without any of this -- these are only needed for the API server
-# and accounts. The scraper is standard library only.
-fastapi>=0.110
-uvicorn[standard]>=0.27
-argon2-cffi>=23.1
+# Development and CI: the runtime dependencies plus the test tooling.
+#
+# The deployed image installs the root requirements.txt instead, which pins
+# exact versions and carries no test packages. This file stays loose because a
+# contributor's existing environment should not be a fight.
+-r ../requirements.txt
 
-# Tests
 pytest>=8.0
 httpx>=0.27
