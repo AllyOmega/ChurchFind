@@ -208,8 +208,40 @@ obvious implementation leaks something:
 Requests are throttled per address and per IP. Without that the endpoint is a
 free mail cannon pointed at anyone whose address you can guess.
 
-Still missing: email verification at sign-up. Reset was the blocking gap — a
-forgotten password was a lost account — and verification is the next one.
+### Email verification, and what it actually gates
+
+Signing up sends a confirmation link and signs you in **anyway**. Making people
+wait on a delivery they do not control, before they can even look around, is a
+poor trade — and the account is not what verification protects.
+
+What it protects is *contributed* data. The threat is somebody registering with
+an address they do not own and then posting under it, so the line is drawn at
+things other people see:
+
+| Blocked until confirmed | Works immediately |
+|---|---|
+| Reviews | Signing in |
+| Churchmanship readings | Saving churches |
+| Correction reports | Setting a home location |
+
+A saved list is private and harms nobody, so locking it would only mean a failed
+delivery costs someone their whole account.
+
+Three details:
+
+- **The token records which address it confirms.** Without that, changing the
+  email on an account before clicking an old link would silently vouch for the
+  new one. A mismatch is refused rather than honoured.
+- **Accounts that predate verification are grandfathered** at migration time,
+  their `email_verified_at` backfilled from `created_at`. They registered under
+  rules that did not ask for it, and retroactively suspending them to enforce a
+  policy they were never offered punishes people for the schema changing.
+- **Resending needs a session**, so the endpoint is not an open mail relay
+  pointed at any address somebody can type. It is throttled per account too.
+
+The banner is driven by the current user rather than evaluated at page load —
+which sounds like a detail until you notice that signing up *in the same
+session* then showed nothing at all, which is exactly when it matters most.
 
 ### Why a rebuild no longer destroys user data
 
@@ -939,7 +971,7 @@ server/queries.py              church search: R*Tree radius, FTS5 names
 server/auth.py                 argon2id, sessions, CSRF, throttling
 server/moderation.py           review moderation with Claude, fail-closed
 server/app.py                  FastAPI routes and the static host
-server/test_api.py             94 tests over the API, weighted to the security-critical parts
+server/test_api.py             103 tests over the API, weighted to the security-critical parts
 Dockerfile                     two-stage build; the volume holds the live database
 docker-entrypoint.sh           seeds a fresh volume once, never overwrites one
 fly.toml                       Fly config; [mounts] is the line that matters

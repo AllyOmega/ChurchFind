@@ -310,3 +310,71 @@ def consume_reset(connection, row, new_password_hash):
 
 def prune_resets(connection):
     connection.execute("DELETE FROM password_resets WHERE expires_at <= ?", (iso(now()),))
+
+
+# -------------------------------------------------------- email verification
+
+# A week. People sit on sign-up mail in a way they do not sit on a reset, and
+# the token is far less powerful -- it confirms an address rather than granting
+# access to an account.
+VERIFY_TTL_DAYS = 7
+VERIFY_MAX_PER_USER = 5
+
+
+def create_verification(connection, user_id, email):
+    """Mint a verification token for a specific address."""
+    raw = secrets.token_urlsafe(32)
+    moment = now()
+    connection.execute(
+        "INSERT INTO email_verifications "
+        "(token_hash, user_id, email, created_at, expires_at) VALUES (?,?,?,?,?)",
+        (token_hash(raw), user_id, email, iso(moment),
+         iso(moment + timedelta(days=VERIFY_TTL_DAYS))),
+    )
+    return raw
+
+
+def load_verification(connection, raw_token):
+    """The row for a token, or None if unknown, used or expired."""
+    if not raw_token:
+        return None
+    row = connection.execute(
+        "SELECT token_hash, user_id, email, expires_at, used_at FROM email_verifications "
+        "WHERE token_hash = ?", (token_hash(raw_token),)
+    ).fetchone()
+    if row is None or row["used_at"]:
+        return None
+    if parse_iso(row["expires_at"]) <= now():
+        return None
+    return row
+
+
+def consume_verification(connection, row):
+    """Mark the address verified, if it is still the address on the account.
+
+    The address check is the point of storing `email` on the token. A token
+    confirms a specific address; if the account has since moved to another one,
+    clicking an old link must not silently vouch for the new address.
+    Returns True when the account was verified.
+    """
+    moment = iso(now())
+    connection.execute(
+        "UPDATE email_verifications SET used_at = ? WHERE token_hash = ?",
+        (moment, row["token_hash"]),
+    )
+    current = connection.execute(
+        "SELECT email FROM users WHERE id = ?", (row["user_id"],)
+    ).fetchone()
+    if current is None or current["email"] != row["email"]:
+        return False
+    connection.execute(
+        "UPDATE users SET email_verified_at = ? WHERE id = ? AND email_verified_at = ''",
+        (moment, row["user_id"]),
+    )
+    return True
+
+
+def prune_verifications(connection):
+    connection.execute(
+        "DELETE FROM email_verifications WHERE expires_at <= ?", (iso(now()),)
+    )

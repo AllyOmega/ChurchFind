@@ -60,6 +60,7 @@ def connect(path=None, readonly=False):
 # applied before the schema script runs.
 _ADDED_USER_COLUMNS = [
     ("is_moderator", "INTEGER NOT NULL DEFAULT 0"),
+    ("email_verified_at", "TEXT NOT NULL DEFAULT ''"),
 ]
 
 _ADDED_CHURCHMANSHIP_COLUMNS = [
@@ -126,6 +127,16 @@ def init_schema(connection):
     added += _migrate_table(connection, "users", _ADDED_USER_COLUMNS)
     added += _migrate_table(connection, "churchmanship", _ADDED_CHURCHMANSHIP_COLUMNS)
     connection.executescript(SCHEMA.read_text())
+
+    # Accounts that predate verification are grandfathered rather than locked
+    # out. They registered under rules that did not ask for it, and retroactively
+    # suspending them to enforce a policy they were never offered is punishing
+    # people for the schema changing under them. Only new sign-ups are asked.
+    if "users.email_verified_at" in added:
+        connection.execute(
+            "UPDATE users SET email_verified_at = created_at WHERE email_verified_at = ''"
+        )
+
     connection.commit()
     return added
 

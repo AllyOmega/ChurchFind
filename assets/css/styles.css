@@ -737,3 +737,16 @@ input[type="range"] { width: 100%; accent-color: var(--indigo); }
   border: 1px solid color-mix(in srgb, var(--ok) 35%, transparent);
   border-radius: 8px;
 }
+
+/* Sits above everything, in the same register as the "no API server" note --
+   a statement of fact about the account rather than an alert. */
+.account-banner {
+  margin: 0;
+  padding: .7rem clamp(1rem, 4vw, 3rem);
+  font-size: .92rem;
+  border-bottom: 1px solid var(--rule);
+}
+.account-banner.is-ok    { background: color-mix(in srgb, var(--ok) 14%, transparent); }
+.account-banner.is-warn  { background: color-mix(in srgb, var(--gold) 16%, transparent); }
+.account-banner.is-error { background: color-mix(in srgb, var(--danger) 14%, transparent); }
+.account-banner .link-btn { margin-left: .35rem; }

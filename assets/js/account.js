@@ -52,7 +52,20 @@
   }
 
   function notify() {
+    // The banner is a function of who is signed in, so it belongs here rather
+    // than at boot: evaluated only at page load, signing up in the same session
+    // showed nothing at all, which is exactly when it matters most.
+    refreshVerificationBanner();
     listeners.forEach(function (fn) { fn(user, savedIds); });
+  }
+
+  function refreshVerificationBanner() {
+    if (user && !user.emailVerified) {
+      banner('Confirm your email address to post reviews and churchmanship ' +
+             'readings. Everything else works meanwhile.', 'warn');
+    } else if (bannerIsVerificationNag) {
+      hideBanner();
+    }
   }
 
   function onChange(fn) {
@@ -76,6 +89,7 @@
         // After the session is settled, so a reset link opens over a known
         // signed-in state rather than racing it.
         checkResetLink();
+        checkVerifyLink();
         return user;
       });
   }
@@ -312,12 +326,74 @@
      link, a bookmark or a referrer header. */
   function clearResetFromUrl() {
     resetToken = '';
+    clearParam('reset');
+  }
+
+  function clearParam(name) {
     var query = new URLSearchParams(window.location.search);
-    if (!query.has('reset')) return;
-    query.delete('reset');
+    if (!query.has(name)) return;
+    query.delete(name);
     var search = query.toString();
     window.history.replaceState({}, '',
       search ? '?' + search : window.location.pathname);
+  }
+
+  /* A page-level message, for things that happen without a dialog open --
+     landing on a confirmation link, or being told to confirm before posting. */
+  // Tracked so signing out, or confirming, clears the nag -- without clobbering
+  // a message the user actually needs to read, like a failed confirmation.
+  var bannerIsVerificationNag = false;
+
+  function hideBanner() {
+    var node = document.getElementById('account-banner');
+    if (node) node.hidden = true;
+    bannerIsVerificationNag = false;
+  }
+
+  function banner(text, tone) {
+    bannerIsVerificationNag = tone === 'warn';
+    var node = document.getElementById('account-banner');
+    if (!node) {
+      node = document.createElement('p');
+      node.id = 'account-banner';
+      document.body.insertBefore(node, document.body.firstChild);
+    }
+    node.className = 'account-banner is-' + (tone || 'ok');
+    node.textContent = '';
+    node.appendChild(document.createTextNode(text + ' '));
+
+    // An unverified user needs a way to get another link, not just a scolding.
+    if (tone === 'warn' && user && !user.emailVerified) {
+      var again = document.createElement('button');
+      again.type = 'button';
+      again.className = 'link-btn';
+      again.textContent = 'Send it again';
+      again.addEventListener('click', function () {
+        again.disabled = true;
+        request('POST', '/auth/verify/resend')
+          .then(function () { banner('Sent. Check your inbox.', 'ok'); })
+          .catch(function (error) { banner(error.message, 'error'); });
+      });
+      node.appendChild(again);
+    }
+    node.hidden = false;
+  }
+
+  /* Arriving on a confirmation link. Same shape as the reset link: consume it,
+     then take it out of the address bar. */
+  function checkVerifyLink() {
+    var token = new URLSearchParams(window.location.search).get('verify');
+    if (!token || !available) return;
+    clearParam('verify');
+    request('POST', '/auth/verify', { token: token })
+      .then(function () {
+        return request('GET', '/auth/me').then(function (body) {
+          user = body.user;
+          notify();
+        });
+      })
+      .then(function () { banner('Email confirmed. Thank you.', 'ok'); })
+      .catch(function (error) { banner(error.message, 'error'); });
   }
 
   function checkResetLink() {

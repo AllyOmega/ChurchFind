@@ -74,6 +74,7 @@ def startup():
     auth.prune_sessions(_connection)
     auth.prune_attempts(_connection)
     auth.prune_resets(_connection)
+    auth.prune_verifications(_connection)
     _connection.commit()
 
 
@@ -149,7 +150,8 @@ def current_user(session=Depends(current_session)):
         return None
     row = db().execute(
         "SELECT id, email, display_name, created_at, home_lat, home_lon, home_label, "
-        "is_active, is_moderator FROM users WHERE id = ?", (session["user_id"],)
+        "is_active, is_moderator, email_verified_at FROM users WHERE id = ?",
+        (session["user_id"],)
     ).fetchone()
     if row is None or not row["is_active"]:
         return None
@@ -159,6 +161,25 @@ def current_user(session=Depends(current_session)):
 def require_user(user=Depends(current_user)):
     if user is None:
         raise HTTPException(401, "Sign in to do that.")
+    return user
+
+
+def require_verified_user(user=Depends(require_user)):
+    """For anything that puts a user's contribution in front of other people.
+
+    The threat verification answers is somebody registering with an address they
+    do not own and then contributing under it. So the line is drawn at *shared*
+    data, not at the account: reviews, churchmanship readings and correction
+    reports are gated; signing in, saving churches and setting a home location
+    are not, because those are private to the account and harm nobody.
+
+    Locking the whole account would also make a failed delivery a total loss of
+    access, which is a worse outcome than an unverified saved list.
+    """
+    if not user.get("email_verified_at"):
+        raise HTTPException(
+            403, "Confirm your email address first — check your inbox for the link."
+        )
     return user
 
 
@@ -184,6 +205,7 @@ def public_user(user):
         "displayName": user["display_name"],
         "createdAt": user["created_at"],
         "isModerator": bool(user.get("is_moderator")),
+        "emailVerified": bool(user.get("email_verified_at")),
         "home": (
             {"lat": user["home_lat"], "lon": user["home_lon"], "label": user["home_label"]}
             if user["home_lat"] is not None else None
@@ -391,12 +413,18 @@ def register(payload: Credentials, request: Request, response: Response):
         connection, user_id, request.headers.get("user-agent", "")
     )
     auth.record_attempt(connection, ip_bucket, True)
+
+    # Signed in immediately, unverified. Making people wait on an email before
+    # they can even look around punishes them for a delivery they do not control,
+    # and the account is not what verification protects -- contributing is.
+    verification = auth.create_verification(connection, user_id, email)
     connection.commit()
+    mailer.verify_email(email, verification)
 
     set_session_cookies(response, raw_token, raw_csrf)
     user = connection.execute(
         "SELECT id, email, display_name, created_at, home_lat, home_lon, home_label, "
-        "is_active, is_moderator FROM users WHERE id = ?", (user_id,)
+        "is_active, is_moderator, email_verified_at FROM users WHERE id = ?", (user_id,)
     ).fetchone()
     return {"user": public_user(dict(user))}
 
@@ -454,7 +482,7 @@ def login(payload: Credentials, request: Request, response: Response):
     set_session_cookies(response, raw_token, raw_csrf)
     user = connection.execute(
         "SELECT id, email, display_name, created_at, home_lat, home_lon, home_label, "
-        "is_active, is_moderator FROM users WHERE id = ?", (row["id"],)
+        "is_active, is_moderator, email_verified_at FROM users WHERE id = ?", (row["id"],)
     ).fetchone()
     return {"user": public_user(dict(user))}
 
@@ -470,6 +498,47 @@ def logout(response: Response, cf_session: str = Cookie(default=None), _=Depends
 @app.get("/api/auth/me")
 def me(user=Depends(current_user)):
     return {"user": public_user(user) if user else None}
+
+
+class VerifyPayload(BaseModel):
+    token: str = Field(max_length=200)
+
+
+@app.post("/api/auth/verify")
+def verify_email(payload: VerifyPayload):
+    """Confirm an address. No session needed -- the link is the credential, and
+    people click it in whatever browser opened the mail."""
+    connection = db()
+    row = auth.load_verification(connection, payload.token)
+    if row is None:
+        raise HTTPException(400, "That confirmation link is no longer valid. "
+                                 "Sign in and ask for another.")
+
+    confirmed = auth.consume_verification(connection, row)
+    connection.commit()
+    if not confirmed:
+        # The account moved to a different address after the link was sent.
+        raise HTTPException(409, "That link was for a different email address. "
+                                 "Sign in and ask for a new one.")
+    return {"ok": True}
+
+
+@app.post("/api/auth/verify/resend")
+def resend_verification(user=Depends(require_user), _=Depends(require_csrf)):
+    """Send another link. Requires a session, so it is not an open mail relay."""
+    connection = db()
+    if user.get("email_verified_at"):
+        return {"ok": True, "alreadyVerified": True}
+
+    bucket = f"verify:{user['id']}"
+    if auth.attempts_since(connection, bucket) >= auth.VERIFY_MAX_PER_USER:
+        raise HTTPException(429, "Too many confirmation emails. Try again later.")
+    auth.record_attempt(connection, bucket, False)
+
+    raw = auth.create_verification(connection, user["id"], user["email"])
+    connection.commit()
+    mailer.verify_email(user["email"], raw)
+    return {"ok": True}
 
 
 @app.post("/api/auth/forgot")
@@ -619,7 +688,8 @@ def set_home(payload: HomePayload, user=Depends(require_user), _=Depends(require
 
 
 @app.post("/api/reports")
-def report_correction(payload: ReportPayload, user=Depends(require_user), _=Depends(require_csrf)):
+def report_correction(payload: ReportPayload, user=Depends(require_verified_user),
+                      _=Depends(require_csrf)):
     if queries.get_church(db(), payload.church_id) is None:
         raise HTTPException(404, "No church with that id.")
     suggestion = payload.suggestion.strip()
@@ -706,7 +776,7 @@ def get_churchmanship(church_id: str, user=Depends(current_user)):
 
 
 @app.post("/api/churchmanship")
-def submit_churchmanship(payload: ChurchmanshipVote, user=Depends(require_user),
+def submit_churchmanship(payload: ChurchmanshipVote, user=Depends(require_verified_user),
                          _=Depends(require_csrf)):
     church = queries.get_church(db(), payload.church_id)
     if church is None:
@@ -768,7 +838,8 @@ def list_reviews(church_id: str, user=Depends(current_user)):
 
 
 @app.post("/api/reviews")
-def write_review(payload: ReviewPayload, user=Depends(require_user), _=Depends(require_csrf)):
+def write_review(payload: ReviewPayload, user=Depends(require_verified_user),
+                 _=Depends(require_csrf)):
     church = queries.get_church(db(), payload.church_id)
     if church is None:
         raise HTTPException(404, "No church with that id.")

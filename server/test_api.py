@@ -73,15 +73,29 @@ def clean_accounts(client):
     """Every test starts with no users, sessions or throttle history."""
     connection = app_module._connection
     for table in ("reviews", "saved_churches", "correction_reports", "sessions",
-                  "auth_attempts", "users"):
+                  "auth_attempts", "password_resets", "email_verifications", "users"):
         connection.execute(f"DELETE FROM {table}")
     connection.commit()
     client.cookies.clear()
 
 
-def register(client, email="person@example.org", password=GOOD_PASSWORD, **extra):
-    return client.post("/api/auth/register",
-                       json={"email": email, "password": password, **extra})
+def register(client, email="person@example.org", password=GOOD_PASSWORD,
+             verify=True, **extra):
+    """Register, and by default mark the address confirmed.
+
+    Contributing needs a verified address, so without this every test about
+    reviews or churchmanship would be a test about verification instead. The
+    tests that are actually about the gate pass verify=False.
+    """
+    response = client.post("/api/auth/register",
+                           json={"email": email, "password": password, **extra})
+    if verify and response.status_code == 200:
+        app_module._connection.execute(
+            "UPDATE users SET email_verified_at = ? WHERE email = ?",
+            (auth.iso(auth.now()), email.strip().lower()),
+        )
+        app_module._connection.commit()
+    return response
 
 
 def csrf(client):
@@ -1140,3 +1154,154 @@ def test_the_stored_token_is_a_hash_not_the_link(client, monkeypatch):
         "SELECT token_hash FROM password_resets").fetchall()
     assert stored and all(row["token_hash"] != raw for row in stored)
     assert any(row["token_hash"] == auth.token_hash(raw) for row in stored)
+
+
+# ---------------------------------------------------------- email verification
+
+def sent_verifications(monkeypatch):
+    captured = []
+    import app as module
+    monkeypatch.setattr(module.mailer, "verify_email",
+                        lambda to, raw: captured.append((to, raw)) or True)
+    return captured
+
+
+def test_signing_up_sends_a_confirmation_and_signs_you_in_anyway(client, monkeypatch):
+    """Making people wait on an email before they can look around punishes them
+    for a delivery they do not control. The account is not what verification
+    protects -- contributing is."""
+    captured = sent_verifications(monkeypatch)
+    response = register(client, email="new@example.org", verify=False)
+
+    assert response.status_code == 200
+    assert response.json()["user"]["emailVerified"] is False
+    assert client.get("/api/auth/me").json()["user"] is not None   # signed in
+    assert [to for to, _ in captured] == ["new@example.org"]
+
+
+def test_an_unverified_account_cannot_contribute(client, monkeypatch):
+    """Reviews, churchmanship and corrections all put something in front of other
+    people under a name. That is exactly what an unowned address should not be
+    able to do."""
+    sent_verifications(monkeypatch)
+    register(client, email="unverified@example.org", verify=False)
+    token = csrf(client)
+
+    review = client.post("/api/reviews", headers={auth.CSRF_HEADER: token},
+                         json={"church_id": "n1", "rating": 5, "body": "Lovely place, warm welcome."})
+    vote = client.post("/api/churchmanship", headers={auth.CSRF_HEADER: token},
+                       json={"church_id": "n1", "ceremonial": 0.5, "theology": 0.5})
+    report = client.post("/api/reports", headers={auth.CSRF_HEADER: token},
+                         json={"church_id": "n1", "field": "address",
+                               "suggestion": "The street number is wrong."})
+
+    assert review.status_code == 403
+    assert vote.status_code == 403
+    assert report.status_code == 403
+    assert "Confirm your email" in review.json()["detail"]
+
+
+def test_an_unverified_account_can_still_use_its_own_private_things(client, monkeypatch):
+    """Saving a church harms nobody and is visible to nobody. Locking the whole
+    account would make a failed delivery a total loss of access."""
+    sent_verifications(monkeypatch)
+    register(client, email="private@example.org", verify=False)
+    token = csrf(client)
+
+    saved = client.post("/api/saved", headers={auth.CSRF_HEADER: token},
+                        json={"church_id": "n1", "note": "near the station"})
+    home = client.put("/api/me/home", headers={auth.CSRF_HEADER: token},
+                      json={"lat": 39.7, "lon": -104.9, "label": "Denver"})
+
+    assert saved.status_code == 200
+    assert home.status_code == 200
+
+
+def test_clicking_the_link_verifies_and_unblocks_contributing(client, monkeypatch):
+    captured = sent_verifications(monkeypatch)
+    register(client, email="confirm@example.org", verify=False)
+    token = csrf(client)
+
+    assert client.post("/api/auth/verify", json={"token": captured[0][1]}).status_code == 200
+    assert client.get("/api/auth/me").json()["user"]["emailVerified"] is True
+
+    review = client.post("/api/reviews", headers={auth.CSRF_HEADER: token},
+                         json={"church_id": "n1", "rating": 5, "body": "Lovely place, warm welcome."})
+    assert review.status_code == 200
+
+
+def test_a_confirmation_link_works_once(client, monkeypatch):
+    captured = sent_verifications(monkeypatch)
+    register(client, email="twice@example.org", verify=False)
+    raw = captured[0][1]
+
+    assert client.post("/api/auth/verify", json={"token": raw}).status_code == 200
+    assert client.post("/api/auth/verify", json={"token": raw}).status_code == 400
+
+
+def test_a_bogus_confirmation_token_is_refused(client, monkeypatch):
+    sent_verifications(monkeypatch)
+    assert client.post("/api/auth/verify",
+                       json={"token": "nonsense"}).status_code == 400
+
+
+def test_a_link_for_a_since_changed_address_does_not_verify_the_new_one(client, monkeypatch):
+    """A token confirms a *specific* address. Without recording which, changing
+    the address before clicking would silently vouch for the new one."""
+    captured = sent_verifications(monkeypatch)
+    register(client, email="moved@example.org", verify=False)
+    raw = captured[0][1]
+
+    app_module._connection.execute(
+        "UPDATE users SET email = ? WHERE email = ?", ("elsewhere@example.org", "moved@example.org")
+    )
+    app_module._connection.commit()
+
+    response = client.post("/api/auth/verify", json={"token": raw})
+    assert response.status_code == 409
+    assert app_module._connection.execute(
+        "SELECT email_verified_at FROM users WHERE email = ?",
+        ("elsewhere@example.org",)).fetchone()[0] == ""
+
+
+def test_resending_needs_a_session_and_is_throttled(client, monkeypatch):
+    """A session, so it is not an open mail relay pointed at any address."""
+    captured = sent_verifications(monkeypatch)
+    assert client.post("/api/auth/verify/resend").status_code == 401
+
+    register(client, email="resend@example.org", verify=False)
+    token = csrf(client)
+    captured.clear()
+
+    codes = [client.post("/api/auth/verify/resend",
+                         headers={auth.CSRF_HEADER: token}).status_code
+             for _ in range(auth.VERIFY_MAX_PER_USER + 3)]
+    assert 429 in codes
+    assert len(captured) <= auth.VERIFY_MAX_PER_USER
+
+
+def test_accounts_that_predate_verification_are_grandfathered(tmp_path):
+    """They registered under rules that did not ask for it. Retroactively
+    suspending them to enforce a policy they were never offered is punishing
+    people for the schema changing under them."""
+    import db as db_module
+    import sqlite3
+
+    path = tmp_path / "old.db"
+    old = sqlite3.connect(path)
+    old.execute("CREATE TABLE users (id INTEGER PRIMARY KEY, email TEXT NOT NULL UNIQUE, "
+                "password_hash TEXT NOT NULL, display_name TEXT NOT NULL DEFAULT '', "
+                "created_at TEXT NOT NULL, last_login_at TEXT, home_lat REAL, home_lon REAL, "
+                "home_label TEXT NOT NULL DEFAULT '', is_active INTEGER NOT NULL DEFAULT 1)")
+    old.execute("INSERT INTO users (email, password_hash, created_at) "
+                "VALUES ('old@example.org','x','2026-01-01T00:00:00Z')")
+    old.commit()
+    old.close()
+
+    connection = db_module.connect(path)
+    db_module.init_schema(connection)
+
+    verified = connection.execute(
+        "SELECT email_verified_at FROM users WHERE email = 'old@example.org'").fetchone()[0]
+    assert verified == "2026-01-01T00:00:00Z"
+    connection.close()

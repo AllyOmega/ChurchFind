@@ -94,7 +94,11 @@ CREATE TABLE IF NOT EXISTS users (
   home_lon       REAL,
   home_label     TEXT NOT NULL DEFAULT '',
   is_active      INTEGER NOT NULL DEFAULT 1,
-  is_moderator   INTEGER NOT NULL DEFAULT 0
+  is_moderator   INTEGER NOT NULL DEFAULT 0,
+  -- Empty until the address is confirmed. Deliberately a timestamp rather than a
+  -- flag: "when" answers questions "whether" cannot, and an empty string is
+  -- already this schema's convention for missing.
+  email_verified_at TEXT NOT NULL DEFAULT ''
 );
 
 -- Sessions hold the SHA-256 of the cookie token, never the token. Someone who
@@ -153,6 +157,25 @@ CREATE TABLE IF NOT EXISTS password_resets (
 
 CREATE INDEX IF NOT EXISTS idx_resets_user    ON password_resets(user_id);
 CREATE INDEX IF NOT EXISTS idx_resets_expires ON password_resets(expires_at);
+
+-- Email verification. Same shape as password_resets and for the same reasons:
+-- the token is stored hashed, and a used row is marked rather than deleted so a
+-- second click on the same link is distinguishable from a link that never was.
+--
+-- `email` is recorded alongside user_id because a token confirms a *specific*
+-- address. Without it, changing the address on an account before clicking would
+-- silently verify the new one.
+CREATE TABLE IF NOT EXISTS email_verifications (
+  token_hash  TEXT PRIMARY KEY,
+  user_id     INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  email       TEXT NOT NULL,
+  created_at  TEXT NOT NULL,
+  expires_at  TEXT NOT NULL,
+  used_at     TEXT NOT NULL DEFAULT ''
+);
+
+CREATE INDEX IF NOT EXISTS idx_verify_user    ON email_verifications(user_id);
+CREATE INDEX IF NOT EXISTS idx_verify_expires ON email_verifications(expires_at);
 
 -- Throttling for login and registration. Rows are pruned as they age out.
 CREATE TABLE IF NOT EXISTS auth_attempts (

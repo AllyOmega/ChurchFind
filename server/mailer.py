@@ -153,6 +153,21 @@ def send(to_address, subject, body):
         return False
 
 
+def verify_email(to_address, raw_token):
+    """Confirm an address at sign-up."""
+    link = f"{base_url()}/?verify={raw_token}"
+    subject = "Confirm your email for ChurchFind"
+    body = (
+        "Somebody created a ChurchFind account with this address.\n\n"
+        f"{link}\n\n"
+        "Confirming it lets you post reviews and churchmanship readings. The\n"
+        "link works once and expires in a week.\n\n"
+        "If it was not you, you can ignore this. Nothing has been posted in\n"
+        "your name and nobody can sign in without your password.\n"
+    )
+    return send(to_address, subject, body)
+
+
 def password_reset(to_address, raw_token):
     """The one message this application sends."""
     link = f"{base_url()}/?reset={raw_token}"
