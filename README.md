@@ -147,6 +147,29 @@ The server sends exactly one message, over plain SMTP — standard library, no
 third-party package, and it works with every provider rather than tying the
 project to one vendor's API.
 
+**With Resend, one secret.** Resend speaks SMTP, so it needs no code of its own,
+and its host, port, username and TLS mode are always the same — setting the API
+key fills all four in:
+
+```bash
+fly secrets set \
+  CHURCHFIND_RESEND_API_KEY=re_your_key \
+  CHURCHFIND_MAIL_FROM='ChurchFind <no-reply@yourdomain>' \
+  CHURCHFIND_BASE_URL=https://churchfind.fly.dev
+```
+
+**The From domain has to be verified with Resend first**, which is the failure
+everybody hits: an unverified sender is refused and the reset simply never
+arrives. That one gets its own log line naming `CHURCHFIND_MAIL_FROM`, rather
+than the generic "could not send" that tells you nothing.
+
+`CHURCHFIND_BASE_URL` must be the public origin. It goes in the link, so
+localhost is worse than useless.
+
+Any other provider works through the generic settings, and an explicit
+`CHURCHFIND_SMTP_*` always beats the Resend shortcut — switching means deleting
+one variable, not unpicking a special case:
+
 ```
 CHURCHFIND_SMTP_HOST      required, or nothing is sent
 CHURCHFIND_SMTP_PORT      default 587
@@ -156,8 +179,6 @@ CHURCHFIND_SMTP_TLS       starttls (default), ssl, or none
 CHURCHFIND_MAIL_FROM      default "ChurchFind <no-reply@localhost>"
 CHURCHFIND_BASE_URL       the public origin, because it goes in the link
 ```
-
-On Fly: `fly secrets set CHURCHFIND_SMTP_HOST=… CHURCHFIND_SMTP_PASSWORD=…`.
 
 **With none of it set, nothing breaks.** The message is written to the log
 instead, which is how local development gets a working reset link with no mail

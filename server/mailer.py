@@ -28,6 +28,17 @@ CONFIGURATION
     CHURCHFIND_MAIL_FROM      default "ChurchFind <no-reply@localhost>"
     CHURCHFIND_BASE_URL       default "http://localhost:8000" -- the origin that
                               goes in links, so it must be the public one
+
+RESEND
+
+Resend speaks SMTP, so it needs no code of its own. Setting one variable fills
+in the four that are always the same for them:
+
+    CHURCHFIND_RESEND_API_KEY   ->  host smtp.resend.com, port 587,
+                                    user "resend", starttls
+
+Any explicit CHURCHFIND_SMTP_* still wins, so this is a shortcut rather than a
+special case, and switching to another provider means deleting one variable.
 """
 
 import logging
@@ -42,8 +53,31 @@ DEFAULT_PORT = 587
 TIMEOUT = 15
 
 
+# Resend's published SMTP endpoint. Port 587 is their STARTTLS port; 465 is
+# implicit SSL if a network ever forces it.
+RESEND_HOST = "smtp.resend.com"
+RESEND_USER = "resend"
+
+
+def settings():
+    """Resolve SMTP settings, letting a Resend key stand in for four variables.
+
+    Explicit CHURCHFIND_SMTP_* always wins. That ordering is what keeps this a
+    convenience rather than a provider special case -- pointing at a different
+    SMTP server never requires unpicking anything here.
+    """
+    resend_key = os.environ.get("CHURCHFIND_RESEND_API_KEY", "").strip()
+    return {
+        "host": os.environ.get("CHURCHFIND_SMTP_HOST") or (RESEND_HOST if resend_key else ""),
+        "port": int(os.environ.get("CHURCHFIND_SMTP_PORT", DEFAULT_PORT)),
+        "user": os.environ.get("CHURCHFIND_SMTP_USER") or (RESEND_USER if resend_key else ""),
+        "password": os.environ.get("CHURCHFIND_SMTP_PASSWORD") or resend_key,
+        "tls": os.environ.get("CHURCHFIND_SMTP_TLS", "starttls").lower(),
+    }
+
+
 def configured():
-    return bool(os.environ.get("CHURCHFIND_SMTP_HOST"))
+    return bool(settings()["host"])
 
 
 def base_url():
@@ -84,11 +118,9 @@ def send(to_address, subject, body):
     message["Subject"] = subject
     message.set_content(body)
 
-    host = os.environ["CHURCHFIND_SMTP_HOST"]
-    port = int(os.environ.get("CHURCHFIND_SMTP_PORT", DEFAULT_PORT))
-    user = os.environ.get("CHURCHFIND_SMTP_USER")
-    password = os.environ.get("CHURCHFIND_SMTP_PASSWORD")
-    mode = os.environ.get("CHURCHFIND_SMTP_TLS", "starttls").lower()
+    config = settings()
+    host, port = config["host"], config["port"]
+    user, password, mode = config["user"], config["password"], config["tls"]
 
     try:
         if mode == "ssl":
@@ -103,6 +135,16 @@ def send(to_address, subject, body):
                 server.login(user, password or "")
             server.send_message(message)
         return True
+    except smtplib.SMTPSenderRefused:
+        # Worth its own branch because it is the failure everyone hits first:
+        # Resend and most providers refuse a From address on a domain you have
+        # not verified, and the generic "could not send" gives no clue why.
+        logger.exception(
+            "The sender address %r was refused. With Resend and most providers "
+            "the From domain has to be verified first -- check "
+            "CHURCHFIND_MAIL_FROM.", mail_from()
+        )
+        return False
     except Exception:                                       # noqa: BLE001
         # Broad on purpose: smtplib raises a dozen different exceptions and a
         # socket can fail in ways none of them cover. None of them should reach
