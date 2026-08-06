@@ -721,3 +721,19 @@ input[type="range"] { width: 100%; accent-color: var(--indigo); }
 @media (max-width: 720px) {
   .toast { left: 1rem; right: 1rem; bottom: 1rem; max-width: none; }
 }
+
+/* The forgotten-password link sits under the submit button, quiet: it is the
+   path for a bad day, not a call to action. */
+.auth-forgot {
+  display: block; margin-top: .85rem;
+  font-size: .88rem; color: var(--ink-soft);
+}
+.auth-forgot:hover { color: var(--indigo); }
+.auth-notice {
+  margin: .75rem 0 0; padding: .7rem .85rem;
+  font-size: .9rem; line-height: 1.45;
+  color: var(--ink);
+  background: color-mix(in srgb, var(--ok) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ok) 35%, transparent);
+  border-radius: 8px;
+}

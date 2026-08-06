@@ -136,6 +136,24 @@ CREATE TABLE IF NOT EXISTS correction_reports (
 
 CREATE INDEX IF NOT EXISTS idx_reports_status ON correction_reports(status, created_at DESC);
 
+-- Password reset. The token is stored as a SHA-256 the same way session tokens
+-- are: somebody who reads this table cannot mint a working link from it.
+--
+-- `used_at` rather than deleting the row on use, so a second click on the same
+-- link is distinguishable from a link that never existed, and so a burst of
+-- resets is visible when something is wrong.
+CREATE TABLE IF NOT EXISTS password_resets (
+  token_hash  TEXT PRIMARY KEY,
+  user_id     INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  created_at  TEXT NOT NULL,
+  expires_at  TEXT NOT NULL,
+  used_at     TEXT NOT NULL DEFAULT '',
+  requested_ip TEXT NOT NULL DEFAULT ''
+);
+
+CREATE INDEX IF NOT EXISTS idx_resets_user    ON password_resets(user_id);
+CREATE INDEX IF NOT EXISTS idx_resets_expires ON password_resets(expires_at);
+
 -- Throttling for login and registration. Rows are pruned as they age out.
 CREATE TABLE IF NOT EXISTS auth_attempts (
   id       INTEGER PRIMARY KEY,

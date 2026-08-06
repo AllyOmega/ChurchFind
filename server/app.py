@@ -24,6 +24,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scraper"))
 
 import auth  # noqa: E402
 import build_db  # noqa: E402
+import mailer  # noqa: E402
 import moderation  # noqa: E402
 import queries  # noqa: E402
 from db import connect, init_schema  # noqa: E402
@@ -72,6 +73,7 @@ def startup():
     init_schema(_connection)
     auth.prune_sessions(_connection)
     auth.prune_attempts(_connection)
+    auth.prune_resets(_connection)
     _connection.commit()
 
 
@@ -199,6 +201,15 @@ class Credentials(BaseModel):
 
 class PasswordChange(BaseModel):
     current_password: str = Field(max_length=auth.MAX_PASSWORD_LENGTH)
+    new_password: str = Field(max_length=auth.MAX_PASSWORD_LENGTH)
+
+
+class ForgotPayload(BaseModel):
+    email: str = Field(max_length=auth.MAX_EMAIL_LENGTH)
+
+
+class ResetPayload(BaseModel):
+    token: str = Field(max_length=200)
     new_password: str = Field(max_length=auth.MAX_PASSWORD_LENGTH)
 
 
@@ -459,6 +470,75 @@ def logout(response: Response, cf_session: str = Cookie(default=None), _=Depends
 @app.get("/api/auth/me")
 def me(user=Depends(current_user)):
     return {"user": public_user(user) if user else None}
+
+
+@app.post("/api/auth/forgot")
+def forgot_password(payload: ForgotPayload, request: Request):
+    """Start a reset. Answers identically whether or not the account exists.
+
+    That is the whole design. A form that says "no account with that address" is
+    a way to test who has one, and this is a site about people's churchgoing --
+    a list of members is not a neutral thing to leak.
+
+    So: no CSRF requirement (there is no session yet), no distinction in the
+    response, and the same work done either way as far as the caller can see.
+    """
+    connection = db()
+    ip = client_ip(request)
+
+    try:
+        email = auth.normalise_email(payload.email)
+    except auth.ValidationError:
+        # Even a malformed address gets the bland answer. Saying "that is not a
+        # valid email" is fine; saying it differently from "no such account" is
+        # what leaks.
+        return {"ok": True}
+
+    # Throttled per address and per IP: without this the endpoint is a free
+    # mail cannon pointed at anyone whose address you can guess.
+    if (auth.attempts_since(connection, f"reset:{email}") >= auth.RESET_MAX_PER_EMAIL
+            or auth.attempts_since(connection, f"reset:ip:{ip}") >= auth.RESET_MAX_PER_IP):
+        return {"ok": True}
+    auth.record_attempt(connection, f"reset:{email}", False)
+    auth.record_attempt(connection, f"reset:ip:{ip}", False)
+
+    row = connection.execute(
+        "SELECT id, is_active FROM users WHERE email = ?", (email,)
+    ).fetchone()
+    if row is not None and row["is_active"]:
+        raw = auth.create_reset(connection, row["id"], ip)
+        # Committed before sending: a mail that goes out referencing a token
+        # that was never stored is worse than a token nobody uses.
+        connection.commit()
+        mailer.password_reset(email, raw)
+    else:
+        connection.commit()
+
+    return {"ok": True}
+
+
+@app.post("/api/auth/reset")
+def reset_password(payload: ResetPayload, request: Request, response: Response):
+    """Finish a reset: set the password, burn the token, sign every device out."""
+    connection = db()
+    row = auth.load_reset(connection, payload.token)
+    if row is None:
+        # Unknown, expired and already-used all answer the same way.
+        raise HTTPException(400, "That reset link is no longer valid. Ask for a new one.")
+
+    try:
+        auth.validate_password(payload.new_password)
+    except auth.ValidationError as error:
+        raise HTTPException(422, str(error))
+
+    auth.consume_reset(connection, row, auth.hash_password(payload.new_password))
+    auth.clear_attempts(connection, f"reset:{client_ip(request)}")
+    connection.commit()
+
+    # Deliberately not signed in afterwards. consume_reset has just ended every
+    # session for this user, and handing out a fresh one here would undo that
+    # for whoever happens to be holding the link.
+    return {"ok": True}
 
 
 @app.post("/api/auth/password")

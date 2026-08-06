@@ -71,7 +71,13 @@
         return user ? refreshSaved() : null;
       })
       .catch(function () { user = null; })
-      .then(function () { notify(); return user; });
+      .then(function () {
+        notify();
+        // After the session is settled, so a reset link opens over a known
+        // signed-in state rather than racing it.
+        checkResetLink();
+        return user;
+      });
   }
 
   function refreshSaved() {
@@ -177,17 +183,23 @@
       '</div>',
       '<p class="auth-intro" id="auth-intro"></p>',
       '<form class="auth-form" id="auth-form" novalidate>',
-      '  <label for="auth-email">Email</label>',
-      '  <input id="auth-email" name="email" type="email" autocomplete="email" required>',
+      '  <div class="auth-email-row">',
+      '    <label for="auth-email">Email</label>',
+      '    <input id="auth-email" name="email" type="email" autocomplete="email" required>',
+      '  </div>',
       '  <div class="auth-name-row" hidden>',
       '    <label for="auth-name">Display name <span class="auth-optional">(optional)</span></label>',
       '    <input id="auth-name" name="display_name" type="text" autocomplete="nickname" maxlength="80">',
       '  </div>',
-      '  <label for="auth-password">Password</label>',
-      '  <input id="auth-password" name="password" type="password" required>',
+      '  <div class="auth-password-row">',
+      '    <label for="auth-password">Password</label>',
+      '    <input id="auth-password" name="password" type="password">',
+      '  </div>',
       '  <p class="auth-hint" id="auth-hint">At least 10 characters. A short phrase beats a short password.</p>',
       '  <p class="auth-error" id="auth-error" role="alert"></p>',
+      '  <p class="auth-notice" id="auth-notice" role="status" hidden></p>',
       '  <button type="submit" class="btn btn-primary auth-submit">Sign in</button>',
+      '  <button type="button" class="link-btn auth-forgot" id="auth-forgot">Forgotten your password?</button>',
       '</form>'
     ].join('');
 
@@ -198,22 +210,38 @@
     dialog.querySelectorAll('.auth-tab').forEach(function (tab) {
       tab.addEventListener('click', function () { setMode(tab.dataset.mode); });
     });
+    dialog.querySelector('#auth-forgot').addEventListener('click', function () {
+      setMode('forgot');
+    });
     form.addEventListener('submit', submit);
     return dialog;
   }
 
+  /* Three modes share one form: sign in, create account, and forgot -- which is
+     the same form with the password field removed, because all it needs is an
+     address. A fourth, `reset`, is entered by arriving with ?reset=<token> and
+     asks for the new password instead. */
   function setMode(next) {
     var signup = next === 'signup';
+    var forgot = next === 'forgot';
+    var reset = next === 'reset';
+
     dialog.querySelectorAll('.auth-tab').forEach(function (tab) {
       var on = tab.dataset.mode === next;
       tab.classList.toggle('is-on', on);
       tab.setAttribute('aria-selected', on ? 'true' : 'false');
     });
+    dialog.querySelector('.auth-tabs').hidden = forgot || reset;
     dialog.querySelector('.auth-name-row').hidden = !signup;
-    dialog.querySelector('.auth-submit').textContent = signup ? 'Create account' : 'Sign in';
-    dialog.querySelector('#auth-hint').hidden = !signup;
+    dialog.querySelector('.auth-email-row').hidden = reset;
+    dialog.querySelector('.auth-password-row').hidden = forgot;
+    dialog.querySelector('.auth-forgot').hidden = signup || forgot || reset;
+    dialog.querySelector('#auth-hint').hidden = !(signup || reset);
+    dialog.querySelector('.auth-submit').textContent =
+      signup ? 'Create account' : forgot ? 'Email me a link'
+      : reset ? 'Set a new password' : 'Sign in';
     dialog.querySelector('#auth-password').setAttribute(
-      'autocomplete', signup ? 'new-password' : 'current-password'
+      'autocomplete', (signup || reset) ? 'new-password' : 'current-password'
     );
     dialog.dataset.mode = next;
     errorNode.textContent = '';
@@ -226,10 +254,37 @@
     var email = form.email.value.trim();
     var password = form.password.value;
     var button = dialog.querySelector('.auth-submit');
-    var signup = dialog.dataset.mode === 'signup';
+    var mode = dialog.dataset.mode;
 
     button.disabled = true;
-    var action = signup
+
+    if (mode === 'forgot') {
+      // Always the same message, whatever the server did. The endpoint is
+      // deliberately indistinguishable for a known and an unknown address, and
+      // a UI that reported otherwise would give away what the API withholds.
+      request('POST', '/auth/forgot', { email: email }).catch(function () {})
+        .then(function () {
+          showNotice('If there is an account for ' + email + ', a reset link is on ' +
+                     'its way. It works once and expires in an hour.');
+          button.disabled = false;
+        });
+      return;
+    }
+
+    if (mode === 'reset') {
+      request('POST', '/auth/reset', { token: resetToken, new_password: password })
+        .then(function () {
+          clearResetFromUrl();
+          setMode('signin');
+          showNotice('Password changed. You have been signed out everywhere — ' +
+                     'sign in with the new one.');
+        }).catch(function (error) {
+          errorNode.textContent = error.message;
+        }).then(function () { button.disabled = false; });
+      return;
+    }
+
+    var action = mode === 'signup'
       ? signUp(email, password, form.display_name.value)
       : signIn(email, password);
 
@@ -241,6 +296,45 @@
     }).then(function () {
       button.disabled = false;
     });
+  }
+
+  var resetToken = '';
+
+  function showNotice(text) {
+    var node = dialog.querySelector('#auth-notice');
+    node.textContent = text;
+    node.hidden = false;
+    errorNode.textContent = '';
+  }
+
+  /* The token is a single-use credential sitting in the address bar. Once the
+     dialog holds it, take it out of the URL so it does not end up in a shared
+     link, a bookmark or a referrer header. */
+  function clearResetFromUrl() {
+    resetToken = '';
+    var query = new URLSearchParams(window.location.search);
+    if (!query.has('reset')) return;
+    query.delete('reset');
+    var search = query.toString();
+    window.history.replaceState({}, '',
+      search ? '?' + search : window.location.pathname);
+  }
+
+  function checkResetLink() {
+    var token = new URLSearchParams(window.location.search).get('reset');
+    if (!token) return;
+    if (!available) {
+      // A reset link is useless without the API. Say so rather than silently
+      // doing nothing with a token the user just clicked.
+      return;
+    }
+    buildDialog();
+    resetToken = token;
+    setMode('reset');
+    dialog.querySelector('#auth-intro').textContent = 'Choose a new password.';
+    dialog.querySelector('#auth-intro').hidden = false;
+    dialog.showModal();
+    dialog.querySelector('#auth-password').focus();
   }
 
   function open(mode, message) {

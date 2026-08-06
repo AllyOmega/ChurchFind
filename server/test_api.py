@@ -995,3 +995,148 @@ def test_a_truncated_snapshot_is_refused_rather_than_applied(tmp_path, monkeypat
     build_db.rebuild(connection, force=True)
     assert connection.execute("SELECT COUNT(*) FROM churches").fetchone()[0] == 3
     connection.close()
+
+
+# --------------------------------------------------------------- password reset
+
+def sent_tokens(monkeypatch):
+    """Capture reset tokens instead of sending mail."""
+    import mailer
+    captured = []
+    monkeypatch.setattr(mailer, "password_reset",
+                        lambda to, raw: captured.append((to, raw)) or True)
+    import app as module
+    monkeypatch.setattr(module.mailer, "password_reset",
+                        lambda to, raw: captured.append((to, raw)) or True)
+    return captured
+
+
+def test_forgot_answers_identically_for_known_and_unknown_addresses(client, monkeypatch):
+    """The whole design. A form that says "no account with that address" is a way
+    to test who has one, and this is a site about people's churchgoing -- a
+    membership list is not a neutral thing to leak."""
+    sent_tokens(monkeypatch)
+    register(client, email="real@example.org")
+    client.post("/api/auth/logout", headers={auth.CSRF_HEADER: csrf(client)})
+
+    known = client.post("/api/auth/forgot", json={"email": "real@example.org"})
+    unknown = client.post("/api/auth/forgot", json={"email": "nobody@example.org"})
+    malformed = client.post("/api/auth/forgot", json={"email": "not-an-address"})
+
+    assert known.status_code == unknown.status_code == malformed.status_code == 200
+    assert known.json() == unknown.json() == malformed.json() == {"ok": True}
+
+
+def test_a_reset_link_actually_changes_the_password(client, monkeypatch):
+    captured = sent_tokens(monkeypatch)
+    register(client, email="reset@example.org")
+    client.post("/api/auth/logout", headers={auth.CSRF_HEADER: csrf(client)})
+
+    client.post("/api/auth/forgot", json={"email": "reset@example.org"})
+    assert len(captured) == 1
+    token = captured[0][1]
+
+    new_password = "a-brand-new-passphrase-here"
+    done = client.post("/api/auth/reset", json={"token": token, "new_password": new_password})
+    assert done.status_code == 200
+
+    assert client.post("/api/auth/login",
+                       json={"email": "reset@example.org",
+                             "password": GOOD_PASSWORD}).status_code == 401
+    assert client.post("/api/auth/login",
+                       json={"email": "reset@example.org",
+                             "password": new_password}).status_code == 200
+
+
+def test_a_reset_link_works_once(client, monkeypatch):
+    captured = sent_tokens(monkeypatch)
+    register(client, email="once@example.org")
+    client.post("/api/auth/logout", headers={auth.CSRF_HEADER: csrf(client)})
+    client.post("/api/auth/forgot", json={"email": "once@example.org"})
+    token = captured[0][1]
+
+    first = client.post("/api/auth/reset",
+                        json={"token": token, "new_password": "first-new-passphrase"})
+    second = client.post("/api/auth/reset",
+                         json={"token": token, "new_password": "second-new-passphrase"})
+    assert first.status_code == 200
+    assert second.status_code == 400
+
+
+def test_a_reset_ends_every_existing_session(client, monkeypatch):
+    """The commonest reason to reset is that somebody else might have the
+    password. Leaving their session alive makes the reset a gesture."""
+    captured = sent_tokens(monkeypatch)
+    register(client, email="compromised@example.org")
+    assert client.get("/api/auth/me").json()["user"] is not None   # still signed in
+
+    client.post("/api/auth/forgot", json={"email": "compromised@example.org"})
+    client.post("/api/auth/reset",
+                json={"token": captured[0][1], "new_password": "an-entirely-new-phrase"})
+
+    # The old session cookie is still in the jar but no longer resolves.
+    assert client.get("/api/auth/me").json()["user"] is None
+
+
+def test_a_reset_does_not_sign_the_holder_in(client, monkeypatch):
+    """consume_reset has just ended every session; handing out a fresh one would
+    undo that for whoever is holding the link."""
+    captured = sent_tokens(monkeypatch)
+    register(client, email="nosignin@example.org")
+    client.post("/api/auth/logout", headers={auth.CSRF_HEADER: csrf(client)})
+    client.post("/api/auth/forgot", json={"email": "nosignin@example.org"})
+
+    response = client.post("/api/auth/reset",
+                           json={"token": captured[0][1], "new_password": "yet-another-phrase"})
+    assert not [c for c in response.headers.get_list("set-cookie")
+                if c.startswith(auth.SESSION_COOKIE) and "Max-Age=0" not in c]
+    assert client.get("/api/auth/me").json()["user"] is None
+
+
+def test_a_bogus_or_expired_token_is_refused(client, monkeypatch):
+    sent_tokens(monkeypatch)
+    assert client.post("/api/auth/reset",
+                       json={"token": "not-a-real-token",
+                             "new_password": "some-valid-passphrase"}).status_code == 400
+
+
+def test_a_reset_still_enforces_the_password_rules(client, monkeypatch):
+    captured = sent_tokens(monkeypatch)
+    register(client, email="weak@example.org")
+    client.post("/api/auth/logout", headers={auth.CSRF_HEADER: csrf(client)})
+    client.post("/api/auth/forgot", json={"email": "weak@example.org"})
+
+    weak = client.post("/api/auth/reset",
+                       json={"token": captured[0][1], "new_password": "password123"})
+    assert weak.status_code == 422
+    # And the token survives a rejected attempt, so the user can try again.
+    assert client.post("/api/auth/reset",
+                       json={"token": captured[0][1],
+                             "new_password": "a-perfectly-fine-phrase"}).status_code == 200
+
+
+def test_forgot_is_throttled_per_address(client, monkeypatch):
+    """Without this the endpoint is a free mail cannon pointed at anyone whose
+    address you can guess."""
+    captured = sent_tokens(monkeypatch)
+    register(client, email="flood@example.org")
+    client.post("/api/auth/logout", headers={auth.CSRF_HEADER: csrf(client)})
+
+    for _ in range(8):
+        assert client.post("/api/auth/forgot",
+                           json={"email": "flood@example.org"}).status_code == 200
+    assert len(captured) <= auth.RESET_MAX_PER_EMAIL
+
+
+def test_the_stored_token_is_a_hash_not_the_link(client, monkeypatch):
+    """Reading the table must not yield a working link."""
+    captured = sent_tokens(monkeypatch)
+    register(client, email="hashed@example.org")
+    client.post("/api/auth/logout", headers={auth.CSRF_HEADER: csrf(client)})
+    client.post("/api/auth/forgot", json={"email": "hashed@example.org"})
+    raw = captured[0][1]
+
+    stored = app_module._connection.execute(
+        "SELECT token_hash FROM password_resets").fetchall()
+    assert stored and all(row["token_hash"] != raw for row in stored)
+    assert any(row["token_hash"] == auth.token_hash(raw) for row in stored)

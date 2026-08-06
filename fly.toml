@@ -18,11 +18,17 @@ primary_region = "iad"
 [http_service]
   internal_port = 8000
   force_https = true
-  auto_stop_machines = "suspend"
+  # Cheapest shape: the machine stops when idle and starts again on the next
+  # request. You pay for the volume and for the seconds it actually runs. The
+  # cost is a cold start of a few seconds on the first request after a quiet
+  # spell -- fine for a directory nobody is paging, worth revisiting if it ever
+  # gets steady traffic.
+  auto_stop_machines = "stop"
   auto_start_machines = true
-  # One machine, because SQLite is a single file on a single volume. Scaling this
-  # horizontally needs Postgres or LiteFS first, not another machine.
-  min_machines_running = 1
+  # Zero, deliberately. One machine either way: SQLite is a single file on a
+  # single volume, and scaling this horizontally needs Postgres or LiteFS first,
+  # not another machine.
+  min_machines_running = 0
 
   [http_service.concurrency]
     type = "requests"

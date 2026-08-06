@@ -141,6 +141,55 @@ python server/build_db.py --db /data/churchfind.db
 
 which upserts over the top and leaves user data alone — see below.
 
+### Email, and password reset
+
+The server sends exactly one message, over plain SMTP — standard library, no
+third-party package, and it works with every provider rather than tying the
+project to one vendor's API.
+
+```
+CHURCHFIND_SMTP_HOST      required, or nothing is sent
+CHURCHFIND_SMTP_PORT      default 587
+CHURCHFIND_SMTP_USER      optional; no login attempted without it
+CHURCHFIND_SMTP_PASSWORD  optional
+CHURCHFIND_SMTP_TLS       starttls (default), ssl, or none
+CHURCHFIND_MAIL_FROM      default "ChurchFind <no-reply@localhost>"
+CHURCHFIND_BASE_URL       the public origin, because it goes in the link
+```
+
+On Fly: `fly secrets set CHURCHFIND_SMTP_HOST=… CHURCHFIND_SMTP_PASSWORD=…`.
+
+**With none of it set, nothing breaks.** The message is written to the log
+instead, which is how local development gets a working reset link with no mail
+server at all. That path was dead on arrival the first time: it logged at INFO,
+and since nothing here configures logging the root logger sits at WARNING with no
+handlers, so the only way to obtain a link went to the floor. It logs at WARNING
+now — mail that did not go is worth saying out loud anyway.
+
+Four decisions in the reset flow are worth stating, because each is a place the
+obvious implementation leaks something:
+
+- **The request answers identically for a known and an unknown address**, and for
+  a malformed one. A form that says "no account with that address" is a way to
+  test who has one, and this is a directory of people's churchgoing — a
+  membership list is not a neutral thing to leak. The UI repeats the same bland
+  sentence rather than reporting what the API declined to.
+- **The token is stored as a SHA-256**, like session tokens. Reading the table
+  does not yield a working link.
+- **Completing a reset ends every session for that user.** The commonest reason
+  to reset is that somebody else might have the password; leaving their session
+  alive makes the reset a gesture rather than a remedy. It also does not sign the
+  holder of the link in, which would undo that immediately.
+- **The token leaves the address bar** as soon as the dialog has it, so a
+  single-use credential does not survive in a bookmark, a shared link or a
+  referrer header.
+
+Requests are throttled per address and per IP. Without that the endpoint is a
+free mail cannon pointed at anyone whose address you can guess.
+
+Still missing: email verification at sign-up. Reset was the blocking gap — a
+forgotten password was a lost account — and verification is the next one.
+
 ### Why a rebuild no longer destroys user data
 
 `build_db.py` used to open with `DELETE FROM churches` and re-insert. Every user
@@ -869,7 +918,7 @@ server/queries.py              church search: R*Tree radius, FTS5 names
 server/auth.py                 argon2id, sessions, CSRF, throttling
 server/moderation.py           review moderation with Claude, fail-closed
 server/app.py                  FastAPI routes and the static host
-server/test_api.py             85 tests over the API, weighted to the security-critical parts
+server/test_api.py             94 tests over the API, weighted to the security-critical parts
 Dockerfile                     two-stage build; the volume holds the live database
 docker-entrypoint.sh           seeds a fresh volume once, never overwrites one
 fly.toml                       Fly config; [mounts] is the line that matters

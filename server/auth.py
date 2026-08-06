@@ -243,3 +243,70 @@ def secure_cookies():
     deployment by accident.
     """
     return os.environ.get("CHURCHFIND_INSECURE_COOKIES", "") != "1"
+
+
+# ------------------------------------------------------------- password resets
+
+# An hour. Long enough to walk to a different device and find the mail; short
+# enough that a link left sitting in an inbox stops being a spare key.
+RESET_TTL_MINUTES = 60
+RESET_MAX_PER_EMAIL = 3
+RESET_MAX_PER_IP = 10
+
+
+def create_reset(connection, user_id, requested_ip=""):
+    """Mint a reset token. Returns the raw token; only its hash is stored."""
+    raw = secrets.token_urlsafe(32)
+    moment = now()
+    connection.execute(
+        "INSERT INTO password_resets "
+        "(token_hash, user_id, created_at, expires_at, requested_ip) VALUES (?,?,?,?,?)",
+        (token_hash(raw), user_id, iso(moment),
+         iso(moment + timedelta(minutes=RESET_TTL_MINUTES)), requested_ip),
+    )
+    return raw
+
+
+def load_reset(connection, raw_token):
+    """The row for a token, or None if it is unknown, used or expired.
+
+    All three failures collapse to None on purpose. Telling the difference would
+    let somebody probe which tokens have existed.
+    """
+    if not raw_token:
+        return None
+    row = connection.execute(
+        "SELECT token_hash, user_id, expires_at, used_at FROM password_resets "
+        "WHERE token_hash = ?", (token_hash(raw_token),)
+    ).fetchone()
+    if row is None or row["used_at"]:
+        return None
+    if parse_iso(row["expires_at"]) <= now():
+        return None
+    return row
+
+
+def consume_reset(connection, row, new_password_hash):
+    """Set the password, burn the token, and end every session.
+
+    Ending sessions matters: the commonest reason to reset a password is that
+    somebody else might have it. Leaving their session alive would make the reset
+    a gesture rather than a remedy.
+
+    Every other outstanding reset for the user is burned too, so an attacker who
+    also requested one cannot use it afterwards.
+    """
+    moment = iso(now())
+    connection.execute(
+        "UPDATE users SET password_hash = ? WHERE id = ?",
+        (new_password_hash, row["user_id"]),
+    )
+    connection.execute(
+        "UPDATE password_resets SET used_at = ? WHERE user_id = ? AND used_at = ''",
+        (moment, row["user_id"]),
+    )
+    connection.execute("DELETE FROM sessions WHERE user_id = ?", (row["user_id"],))
+
+
+def prune_resets(connection):
+    connection.execute("DELETE FROM password_resets WHERE expires_at <= ?", (iso(now()),))
